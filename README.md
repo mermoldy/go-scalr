@@ -1,54 +1,13 @@
-Terraform Enterprise Go Client
+Scalr Go Client
 ==============================
-
-[![Build Status](https://travis-ci.org/hashicorp/go-tfe.svg?branch=master)](https://travis-ci.org/hashicorp/go-tfe)
-[![GitHub license](https://img.shields.io/github/license/hashicorp/go-tfe.svg)](https://github.com/hashicorp/go-tfe/blob/master/LICENSE)
-[![GoDoc](https://godoc.org/github.com/hashicorp/go-tfe?status.svg)](https://godoc.org/github.com/hashicorp/go-tfe)
-[![Go Report Card](https://goreportcard.com/badge/github.com/hashicorp/go-tfe)](https://goreportcard.com/report/github.com/hashicorp/go-tfe)
-[![GitHub issues](https://img.shields.io/github/issues/hashicorp/go-tfe.svg)](https://github.com/hashicorp/go-tfe/issues)
-
-This is an API client for [Terraform Enterprise](https://www.hashicorp.com/products/terraform).
-
-## NOTE
-
-The Terraform Enterprise API endpoints are in beta and are subject to change!
-So that means this API client is also in beta and is also subject to change. We
-will indicate any breaking changes by releasing new versions. Until the release
-of v1.0, any minor version changes will indicate possible breaking changes. Patch
-version changes will be used for both bugfixes and non-breaking changes.
-
-## Coverage
-
-Currently the following endpoints are supported:
-
-- [x] [Accounts](https://www.terraform.io/docs/enterprise/api/account.html)
-- [x] [Configuration Versions](https://www.terraform.io/docs/enterprise/api/configuration-versions.html)
-- [x] [OAuth Clients](https://www.terraform.io/docs/enterprise/api/oauth-clients.html)
-- [x] [OAuth Tokens](https://www.terraform.io/docs/enterprise/api/oauth-tokens.html)
-- [x] [Organizations](https://www.terraform.io/docs/enterprise/api/organizations.html)
-- [ ] Organization Memberships
-- [x] [Organization Tokens](https://www.terraform.io/docs/enterprise/api/organization-tokens.html)
-- [x] [Policies](https://www.terraform.io/docs/enterprise/api/policies.html)
-- [x] [Policy Sets](https://www.terraform.io/docs/enterprise/api/policy-sets.html)
-- [x] [Policy Checks](https://www.terraform.io/docs/enterprise/api/policy-checks.html)
-- [ ] [Registry Modules](https://www.terraform.io/docs/enterprise/api/modules.html)
-- [x] [Runs](https://www.terraform.io/docs/enterprise/api/run.html)
-- [x] [SSH Keys](https://www.terraform.io/docs/enterprise/api/ssh-keys.html)
-- [x] [State Versions](https://www.terraform.io/docs/enterprise/api/state-versions.html)
-- [x] [Team Access](https://www.terraform.io/docs/enterprise/api/team-access.html)
-- [x] [Team Memberships](https://www.terraform.io/docs/enterprise/api/team-members.html)
-- [x] [Team Tokens](https://www.terraform.io/docs/enterprise/api/team-tokens.html)
-- [x] [Teams](https://www.terraform.io/docs/enterprise/api/teams.html)
-- [x] [Variables](https://www.terraform.io/docs/enterprise/api/variables.html)
-- [x] [Workspaces](https://www.terraform.io/docs/enterprise/api/workspaces.html)
-- [ ] [Admin](https://www.terraform.io/docs/enterprise/api/admin/index.html)
+This is a fork of the Hashicorp Terraform Enterprise Go client.
 
 ## Installation
 
 Installation can be done with a normal `go get`:
 
 ```
-go get -u github.com/hashicorp/go-tfe
+go get -u github.com/scalr/go-tfe
 ```
 
 ## Documentation
@@ -58,7 +17,7 @@ For complete usage of the API client, see the full [package docs](https://godoc.
 ## Usage
 
 ```go
-import tfe "github.com/hashicorp/go-tfe"
+import tfe "github.com/scalr/go-tfe"
 ```
 
 Construct a new TFE client, then use the various endpoints on the client to
@@ -83,7 +42,7 @@ if err != nil {
 
 ## Examples
 
-The [examples](https://github.com/hashicorp/go-tfe/tree/master/examples) directory
+The [examples](https://github.com/scalr/go-tfe/tree/master/examples) directory
 contains a couple of examples. One of which is listed here as well:
 
 ```go
@@ -92,7 +51,7 @@ package main
 import (
 	"log"
 
-	tfe "github.com/hashicorp/go-tfe"
+	tfe "github.com/scalr/go-tfe"
 )
 
 func main() {
@@ -196,42 +155,3 @@ $ envchain YOUR_NAMESPACE_HERE go test -run TestNotificationConfiguration -v ./.
 ```sh
 $ go test -run TestNotificationConfiguration -v ./...
 ```   
-
-## Issues and Contributing
-
-If you find an issue with this package, please report an issue. If you'd like,
-we welcome any contributions. Fork this repository and submit a pull request.
-
-## Releases
-
-Documentation updates and test fixes that only touch test files don't require a release or tag. You can just merge these changes into master once they have been approved.
-
-### Creating a release
-1. Merge your approved branch into master.
-1. [Create a new release in GitHub](https://help.github.com/en/github/administering-a-repository/creating-releases).
-   - Click on "Releases" and then "Draft a new release"
-   - Set the `tag version` to a new tag, using [Semantic Versioning](https://semver.org/) as a guideline. 
-   - Set the `target` as master.
-   - Set the `Release title` to the tag you created, `vX.Y.Z`
-   - Use the description section to describe why you're releasing and what changes you've made. You should include links to merged PRs
-   - Consider using the following headers in the description of your release:
-      - BREAKING CHANGES: Use this for any changes that aren't backwards compatible. Include details on how to handle these changes.
-      - FEATURES: Use this for any large new features added, 
-      - ENHANCEMENTS: Use this for smaller new features added
-      - BUG FIXES: Use this for any bugs that were fixed.
-      - NOTES: Use this section if you need to include any additional notes on things like upgrading, upcoming deprecations, or any other information you might want to highlight.
-      
-      Markdown example:
-      
-      ```markdown
-      ENHANCEMENTS
-      * Add description of new small feature (#3)[link-to-pull-request]
-  
-      BUG FIXES
-      * Fix description of a bug (#2)[link-to-pull-request]
-      * Fix description of another bug (#1)[link-to-pull-request]
-      ```
-      
-   - Don't attach any binaries. The zip and tar.gz assets are automatically created and attached after you publish your release.    
-   - Click "Publish release" to save and publish your release.
-     
