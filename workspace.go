@@ -89,7 +89,6 @@ type Workspace struct {
 	Permissions          *WorkspacePermissions `jsonapi:"attr,permissions"`
 	QueueAllRuns         bool                  `jsonapi:"attr,queue-all-runs"`
 	TerraformVersion     string                `jsonapi:"attr,terraform-version"`
-	TriggerPrefixes      []string              `jsonapi:"attr,trigger-prefixes"`
 	VCSRepo              *VCSRepo              `jsonapi:"attr,vcs-repo"`
 	WorkingDirectory     string                `jsonapi:"attr,working-directory"`
 
@@ -189,10 +188,6 @@ type WorkspaceCreateOptions struct {
 	// The version of Terraform to use for this workspace. Upon creating a
 	// workspace, the latest version is selected unless otherwise specified.
 	TerraformVersion *string `jsonapi:"attr,terraform-version,omitempty"`
-
-	// List of repository-root-relative paths which list all locations to be
-	// tracked for changes. See FileTriggersEnabled above for more details.
-	TriggerPrefixes []string `jsonapi:"attr,trigger-prefixes,omitempty"`
 
 	// Settings for the workspace's VCS repository. If omitted, the workspace is
 	// created without a VCS repo. If included, you must specify at least the
@@ -328,10 +323,6 @@ type WorkspaceUpdateOptions struct {
 
 	// The version of Terraform to use for this workspace.
 	TerraformVersion *string `jsonapi:"attr,terraform-version,omitempty"`
-
-	// List of repository-root-relative paths which list all locations to be
-	// tracked for changes. See FileTriggersEnabled above for more details.
-	TriggerPrefixes []string `jsonapi:"attr,trigger-prefixes,omitempty"`
 
 	// To delete a workspace's existing VCS repo, specify null instead of an
 	// object. To modify a workspace's existing VCS repo, include whichever of
