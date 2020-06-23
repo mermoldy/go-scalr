@@ -97,6 +97,7 @@ type Workspace struct {
 	CurrentRun   *Run          `jsonapi:"relation,current-run"`
 	Organization *Organization `jsonapi:"relation,organization"`
 	SSHKey       *SSHKey       `jsonapi:"relation,ssh-key"`
+	CreatedBy    *User         `jsonapi:"relation,created-by"`
 }
 
 // VCSRepo contains the configuration of a VCS integration.
@@ -259,12 +260,18 @@ func (s *workspaces) Read(ctx context.Context, organization, workspace string) (
 		return nil, errors.New("invalid value for workspace")
 	}
 
+	options := struct {
+		Include string `url:"include"`
+	}{
+		Include: "created-by",
+	}
+
 	u := fmt.Sprintf(
 		"organizations/%s/workspaces/%s",
 		url.QueryEscape(organization),
 		url.QueryEscape(workspace),
 	)
-	req, err := s.client.newRequest("GET", u, nil)
+	req, err := s.client.newRequest("GET", u, options)
 	if err != nil {
 		return nil, err
 	}
@@ -284,8 +291,13 @@ func (s *workspaces) ReadByID(ctx context.Context, workspaceID string) (*Workspa
 		return nil, errors.New("invalid value for workspace ID")
 	}
 
+	options := struct {
+		Include string `url:"include"`
+	}{
+		Include: "created-by",
+	}
 	u := fmt.Sprintf("workspaces/%s", url.QueryEscape(workspaceID))
-	req, err := s.client.newRequest("GET", u, nil)
+	req, err := s.client.newRequest("GET", u, options)
 	if err != nil {
 		return nil, err
 	}
