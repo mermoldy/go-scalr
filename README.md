@@ -7,21 +7,21 @@ This is a fork of the Hashicorp Terraform Enterprise Go client.
 Installation can be done with a normal `go get`:
 
 ```
-go get -u github.com/scalr/go-tfe
+go get -u github.com/scalr/go-scalr
 ```
 
 ## Documentation
 
-For complete usage of the API client, see the full [package docs](https://godoc.org/github.com/hashicorp/go-tfe).
+For complete usage of the API client, see the full [package docs](https://godoc.org/github.com/hashicorp/go-scalr).
 
 ## Usage
 
 ```go
-import tfe "github.com/scalr/go-tfe"
+import tfe "github.com/scalr/go-scalr"
 ```
 
-Construct a new TFE client, then use the various endpoints on the client to
-access different parts of the Terraform Enterprise API. For example, to list
+Construct a new Scalr client, then use the various endpoints on the client to
+access different parts of the Scalr API. For example, to list
 all organizations:
 
 ```go
@@ -42,7 +42,7 @@ if err != nil {
 
 ## Examples
 
-The [examples](https://github.com/scalr/go-tfe/tree/master/examples) directory
+The [examples](https://github.com/scalr/go-scalr/tree/master/examples) directory
 contains a couple of examples. One of which is listed here as well:
 
 ```go
@@ -51,7 +51,7 @@ package main
 import (
 	"log"
 
-	tfe "github.com/scalr/go-tfe"
+	tfe "github.com/scalr/go-scalr"
 )
 
 func main() {
@@ -110,7 +110,7 @@ and token.
 
 You can set your environment variables up however you prefer. The following are instructions for setting up environment variables using [envchain](https://github.com/sorah/envchain).
    1. Make sure you have envchain installed. [Instructions for this can be found in the envchain README](https://github.com/sorah/envchain#installation).
-   1. Pick a namespace for storing your environment variables. I suggest `go-tfe` or something similar.
+   1. Pick a namespace for storing your environment variables. I suggest `go-scalr` or something similar.
    1. For each environment variable you need to set, run the following command:
       ```sh
       envchain --set YOUR_NAMESPACE_HERE ENVIRONMENT_VARIABLE_HERE

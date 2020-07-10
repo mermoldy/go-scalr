@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	tfe "github.com/scalr/go-tfe"
+	tfe "github.com/scalr/go-scalr"
 )
 
 func main() {

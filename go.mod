@@ -1,4 +1,4 @@
-module github.com/scalr/go-tfe
+module github.com/scalr/go-scalr
 
 require (
 	github.com/google/go-querystring v1.0.0

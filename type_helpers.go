@@ -1,4 +1,4 @@
-package tfe
+package scalr
 
 // Access returns a pointer to the given team access type.
 func Access(v AccessType) *AccessType {
