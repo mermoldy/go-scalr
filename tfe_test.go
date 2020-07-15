@@ -1,4 +1,4 @@
-package tfe
+package scalr
 
 import (
 	"context"
@@ -118,7 +118,7 @@ func TestClient_headers(t *testing.T) {
 		if r.Header.Get("Terraform-Version") != "0.11.9" {
 			t.Fatalf("unexpected Terraform version header: %q", r.Header.Get("Terraform-Version"))
 		}
-		if r.Header.Get("User-Agent") != "go-tfe" {
+		if r.Header.Get("User-Agent") != "go-scalr" {
 			t.Fatalf("unexpected user agent header: %q", r.Header.Get("User-Agent"))
 		}
 	}))

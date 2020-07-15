@@ -1,4 +1,4 @@
-package tfe
+package scalr
 
 import (
 	"context"
@@ -86,12 +86,12 @@ func TestWorkspacesCreate(t *testing.T) {
 
 	t.Run("with valid options", func(t *testing.T) {
 		options := WorkspaceCreateOptions{
-			Name:                String("foo"),
-			AutoApply:           Bool(true),
-			Operations:          Bool(true),
-			QueueAllRuns:        Bool(true),
-			TerraformVersion:    String("0.11.0"),
-			WorkingDirectory:    String("bar/"),
+			Name:             String("foo"),
+			AutoApply:        Bool(true),
+			Operations:       Bool(true),
+			QueueAllRuns:     Bool(true),
+			TerraformVersion: String("0.12.1"),
+			WorkingDirectory: String("bar/"),
 		}
 
 		w, err := client.Workspaces.Create(ctx, orgTest.Name, options)
@@ -256,7 +256,7 @@ func TestWorkspacesUpdate(t *testing.T) {
 			AutoApply:        Bool(true),
 			Operations:       Bool(true),
 			QueueAllRuns:     Bool(true),
-			TerraformVersion: String("0.10.0"),
+			TerraformVersion: String("0.12.0"),
 		}
 
 		wAfter, err := client.Workspaces.Update(ctx, orgTest.Name, wTest.Name, options)
@@ -271,12 +271,12 @@ func TestWorkspacesUpdate(t *testing.T) {
 
 	t.Run("with valid options", func(t *testing.T) {
 		options := WorkspaceUpdateOptions{
-			Name:                String(randomString(t)),
-			AutoApply:           Bool(false),
-			Operations:          Bool(false),
-			QueueAllRuns:        Bool(false),
-			TerraformVersion:    String("0.11.1"),
-			WorkingDirectory:    String("baz/"),
+			Name:             String(randomString(t)),
+			AutoApply:        Bool(false),
+			Operations:       Bool(false),
+			QueueAllRuns:     Bool(false),
+			TerraformVersion: String("0.12.2"),
+			WorkingDirectory: String("baz/"),
 		}
 
 		w, err := client.Workspaces.Update(ctx, orgTest.Name, wTest.Name, options)
@@ -335,7 +335,7 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 			AutoApply:        Bool(true),
 			Operations:       Bool(true),
 			QueueAllRuns:     Bool(true),
-			TerraformVersion: String("0.10.0"),
+			TerraformVersion: String("0.12.0"),
 		}
 
 		wAfter, err := client.Workspaces.UpdateByID(ctx, wTest.ID, options)
@@ -350,12 +350,12 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 
 	t.Run("with valid options", func(t *testing.T) {
 		options := WorkspaceUpdateOptions{
-			Name:                String(randomString(t)),
-			AutoApply:           Bool(false),
-			Operations:          Bool(false),
-			QueueAllRuns:        Bool(false),
-			TerraformVersion:    String("0.11.1"),
-			WorkingDirectory:    String("baz/"),
+			Name:             String(randomString(t)),
+			AutoApply:        Bool(false),
+			Operations:       Bool(false),
+			QueueAllRuns:     Bool(false),
+			TerraformVersion: String("0.12.2"),
+			WorkingDirectory: String("baz/"),
 		}
 
 		w, err := client.Workspaces.UpdateByID(ctx, wTest.ID, options)

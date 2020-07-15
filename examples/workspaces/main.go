@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	tfe "github.com/scalr/go-tfe"
+	tfe "github.com/scalr/go-scalr"
 )
 
 func main() {
@@ -31,7 +31,7 @@ func main() {
 	// Update the workspace
 	w, err = client.Workspaces.Update(ctx, "org-name", w.Name, tfe.WorkspaceUpdateOptions{
 		AutoApply:        tfe.Bool(false),
-		TerraformVersion: tfe.String("0.11.1"),
+		TerraformVersion: tfe.String("0.12.0"),
 		WorkingDirectory: tfe.String("my-app/infra"),
 	})
 	if err != nil {

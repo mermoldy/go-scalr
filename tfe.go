@@ -1,4 +1,4 @@
-package tfe
+package scalr
 
 import (
 	"bytes"
@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	userAgent       = "go-tfe"
+	userAgent       = "go-scalr"
 	headerRateLimit = "X-RateLimit-Limit"
 	headerRateReset = "X-RateLimit-Reset"
 
