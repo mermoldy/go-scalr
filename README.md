@@ -12,7 +12,7 @@ go get -u github.com/scalr/go-scalr
 
 ## Documentation
 
-For complete usage of the API client, see the full [package docs](https://godoc.org/github.com/hashicorp/go-scalr).
+For complete usage of the API client, see the full [package docs](https://godoc.org/github.com/scalr/go-scalr).
 
 ## Usage
 
