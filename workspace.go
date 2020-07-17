@@ -105,6 +105,7 @@ type VCSRepo struct {
 	Identifier        string `json:"identifier"`
 	IngressSubmodules bool   `json:"ingress-submodules"`
 	OAuthTokenID      string `json:"oauth-token-id"`
+	Path              string `json:"path"`
 }
 
 // WorkspaceActions represents the workspace actions.
@@ -207,6 +208,7 @@ type VCSRepoOptions struct {
 	Identifier        *string `json:"identifier,omitempty"`
 	IngressSubmodules *bool   `json:"ingress-submodules,omitempty"`
 	OAuthTokenID      *string `json:"oauth-token-id,omitempty"`
+	Path              *string `json:"path,omitempty"`
 }
 
 func (o WorkspaceCreateOptions) valid() error {
