@@ -129,6 +129,8 @@ type Client struct {
 	Users                      Users
 	Variables                  Variables
 	Workspaces                 Workspaces
+	Endpoints                  Endpoints
+	Webhooks                   Webhooks
 }
 
 // NewClient creates a new Terraform Enterprise API client.
@@ -223,6 +225,8 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.Users = &users{client: client}
 	client.Variables = &variables{client: client}
 	client.Workspaces = &workspaces{client: client}
+	client.Endpoints = &endpoints{client: client}
+	client.Webhooks = &webhooks{client: client}
 
 	return client, nil
 }
