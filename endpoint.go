@@ -95,8 +95,8 @@ type EndpointCreateOptions struct {
 	Timeout     *int    `jsonapi:"attr,timeout"`
 
 	// Relations
-	Workspace   *Workspace   `jsonapi:"relation,workspace"`
-	Environment *Environment `jsonapi:"relation,environment"`
+	Workspace   *Workspace   `jsonapi:"relation,workspace,omitempty"`
+	Environment *Environment `jsonapi:"relation,environment,omitempty"`
 	Account     *Account     `jsonapi:"relation,account"`
 }
 
@@ -104,9 +104,7 @@ func (o EndpointCreateOptions) valid() error {
 	if !validString(o.HTTPMethod) {
 		return errors.New("HTTPMethod is required")
 	}
-	if !validStringID(&o.Workspace.ID) {
-		return errors.New("invalid value for workspace ID")
-	}
+	// TODO: validate scope, HTTPMethod values, etc.
 	return nil
 }
 
