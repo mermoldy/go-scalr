@@ -42,6 +42,7 @@ type Endpoint struct {
 	Name        string `jsonapi:"attr,name"`
 	SecretKey   string `jsonapi:"attr,secret-key"`
 	Timeout     int    `jsonapi:"attr,timeout"`
+	Url         string `jsonapi:"attr,url"`
 
 	// Relations
 	Workspace   *Workspace   `jsonapi:"relation,workspace"`
@@ -89,6 +90,7 @@ type EndpointCreateOptions struct {
 	HTTPMethod  *string `jsonapi:"attr,http-method"`
 	MaxAttempts *int    `jsonapi:"attr,max-attempts"`
 	Name        *string `jsonapi:"attr,name"`
+	Url         *string `jsonapi:"attr,url"`
 	SecretKey   *string `jsonapi:"attr,secret-key"`
 	Timeout     *int    `jsonapi:"attr,timeout"`
 
@@ -156,10 +158,16 @@ func (s *endpoints) Read(ctx context.Context, endpointID string) (*Endpoint, err
 // EndpointUpdateOptions represents the options for updating an endpoint.
 type EndpointUpdateOptions struct {
 	ID          string  `jsonapi:"primary,endpoints"`
-	HTTPMethod  *string `jsonapi:"attr,http-method"`
-	MaxAttempts *int    `jsonapi:"attr,max-attempts"`
-	SecretKey   *string `jsonapi:"attr,secret-key"`
-	Timeout     *int    `jsonapi:"attr,timeout"`
+	HTTPMethod  *string `jsonapi:"attr,http-method,omitempty"`
+	MaxAttempts *int    `jsonapi:"attr,max-attempts,omitempty"`
+	Url         *string `jsonapi:"attr,url,omitempty"`
+	SecretKey   *string `jsonapi:"attr,secret-key,omitempty"`
+	Timeout     *int    `jsonapi:"attr,timeout,omitempty"`
+
+	// Relations
+	Workspace   *Workspace   `jsonapi:"relation,workspace,omitempty"`
+	Environment *Environment `jsonapi:"relation,environment,omitempty"`
+	Account     *Account     `jsonapi:"relation,account"`
 }
 
 // Update settings of an existing endpoint.

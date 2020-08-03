@@ -98,20 +98,21 @@ func (s *webhooks) List(ctx context.Context, options WebhookListOptions) (*Webho
 
 // WebhookCreateOptions represents the options for creating a new webhook.
 type WebhookCreateOptions struct {
-	// For internal use only!
-	ID      string `jsonapi:"primary,webhooks"`
-	Enabled bool   `jsonapi:"attr,enabled"`
-	Name    string `jsonapi:"attr,name"`
+	ID      string  `jsonapi:"primary,webhooks"`
+	Enabled *bool   `jsonapi:"attr,enabled"`
+	Name    *string `jsonapi:"attr,name"`
 
 	// Relations
-	Workspace   *Workspace   `jsonapi:"relation,workspace"`
-	Environment *Environment `jsonapi:"relation,environment"`
-	Account     *Account     `jsonapi:"relation,account"`
+	Workspace   *Workspace         `jsonapi:"relation,workspace,omitempty"`
+	Environment *Environment       `jsonapi:"relation,environment,omitempty"`
+	Account     *Account           `jsonapi:"relation,account"`
+	Endpoint    *Endpoint          `jsonapi:"relation,endpoint"`
+	Events      []*EventDefinition `jsonapi:"relation,events"`
 }
 
 func (o WebhookCreateOptions) valid() error {
-	if !validStringID(&o.Workspace.ID) {
-		return errors.New("invalid value for workspace ID")
+	if o.Name == nil {
+		return errors.New("missing name")
 	}
 	return nil
 }
@@ -163,8 +164,17 @@ func (s *webhooks) Read(ctx context.Context, webhookID string) (*Webhook, error)
 
 // WebhookUpdateOptions represents the options for updating an webhook.
 type WebhookUpdateOptions struct {
-	ID      string `jsonapi:"primary,webhooks"`
-	Enabled *bool  `jsonapi:"attr,enabled"`
+	// For internal use only!
+	ID      string  `jsonapi:"primary,webhooks"`
+	Enabled *bool   `jsonapi:"attr,enabled"`
+	Name    *string `jsonapi:"attr,name"`
+
+	// Relations
+	Workspace   *Workspace         `jsonapi:"relation,workspace,omitempty"`
+	Environment *Environment       `jsonapi:"relation,environment,omitempty"`
+	Account     *Account           `jsonapi:"relation,account"`
+	Endpoint    *Endpoint          `jsonapi:"relation,endpoint"`
+	Events      []*EventDefinition `jsonapi:"relation,events"`
 }
 
 // Update settings of an existing webhook.

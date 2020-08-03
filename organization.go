@@ -214,7 +214,7 @@ func (s *organizations) Create(ctx context.Context, options OrganizationCreateOp
 // Read an organization by its name.
 func (s *organizations) Read(ctx context.Context, organization string) (*Organization, error) {
 	if !validStringID(&organization) {
-		return nil, errors.New("invalid value for organization")
+		return nil, errors.New(fmt.Sprintf("invalid value for organization: %v", organization))
 	}
 
 	u := fmt.Sprintf("organizations/%s", url.QueryEscape(organization))
