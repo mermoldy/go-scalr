@@ -51,12 +51,6 @@ type Workspaces interface {
 
 	// ForceUnlock a workspace by its ID.
 	ForceUnlock(ctx context.Context, workspaceID string) (*Workspace, error)
-
-	// AssignSSHKey to a workspace.
-	AssignSSHKey(ctx context.Context, workspaceID string, options WorkspaceAssignSSHKeyOptions) (*Workspace, error)
-
-	// UnassignSSHKey from a workspace.
-	UnassignSSHKey(ctx context.Context, workspaceID string) (*Workspace, error)
 }
 
 // workspaces implements Workspaces.
@@ -542,84 +536,6 @@ func (s *workspaces) ForceUnlock(ctx context.Context, workspaceID string) (*Work
 
 	u := fmt.Sprintf("workspaces/%s/actions/force-unlock", url.QueryEscape(workspaceID))
 	req, err := s.client.newRequest("POST", u, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	w := &Workspace{}
-	err = s.client.do(ctx, req, w)
-	if err != nil {
-		return nil, err
-	}
-
-	return w, nil
-}
-
-// WorkspaceAssignSSHKeyOptions represents the options to assign an SSH key to
-// a workspace.
-type WorkspaceAssignSSHKeyOptions struct {
-	// For internal use only!
-	ID string `jsonapi:"primary,workspaces"`
-
-	// The SSH key ID to assign.
-	SSHKeyID *string `jsonapi:"attr,id"`
-}
-
-func (o WorkspaceAssignSSHKeyOptions) valid() error {
-	if !validString(o.SSHKeyID) {
-		return errors.New("SSH key ID is required")
-	}
-	if !validStringID(o.SSHKeyID) {
-		return errors.New("invalid value for SSH key ID")
-	}
-	return nil
-}
-
-// AssignSSHKey to a workspace.
-func (s *workspaces) AssignSSHKey(ctx context.Context, workspaceID string, options WorkspaceAssignSSHKeyOptions) (*Workspace, error) {
-	if !validStringID(&workspaceID) {
-		return nil, errors.New("invalid value for workspace ID")
-	}
-	if err := options.valid(); err != nil {
-		return nil, err
-	}
-
-	// Make sure we don't send a user provided ID.
-	options.ID = ""
-
-	u := fmt.Sprintf("workspaces/%s/relationships/ssh-key", url.QueryEscape(workspaceID))
-	req, err := s.client.newRequest("PATCH", u, &options)
-	if err != nil {
-		return nil, err
-	}
-
-	w := &Workspace{}
-	err = s.client.do(ctx, req, w)
-	if err != nil {
-		return nil, err
-	}
-
-	return w, nil
-}
-
-// workspaceUnassignSSHKeyOptions represents the options to unassign an SSH key
-// to a workspace.
-type workspaceUnassignSSHKeyOptions struct {
-	// For internal use only!
-	ID string `jsonapi:"primary,workspaces"`
-
-	// Must be nil to unset the currently assigned SSH key.
-	SSHKeyID *string `jsonapi:"attr,id"`
-}
-
-// UnassignSSHKey from a workspace.
-func (s *workspaces) UnassignSSHKey(ctx context.Context, workspaceID string) (*Workspace, error) {
-	if !validStringID(&workspaceID) {
-		return nil, errors.New("invalid value for workspace ID")
-	}
-
-	u := fmt.Sprintf("workspaces/%s/relationships/ssh-key", url.QueryEscape(workspaceID))
-	req, err := s.client.newRequest("PATCH", u, &workspaceUnassignSSHKeyOptions{})
 	if err != nil {
 		return nil, err
 	}

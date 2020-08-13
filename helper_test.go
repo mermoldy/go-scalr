@@ -278,32 +278,6 @@ func createEnvironment(t *testing.T, client *Client) (*Environment, func()) {
 	}
 }
 
-func createEnvironmentToken(t *testing.T, client *Client, org *Environment) (*EnvironmentToken, func()) {
-	var orgCleanup func()
-
-	if org == nil {
-		org, orgCleanup = createEnvironment(t, client)
-	}
-
-	ctx := context.Background()
-	tk, err := client.EnvironmentTokens.Generate(ctx, org.Name)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return tk, func() {
-		if err := client.EnvironmentTokens.Delete(ctx, org.Name); err != nil {
-			t.Errorf("Error destroying environment token! WARNING: Dangling resources\n"+
-				"may exist! The full error is shown below.\n\n"+
-				"EnvironmentToken: %s\nError: %s", tk.ID, err)
-		}
-
-		if orgCleanup != nil {
-			orgCleanup()
-		}
-	}
-}
-
 func createRun(t *testing.T, client *Client, w *Workspace) (*Run, func()) {
 	var wCleanup func()
 
@@ -448,35 +422,6 @@ func createPlanExport(t *testing.T, client *Client, r *Run) (*PlanExport, func()
 	}
 }
 
-func createSSHKey(t *testing.T, client *Client, org *Environment) (*SSHKey, func()) {
-	var orgCleanup func()
-
-	if org == nil {
-		org, orgCleanup = createEnvironment(t, client)
-	}
-
-	ctx := context.Background()
-	key, err := client.SSHKeys.Create(ctx, org.Name, SSHKeyCreateOptions{
-		Name:  String(randomString(t)),
-		Value: String(randomString(t)),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return key, func() {
-		if err := client.SSHKeys.Delete(ctx, key.ID); err != nil {
-			t.Errorf("Error destroying SSH key! WARNING: Dangling resources\n"+
-				"may exist! The full error is shown below.\n\n"+
-				"SSHKey: %s\nError: %s", key.Name, err)
-		}
-
-		if orgCleanup != nil {
-			orgCleanup()
-		}
-	}
-}
-
 func createStateVersion(t *testing.T, client *Client, serial int64, w *Workspace) (*StateVersion, func()) {
 	var wCleanup func()
 
@@ -516,103 +461,6 @@ func createStateVersion(t *testing.T, client *Client, serial int64, w *Workspace
 		// can only cleanup by deleting the workspace.
 		if wCleanup != nil {
 			wCleanup()
-		}
-	}
-}
-
-func createTeam(t *testing.T, client *Client, org *Environment) (*Team, func()) {
-	var orgCleanup func()
-
-	if org == nil {
-		org, orgCleanup = createEnvironment(t, client)
-	}
-
-	ctx := context.Background()
-	tm, err := client.Teams.Create(ctx, org.Name, TeamCreateOptions{
-		Name:              String(randomString(t)),
-		EnvironmentAccess: &EnvironmentAccessOptions{ManagePolicies: Bool(true)},
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return tm, func() {
-		if err := client.Teams.Delete(ctx, tm.ID); err != nil {
-			t.Errorf("Error destroying team! WARNING: Dangling resources\n"+
-				"may exist! The full error is shown below.\n\n"+
-				"Team: %s\nError: %s", tm.Name, err)
-		}
-
-		if orgCleanup != nil {
-			orgCleanup()
-		}
-	}
-}
-
-func createTeamAccess(t *testing.T, client *Client, tm *Team, w *Workspace, org *Environment) (*TeamAccess, func()) {
-	var orgCleanup, tmCleanup func()
-
-	if org == nil {
-		org, orgCleanup = createEnvironment(t, client)
-	}
-
-	if tm == nil {
-		tm, tmCleanup = createTeam(t, client, org)
-	}
-
-	if w == nil {
-		w, _ = createWorkspace(t, client, org)
-	}
-
-	ctx := context.Background()
-	ta, err := client.TeamAccess.Add(ctx, TeamAccessAddOptions{
-		Access:    Access(AccessAdmin),
-		Team:      tm,
-		Workspace: w,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return ta, func() {
-		if err := client.TeamAccess.Remove(ctx, ta.ID); err != nil {
-			t.Errorf("Error removing team access! WARNING: Dangling resources\n"+
-				"may exist! The full error is shown below.\n\n"+
-				"TeamAccess: %s\nError: %s", ta.ID, err)
-		}
-
-		if tmCleanup != nil {
-			tmCleanup()
-		}
-
-		if orgCleanup != nil {
-			orgCleanup()
-		}
-	}
-}
-
-func createTeamToken(t *testing.T, client *Client, tm *Team) (*TeamToken, func()) {
-	var tmCleanup func()
-
-	if tm == nil {
-		tm, tmCleanup = createTeam(t, client, nil)
-	}
-
-	ctx := context.Background()
-	tt, err := client.TeamTokens.Generate(ctx, tm.ID)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return tt, func() {
-		if err := client.TeamTokens.Delete(ctx, tm.ID); err != nil {
-			t.Errorf("Error destroying team token! WARNING: Dangling resources\n"+
-				"may exist! The full error is shown below.\n\n"+
-				"TeamToken: %s\nError: %s", tm.ID, err)
-		}
-
-		if tmCleanup != nil {
-			tmCleanup()
 		}
 	}
 }
