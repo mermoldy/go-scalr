@@ -16,7 +16,7 @@ func TestStateVersionsList(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	orgTest, orgTestCleanup := createOrganization(t, client)
+	orgTest, orgTestCleanup := createEnvironment(t, client)
 	defer orgTestCleanup()
 
 	wTest, wTestCleanup := createWorkspace(t, client, orgTest)
@@ -27,8 +27,8 @@ func TestStateVersionsList(t *testing.T) {
 
 	t.Run("without list options", func(t *testing.T) {
 		options := StateVersionListOptions{
-			Organization: String(orgTest.Name),
-			Workspace:    String(wTest.Name),
+			Environment: String(orgTest.Name),
+			Workspace:   String(wTest.Name),
 		}
 
 		svl, err := client.StateVersions.List(ctx, options)
@@ -58,8 +58,8 @@ func TestStateVersionsList(t *testing.T) {
 				PageNumber: 999,
 				PageSize:   100,
 			},
-			Organization: String(orgTest.Name),
-			Workspace:    String(wTest.Name),
+			Environment: String(orgTest.Name),
+			Workspace:   String(wTest.Name),
 		}
 
 		svl, err := client.StateVersions.List(ctx, options)
@@ -69,19 +69,19 @@ func TestStateVersionsList(t *testing.T) {
 		assert.Equal(t, 2, svl.TotalCount)
 	})
 
-	t.Run("without an organization", func(t *testing.T) {
+	t.Run("without an environment", func(t *testing.T) {
 		options := StateVersionListOptions{
 			Workspace: String(wTest.Name),
 		}
 
 		svl, err := client.StateVersions.List(ctx, options)
 		assert.Nil(t, svl)
-		assert.EqualError(t, err, "organization is required")
+		assert.EqualError(t, err, "environment is required")
 	})
 
 	t.Run("without a workspace", func(t *testing.T) {
 		options := StateVersionListOptions{
-			Organization: String(orgTest.Name),
+			Environment: String(orgTest.Name),
 		}
 
 		svl, err := client.StateVersions.List(ctx, options)

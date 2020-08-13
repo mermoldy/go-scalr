@@ -11,10 +11,7 @@ import (
 // Compile-time proof of interface implementation.
 var _ Runs = (*runs)(nil)
 
-// Runs describes all the run related methods that the Terraform Enterprise
-// API supports.
-//
-// TFE API docs: https://www.terraform.io/docs/enterprise/api/run.html
+// Runs describes all the run related methods that the Scalr API supports.
 type Runs interface {
 	// List all the runs of the given workspace.
 	List(ctx context.Context, workspaceID string, options RunListOptions) (*RunList, error)
@@ -84,7 +81,7 @@ type RunList struct {
 	Items []*Run
 }
 
-// Run represents a Terraform Enterprise run.
+// Run represents a Scalr run.
 type Run struct {
 	ID                     string               `jsonapi:"primary,runs"`
 	Actions                *RunActions          `jsonapi:"attr,actions"`

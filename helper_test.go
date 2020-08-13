@@ -117,11 +117,11 @@ func createNotificationConfiguration(t *testing.T, client *Client, w *Workspace)
 	}
 }
 
-func createPolicySet(t *testing.T, client *Client, org *Organization, policies []*Policy, workspaces []*Workspace) (*PolicySet, func()) {
+func createPolicySet(t *testing.T, client *Client, org *Environment, policies []*Policy, workspaces []*Workspace) (*PolicySet, func()) {
 	var orgCleanup func()
 
 	if org == nil {
-		org, orgCleanup = createOrganization(t, client)
+		org, orgCleanup = createEnvironment(t, client)
 	}
 
 	ctx := context.Background()
@@ -147,11 +147,11 @@ func createPolicySet(t *testing.T, client *Client, org *Organization, policies [
 	}
 }
 
-func createPolicy(t *testing.T, client *Client, org *Organization) (*Policy, func()) {
+func createPolicy(t *testing.T, client *Client, org *Environment) (*Policy, func()) {
 	var orgCleanup func()
 
 	if org == nil {
-		org, orgCleanup = createOrganization(t, client)
+		org, orgCleanup = createEnvironment(t, client)
 	}
 
 	name := randomString(t)
@@ -184,11 +184,11 @@ func createPolicy(t *testing.T, client *Client, org *Organization) (*Policy, fun
 	}
 }
 
-func createUploadedPolicy(t *testing.T, client *Client, pass bool, org *Organization) (*Policy, func()) {
+func createUploadedPolicy(t *testing.T, client *Client, pass bool, org *Environment) (*Policy, func()) {
 	var orgCleanup func()
 
 	if org == nil {
-		org, orgCleanup = createOrganization(t, client)
+		org, orgCleanup = createEnvironment(t, client)
 	}
 
 	p, pCleanup := createPolicy(t, client, org)
@@ -213,11 +213,11 @@ func createUploadedPolicy(t *testing.T, client *Client, pass bool, org *Organiza
 	}
 }
 
-func createOAuthClient(t *testing.T, client *Client, org *Organization) (*OAuthClient, func()) {
+func createOAuthClient(t *testing.T, client *Client, org *Environment) (*OAuthClient, func()) {
 	var orgCleanup func()
 
 	if org == nil {
-		org, orgCleanup = createOrganization(t, client)
+		org, orgCleanup = createEnvironment(t, client)
 	}
 
 	githubToken := os.Getenv("GITHUB_TOKEN")
@@ -254,14 +254,14 @@ func createOAuthClient(t *testing.T, client *Client, org *Organization) (*OAuthC
 	}
 }
 
-func createOAuthToken(t *testing.T, client *Client, org *Organization) (*OAuthToken, func()) {
+func createOAuthToken(t *testing.T, client *Client, org *Environment) (*OAuthToken, func()) {
 	ocTest, ocTestCleanup := createOAuthClient(t, client, org)
 	return ocTest.OAuthTokens[0], ocTestCleanup
 }
 
-func createOrganization(t *testing.T, client *Client) (*Organization, func()) {
+func createEnvironment(t *testing.T, client *Client) (*Environment, func()) {
 	ctx := context.Background()
-	org, err := client.Organizations.Create(ctx, OrganizationCreateOptions{
+	org, err := client.Environments.Create(ctx, EnvironmentCreateOptions{
 		Name:  String("tst-" + randomString(t)),
 		Email: String(fmt.Sprintf("%s@tfe.local", randomString(t))),
 	})
@@ -270,32 +270,32 @@ func createOrganization(t *testing.T, client *Client) (*Organization, func()) {
 	}
 
 	return org, func() {
-		if err := client.Organizations.Delete(ctx, org.Name); err != nil {
-			t.Errorf("Error destroying organization! WARNING: Dangling resources\n"+
+		if err := client.Environments.Delete(ctx, org.Name); err != nil {
+			t.Errorf("Error destroying environment! WARNING: Dangling resources\n"+
 				"may exist! The full error is shown below.\n\n"+
-				"Organization: %s\nError: %s", org.Name, err)
+				"Environment: %s\nError: %s", org.Name, err)
 		}
 	}
 }
 
-func createOrganizationToken(t *testing.T, client *Client, org *Organization) (*OrganizationToken, func()) {
+func createEnvironmentToken(t *testing.T, client *Client, org *Environment) (*EnvironmentToken, func()) {
 	var orgCleanup func()
 
 	if org == nil {
-		org, orgCleanup = createOrganization(t, client)
+		org, orgCleanup = createEnvironment(t, client)
 	}
 
 	ctx := context.Background()
-	tk, err := client.OrganizationTokens.Generate(ctx, org.Name)
+	tk, err := client.EnvironmentTokens.Generate(ctx, org.Name)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	return tk, func() {
-		if err := client.OrganizationTokens.Delete(ctx, org.Name); err != nil {
-			t.Errorf("Error destroying organization token! WARNING: Dangling resources\n"+
+		if err := client.EnvironmentTokens.Delete(ctx, org.Name); err != nil {
+			t.Errorf("Error destroying environment token! WARNING: Dangling resources\n"+
 				"may exist! The full error is shown below.\n\n"+
-				"OrganizationToken: %s\nError: %s", tk.ID, err)
+				"EnvironmentToken: %s\nError: %s", tk.ID, err)
 		}
 
 		if orgCleanup != nil {
@@ -448,11 +448,11 @@ func createPlanExport(t *testing.T, client *Client, r *Run) (*PlanExport, func()
 	}
 }
 
-func createSSHKey(t *testing.T, client *Client, org *Organization) (*SSHKey, func()) {
+func createSSHKey(t *testing.T, client *Client, org *Environment) (*SSHKey, func()) {
 	var orgCleanup func()
 
 	if org == nil {
-		org, orgCleanup = createOrganization(t, client)
+		org, orgCleanup = createEnvironment(t, client)
 	}
 
 	ctx := context.Background()
@@ -520,17 +520,17 @@ func createStateVersion(t *testing.T, client *Client, serial int64, w *Workspace
 	}
 }
 
-func createTeam(t *testing.T, client *Client, org *Organization) (*Team, func()) {
+func createTeam(t *testing.T, client *Client, org *Environment) (*Team, func()) {
 	var orgCleanup func()
 
 	if org == nil {
-		org, orgCleanup = createOrganization(t, client)
+		org, orgCleanup = createEnvironment(t, client)
 	}
 
 	ctx := context.Background()
 	tm, err := client.Teams.Create(ctx, org.Name, TeamCreateOptions{
-		Name:               String(randomString(t)),
-		OrganizationAccess: &OrganizationAccessOptions{ManagePolicies: Bool(true)},
+		Name:              String(randomString(t)),
+		EnvironmentAccess: &EnvironmentAccessOptions{ManagePolicies: Bool(true)},
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -549,11 +549,11 @@ func createTeam(t *testing.T, client *Client, org *Organization) (*Team, func())
 	}
 }
 
-func createTeamAccess(t *testing.T, client *Client, tm *Team, w *Workspace, org *Organization) (*TeamAccess, func()) {
+func createTeamAccess(t *testing.T, client *Client, tm *Team, w *Workspace, org *Environment) (*TeamAccess, func()) {
 	var orgCleanup, tmCleanup func()
 
 	if org == nil {
-		org, orgCleanup = createOrganization(t, client)
+		org, orgCleanup = createEnvironment(t, client)
 	}
 
 	if tm == nil {
@@ -648,11 +648,11 @@ func createVariable(t *testing.T, client *Client, w *Workspace) (*Variable, func
 	}
 }
 
-func createWorkspace(t *testing.T, client *Client, org *Organization) (*Workspace, func()) {
+func createWorkspace(t *testing.T, client *Client, org *Environment) (*Workspace, func()) {
 	var orgCleanup func()
 
 	if org == nil {
-		org, orgCleanup = createOrganization(t, client)
+		org, orgCleanup = createEnvironment(t, client)
 	}
 
 	ctx := context.Background()
@@ -676,11 +676,11 @@ func createWorkspace(t *testing.T, client *Client, org *Organization) (*Workspac
 	}
 }
 
-func createWorkspaceWithVCS(t *testing.T, client *Client, org *Organization) (*Workspace, func()) {
+func createWorkspaceWithVCS(t *testing.T, client *Client, org *Environment) (*Workspace, func()) {
 	var orgCleanup func()
 
 	if org == nil {
-		org, orgCleanup = createOrganization(t, client)
+		org, orgCleanup = createEnvironment(t, client)
 	}
 
 	oc, ocCleanup := createOAuthToken(t, client, org)

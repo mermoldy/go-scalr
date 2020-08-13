@@ -146,11 +146,11 @@ func TestClient_headers(t *testing.T) {
 	ctx := context.Background()
 
 	// Make a few calls so we can check they all send the expected headers.
-	_, _ = client.Organizations.List(ctx, OrganizationListOptions{})
+	_, _ = client.Environments.List(ctx, EnvironmentListOptions{})
 	_, _ = client.Plans.Logs(ctx, "plan-123456789")
 	_ = client.Runs.Apply(ctx, "run-123456789", RunApplyOptions{})
 	_, _ = client.Workspaces.Lock(ctx, "ws-123456789", WorkspaceLockOptions{})
-	_, _ = client.Workspaces.Read(ctx, "organization", "workspace")
+	_, _ = client.Workspaces.Read(ctx, "environment", "workspace")
 
 	if testedCalls != 6 {
 		t.Fatalf("expected 6 tested calls, got: %d", testedCalls)
@@ -193,11 +193,11 @@ func TestClient_userAgent(t *testing.T) {
 	ctx := context.Background()
 
 	// Make a few calls so we can check they all send the expected headers.
-	_, _ = client.Organizations.List(ctx, OrganizationListOptions{})
+	_, _ = client.Environments.List(ctx, EnvironmentListOptions{})
 	_, _ = client.Plans.Logs(ctx, "plan-123456789")
 	_ = client.Runs.Apply(ctx, "run-123456789", RunApplyOptions{})
 	_, _ = client.Workspaces.Lock(ctx, "ws-123456789", WorkspaceLockOptions{})
-	_, _ = client.Workspaces.Read(ctx, "organization", "workspace")
+	_, _ = client.Workspaces.Read(ctx, "environment", "workspace")
 
 	if testedCalls != 6 {
 		t.Fatalf("expected 6 tested calls, got: %d", testedCalls)

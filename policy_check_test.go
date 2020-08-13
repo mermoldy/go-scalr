@@ -13,7 +13,7 @@ func TestPolicyChecksList(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	orgTest, orgTestCleanup := createOrganization(t, client)
+	orgTest, orgTestCleanup := createEnvironment(t, client)
 	defer orgTestCleanup()
 
 	pTest1, _ := createUploadedPolicy(t, client, true, orgTest)
@@ -76,7 +76,7 @@ func TestPolicyChecksRead(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	orgTest, orgTestCleanup := createOrganization(t, client)
+	orgTest, orgTestCleanup := createEnvironment(t, client)
 	defer orgTestCleanup()
 
 	pTest, _ := createUploadedPolicy(t, client, true, orgTest)
@@ -91,7 +91,7 @@ func TestPolicyChecksRead(t *testing.T) {
 		require.NoError(t, err)
 
 		assert.NotEmpty(t, pc.Permissions)
-		assert.Equal(t, PolicyScopeOrganization, pc.Scope)
+		assert.Equal(t, PolicyScopeEnvironment, pc.Scope)
 		assert.Equal(t, PolicyPasses, pc.Status)
 		assert.NotEmpty(t, pc.StatusTimestamps)
 
@@ -118,7 +118,7 @@ func TestPolicyChecksOverride(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	orgTest, orgTestCleanup := createOrganization(t, client)
+	orgTest, orgTestCleanup := createEnvironment(t, client)
 	defer orgTestCleanup()
 
 	t.Run("when the policy failed", func(t *testing.T) {
@@ -169,7 +169,7 @@ func TestPolicyChecksLogs(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	orgTest, orgTestCleanup := createOrganization(t, client)
+	orgTest, orgTestCleanup := createEnvironment(t, client)
 	defer orgTestCleanup()
 
 	pTest, _ := createUploadedPolicy(t, client, true, orgTest)

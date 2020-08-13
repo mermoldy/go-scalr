@@ -13,7 +13,7 @@ func TestPolicySetsList(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	orgTest, orgTestCleanup := createOrganization(t, client)
+	orgTest, orgTestCleanup := createEnvironment(t, client)
 	defer orgTestCleanup()
 
 	psTest1, _ := createPolicySet(t, client, orgTest, nil, nil)
@@ -60,10 +60,10 @@ func TestPolicySetsList(t *testing.T) {
 		assert.Equal(t, 1, psl.TotalCount)
 	})
 
-	t.Run("without a valid organization", func(t *testing.T) {
+	t.Run("without a valid environment", func(t *testing.T) {
 		ps, err := client.PolicySets.List(ctx, badIdentifier, PolicySetListOptions{})
 		assert.Nil(t, ps)
-		assert.EqualError(t, err, "invalid value for organization")
+		assert.EqualError(t, err, "invalid value for environment")
 	})
 }
 
@@ -71,7 +71,7 @@ func TestPolicySetsCreate(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	orgTest, orgTestCleanup := createOrganization(t, client)
+	orgTest, orgTestCleanup := createEnvironment(t, client)
 	defer orgTestCleanup()
 
 	t.Run("with valid attributes", func(t *testing.T) {
@@ -170,12 +170,12 @@ func TestPolicySetsCreate(t *testing.T) {
 		assert.EqualError(t, err, "invalid value for name")
 	})
 
-	t.Run("without a valid organization", func(t *testing.T) {
+	t.Run("without a valid environment", func(t *testing.T) {
 		ps, err := client.PolicySets.Create(ctx, badIdentifier, PolicySetCreateOptions{
 			Name: String("policy-set"),
 		})
 		assert.Nil(t, ps)
-		assert.EqualError(t, err, "invalid value for organization")
+		assert.EqualError(t, err, "invalid value for environment")
 	})
 }
 
@@ -183,7 +183,7 @@ func TestPolicySetsRead(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	orgTest, orgTestCleanup := createOrganization(t, client)
+	orgTest, orgTestCleanup := createEnvironment(t, client)
 	defer orgTestCleanup()
 
 	psTest, _ := createPolicySet(t, client, orgTest, nil, nil)
@@ -206,7 +206,7 @@ func TestPolicySetsUpdate(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	orgTest, orgTestCleanup := createOrganization(t, client)
+	orgTest, orgTestCleanup := createEnvironment(t, client)
 	defer orgTestCleanup()
 
 	psTest, _ := createPolicySet(t, client, orgTest, nil, nil)
@@ -247,7 +247,7 @@ func TestPolicySetsAddPolicies(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	orgTest, orgTestCleanup := createOrganization(t, client)
+	orgTest, orgTestCleanup := createEnvironment(t, client)
 	defer orgTestCleanup()
 
 	pTest1, _ := createPolicy(t, client, orgTest)
@@ -297,7 +297,7 @@ func TestPolicySetsRemovePolicies(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	orgTest, orgTestCleanup := createOrganization(t, client)
+	orgTest, orgTestCleanup := createEnvironment(t, client)
 	defer orgTestCleanup()
 
 	pTest1, _ := createPolicy(t, client, orgTest)
@@ -341,7 +341,7 @@ func TestPolicySetsAddWorkspaces(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	orgTest, orgTestCleanup := createOrganization(t, client)
+	orgTest, orgTestCleanup := createEnvironment(t, client)
 	defer orgTestCleanup()
 
 	wTest1, _ := createWorkspace(t, client, orgTest)
@@ -405,7 +405,7 @@ func TestPolicySetsRemoveWorkspaces(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	orgTest, orgTestCleanup := createOrganization(t, client)
+	orgTest, orgTestCleanup := createEnvironment(t, client)
 	defer orgTestCleanup()
 
 	wTest1, _ := createWorkspace(t, client, orgTest)
@@ -463,7 +463,7 @@ func TestPolicySetsDelete(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	orgTest, orgTestCleanup := createOrganization(t, client)
+	orgTest, orgTestCleanup := createEnvironment(t, client)
 	defer orgTestCleanup()
 
 	psTest, _ := createPolicySet(t, client, orgTest, nil, nil)

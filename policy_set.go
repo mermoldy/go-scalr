@@ -11,16 +11,13 @@ import (
 // Compile-time proof of interface implementation.
 var _ PolicySets = (*policySets)(nil)
 
-// PolicySets describes all the policy set related methods that the Terraform
-// Enterprise API supports.
-//
-// TFE API docs: https://www.terraform.io/docs/enterprise/api/policies.html
+// PolicySets describes all the policy set related methods that the Scalr API supports.
 type PolicySets interface {
-	// List all the policy sets for a given organization.
-	List(ctx context.Context, organization string, options PolicySetListOptions) (*PolicySetList, error)
+	// List all the policy sets for a given environment.
+	List(ctx context.Context, environment string, options PolicySetListOptions) (*PolicySetList, error)
 
-	// Create a policy set and associate it with an organization.
-	Create(ctx context.Context, organization string, options PolicySetCreateOptions) (*PolicySet, error)
+	// Create a policy set and associate it with an environment.
+	Create(ctx context.Context, environment string, options PolicySetCreateOptions) (*PolicySet, error)
 
 	// Read a policy set by its ID.
 	Read(ctx context.Context, policySetID string) (*PolicySet, error)
@@ -57,7 +54,7 @@ type PolicySetList struct {
 	Items []*PolicySet
 }
 
-// PolicySet represents a Terraform Enterprise policy set.
+// PolicySet represents a Scalr policy set.
 type PolicySet struct {
 	ID             string    `jsonapi:"primary,policy-sets"`
 	Name           string    `jsonapi:"attr,name"`
@@ -71,9 +68,9 @@ type PolicySet struct {
 	UpdatedAt      time.Time `jsonapi:"attr,updated-at,iso8601"`
 
 	// Relations
-	Organization *Organization `jsonapi:"relation,organization"`
-	Policies     []*Policy     `jsonapi:"relation,policies"`
-	Workspaces   []*Workspace  `jsonapi:"relation,workspaces"`
+	Environment *Environment `jsonapi:"relation,organization"`
+	Policies    []*Policy    `jsonapi:"relation,policies"`
+	Workspaces  []*Workspace `jsonapi:"relation,workspaces"`
 }
 
 // PolicySetListOptions represents the options for listing policy sets.
@@ -84,13 +81,13 @@ type PolicySetListOptions struct {
 	Search *string `url:"search[name],omitempty"`
 }
 
-// List all the policies for a given organization.
-func (s *policySets) List(ctx context.Context, organization string, options PolicySetListOptions) (*PolicySetList, error) {
-	if !validStringID(&organization) {
-		return nil, errors.New("invalid value for organization")
+// List all the policies for a given environment.
+func (s *policySets) List(ctx context.Context, environment string, options PolicySetListOptions) (*PolicySetList, error) {
+	if !validStringID(&environment) {
+		return nil, errors.New("invalid value for environment")
 	}
 
-	u := fmt.Sprintf("organizations/%s/policy-sets", url.QueryEscape(organization))
+	u := fmt.Sprintf("organizations/%s/policy-sets", url.QueryEscape(environment))
 	req, err := s.client.newRequest("GET", u, &options)
 	if err != nil {
 		return nil, err
@@ -148,10 +145,10 @@ func (o PolicySetCreateOptions) valid() error {
 	return nil
 }
 
-// Create a policy set and associate it with an organization.
-func (s *policySets) Create(ctx context.Context, organization string, options PolicySetCreateOptions) (*PolicySet, error) {
-	if !validStringID(&organization) {
-		return nil, errors.New("invalid value for organization")
+// Create a policy set and associate it with an environment.
+func (s *policySets) Create(ctx context.Context, environment string, options PolicySetCreateOptions) (*PolicySet, error) {
+	if !validStringID(&environment) {
+		return nil, errors.New("invalid value for environment")
 	}
 	if err := options.valid(); err != nil {
 		return nil, err
@@ -160,7 +157,7 @@ func (s *policySets) Create(ctx context.Context, organization string, options Po
 	// Make sure we don't send a user provided ID.
 	options.ID = ""
 
-	u := fmt.Sprintf("organizations/%s/policy-sets", url.QueryEscape(organization))
+	u := fmt.Sprintf("organizations/%s/policy-sets", url.QueryEscape(environment))
 	req, err := s.client.newRequest("POST", u, &options)
 	if err != nil {
 		return nil, err

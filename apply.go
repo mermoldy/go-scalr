@@ -12,10 +12,7 @@ import (
 // Compile-time proof of interface implementation.
 var _ Applies = (*applies)(nil)
 
-// Applies describes all the apply related methods that the Terraform
-// Enterprise API supports.
-//
-// TFE API docs: https://www.terraform.io/docs/enterprise/api/apply.html
+// Applies describes all the apply related methods that the Scalr API supports.
 type Applies interface {
 	// Read an apply by its ID.
 	Read(ctx context.Context, applyID string) (*Apply, error)
@@ -45,7 +42,7 @@ const (
 	ApplyUnreachable ApplyStatus = "unreachable"
 )
 
-// Apply represents a Terraform Enterprise apply.
+// Apply represents a Scalr apply.
 type Apply struct {
 	ID                   string                 `jsonapi:"primary,applies"`
 	LogReadURL           string                 `jsonapi:"attr,log-read-url"`

@@ -28,10 +28,10 @@ const (
 	headerRateLimit = "X-RateLimit-Limit"
 	headerRateReset = "X-RateLimit-Reset"
 
-	// DefaultAddress of Terraform Enterprise.
-	DefaultAddress = "https://app.terraform.io"
+	// DefaultAddress of Scalr.
+	DefaultAddress = "https://my.scalr.com"
 	// DefaultBasePath on which the API is served.
-	DefaultBasePath = "/api/v2/"
+	DefaultBasePath = "/api/iacp/v3/"
 	// No-op API endpoint used to configure the rate limiter
 	PingEndpoint = "ping"
 )
@@ -55,13 +55,13 @@ type RetryLogHook func(attemptNum int, resp *http.Response)
 
 // Config provides configuration details to the API client.
 type Config struct {
-	// The address of the Terraform Enterprise API.
+	// The address of the Scalr API.
 	Address string
 
 	// The base path on which the API is served.
 	BasePath string
 
-	// API token used to access the Terraform Enterprise API.
+	// API token used to access the Scalr API.
 	Token string
 
 	// Headers that will be added to every request.
@@ -95,8 +95,8 @@ func DefaultConfig() *Config {
 	return config
 }
 
-// Client is the Terraform Enterprise API client. It provides the basic
-// connectivity and configuration for accessing the TFE API.
+// Client is the Scalr API client. It provides the basic
+// connectivity and configuration for accessing the Scalr API.
 type Client struct {
 	baseURL           *url.URL
 	token             string
@@ -110,28 +110,20 @@ type Client struct {
 	ConfigurationVersions      ConfigurationVersions
 	CostEstimates              CostEstimates
 	NotificationConfigurations NotificationConfigurations
-	OAuthClients               OAuthClients
-	OAuthTokens                OAuthTokens
-	Organizations              Organizations
-	OrganizationTokens         OrganizationTokens
+	Environments               Environments
 	Plans                      Plans
 	PlanExports                PlanExports
 	Policies                   Policies
 	PolicyChecks               PolicyChecks
 	PolicySets                 PolicySets
 	Runs                       Runs
-	SSHKeys                    SSHKeys
 	StateVersions              StateVersions
-	Teams                      Teams
-	TeamAccess                 TeamAccesses
-	TeamMembers                TeamMembers
-	TeamTokens                 TeamTokens
 	Users                      Users
 	Variables                  Variables
 	Workspaces                 Workspaces
 }
 
-// NewClient creates a new Terraform Enterprise API client.
+// NewClient creates a new Scalr API client.
 func NewClient(cfg *Config) (*Client, error) {
 	config := DefaultConfig()
 
@@ -204,22 +196,14 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.ConfigurationVersions = &configurationVersions{client: client}
 	client.CostEstimates = &costEstimates{client: client}
 	client.NotificationConfigurations = &notificationConfigurations{client: client}
-	client.OAuthClients = &oAuthClients{client: client}
-	client.OAuthTokens = &oAuthTokens{client: client}
-	client.Organizations = &organizations{client: client}
-	client.OrganizationTokens = &organizationTokens{client: client}
+	client.Environments = &environments{client: client}
 	client.Plans = &plans{client: client}
 	client.PlanExports = &planExports{client: client}
 	client.Policies = &policies{client: client}
 	client.PolicyChecks = &policyChecks{client: client}
 	client.PolicySets = &policySets{client: client}
 	client.Runs = &runs{client: client}
-	client.SSHKeys = &sshKeys{client: client}
 	client.StateVersions = &stateVersions{client: client}
-	client.Teams = &teams{client: client}
-	client.TeamAccess = &teamAccesses{client: client}
-	client.TeamMembers = &teamMembers{client: client}
-	client.TeamTokens = &teamTokens{client: client}
 	client.Users = &users{client: client}
 	client.Variables = &variables{client: client}
 	client.Workspaces = &workspaces{client: client}

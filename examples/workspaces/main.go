@@ -4,15 +4,15 @@ import (
 	"context"
 	"log"
 
-	tfe "github.com/scalr/go-scalr"
+	scalr "github.com/scalr/go-scalr"
 )
 
 func main() {
-	config := &tfe.Config{
+	config := &scalr.Config{
 		Token: "insert-your-token-here",
 	}
 
-	client, err := tfe.NewClient(config)
+	client, err := scalr.NewClient(config)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -21,18 +21,18 @@ func main() {
 	ctx := context.Background()
 
 	// Create a new workspace
-	w, err := client.Workspaces.Create(ctx, "org-name", tfe.WorkspaceCreateOptions{
-		Name: tfe.String("my-app-tst"),
+	w, err := client.Workspaces.Create(ctx, "org-name", scalr.WorkspaceCreateOptions{
+		Name: scalr.String("my-app-tst"),
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Update the workspace
-	w, err = client.Workspaces.Update(ctx, "org-name", w.Name, tfe.WorkspaceUpdateOptions{
-		AutoApply:        tfe.Bool(false),
-		TerraformVersion: tfe.String("0.12.0"),
-		WorkingDirectory: tfe.String("my-app/infra"),
+	w, err = client.Workspaces.Update(ctx, "org-name", w.Name, scalr.WorkspaceUpdateOptions{
+		AutoApply:        scalr.Bool(false),
+		TerraformVersion: scalr.String("0.12.0"),
+		WorkingDirectory: scalr.String("my-app/infra"),
 	})
 	if err != nil {
 		log.Fatal(err)

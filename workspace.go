@@ -11,37 +11,34 @@ import (
 // Compile-time proof of interface implementation.
 var _ Workspaces = (*workspaces)(nil)
 
-// Workspaces describes all the workspace related methods that the Terraform
-// Enterprise API supports.
-//
-// TFE API docs: https://www.terraform.io/docs/enterprise/api/workspaces.html
+// Workspaces describes all the workspace related methods that the Scalr API supports.
 type Workspaces interface {
-	// List all the workspaces within an organization.
-	List(ctx context.Context, organization string, options WorkspaceListOptions) (*WorkspaceList, error)
+	// List all the workspaces within an environment.
+	List(ctx context.Context, environment string, options WorkspaceListOptions) (*WorkspaceList, error)
 
 	// Create is used to create a new workspace.
-	Create(ctx context.Context, organization string, options WorkspaceCreateOptions) (*Workspace, error)
+	Create(ctx context.Context, environment string, options WorkspaceCreateOptions) (*Workspace, error)
 
 	// Read a workspace by its name.
-	Read(ctx context.Context, organization string, workspace string) (*Workspace, error)
+	Read(ctx context.Context, environment string, workspace string) (*Workspace, error)
 
 	// ReadByID reads a workspace by its ID.
 	ReadByID(ctx context.Context, workspaceID string) (*Workspace, error)
 
 	// Update settings of an existing workspace.
-	Update(ctx context.Context, organization string, workspace string, options WorkspaceUpdateOptions) (*Workspace, error)
+	Update(ctx context.Context, environment string, workspace string, options WorkspaceUpdateOptions) (*Workspace, error)
 
 	// UpdateByID updates the settings of an existing workspace.
 	UpdateByID(ctx context.Context, workspaceID string, options WorkspaceUpdateOptions) (*Workspace, error)
 
 	// Delete a workspace by its name.
-	Delete(ctx context.Context, organization string, workspace string) error
+	Delete(ctx context.Context, environment string, workspace string) error
 
 	// DeleteByID deletes a workspace by its ID.
 	DeleteByID(ctx context.Context, workspaceID string) error
 
 	// RemoveVCSConnection from a workspace.
-	RemoveVCSConnection(ctx context.Context, organization, workspace string) (*Workspace, error)
+	RemoveVCSConnection(ctx context.Context, environment, workspace string) (*Workspace, error)
 
 	// RemoveVCSConnectionByID removes a VCS connection from a workspace.
 	RemoveVCSConnectionByID(ctx context.Context, workspaceID string) (*Workspace, error)
@@ -73,7 +70,7 @@ type WorkspaceList struct {
 	Items []*Workspace
 }
 
-// Workspace represents a Terraform Enterprise workspace.
+// Workspace represents a Scalr workspace.
 type Workspace struct {
 	ID                   string                `jsonapi:"primary,workspaces"`
 	Actions              *WorkspaceActions     `jsonapi:"attr,actions"`
@@ -93,10 +90,9 @@ type Workspace struct {
 	WorkingDirectory     string                `jsonapi:"attr,working-directory"`
 
 	// Relations
-	CurrentRun   *Run          `jsonapi:"relation,current-run"`
-	Organization *Organization `jsonapi:"relation,organization"`
-	SSHKey       *SSHKey       `jsonapi:"relation,ssh-key"`
-	CreatedBy    *User         `jsonapi:"relation,created-by"`
+	CurrentRun   *Run         `jsonapi:"relation,current-run"`
+	Organization *Environment `jsonapi:"relation,organization"`
+	CreatedBy    *User        `jsonapi:"relation,created-by"`
 }
 
 // VCSRepo contains the configuration of a VCS integration.
@@ -135,13 +131,13 @@ type WorkspaceListOptions struct {
 	Search *string `url:"search[name],omitempty"`
 }
 
-// List all the workspaces within an organization.
-func (s *workspaces) List(ctx context.Context, organization string, options WorkspaceListOptions) (*WorkspaceList, error) {
-	if !validStringID(&organization) {
-		return nil, errors.New("invalid value for organization")
+// List all the workspaces within an environment.
+func (s *workspaces) List(ctx context.Context, environment string, options WorkspaceListOptions) (*WorkspaceList, error) {
+	if !validStringID(&environment) {
+		return nil, errors.New("invalid value for environment")
 	}
 
-	u := fmt.Sprintf("organizations/%s/workspaces", url.QueryEscape(organization))
+	u := fmt.Sprintf("organizations/%s/workspaces", url.QueryEscape(environment))
 	req, err := s.client.newRequest("GET", u, &options)
 	if err != nil {
 		return nil, err
@@ -164,20 +160,9 @@ type WorkspaceCreateOptions struct {
 	// Whether to automatically apply changes when a Terraform plan is successful.
 	AutoApply *bool `jsonapi:"attr,auto-apply,omitempty"`
 
-	// Whether to filter runs based on the changed files in a VCS push. If
-	// enabled, the working directory and trigger prefixes describe a set of
-	// paths which must contain changes for a VCS push to trigger a run. If
-	// disabled, any push will trigger a run.
-	FileTriggersEnabled *bool `jsonapi:"attr,file-triggers-enabled,omitempty"`
-
-	// The legacy TFE environment to use as the source of the migration, in the
-	// form organization/environment. Omit this unless you are migrating a legacy
-	// environment.
-	MigrationEnvironment *string `jsonapi:"attr,migration-environment,omitempty"`
-
 	// The name of the workspace, which can only include letters, numbers, -,
 	// and _. This will be used as an identifier and must be unique in the
-	// organization.
+	// environment.
 	Name *string `jsonapi:"attr,name"`
 
 	// Whether the workspace will use remote or local execution mode.
@@ -222,9 +207,9 @@ func (o WorkspaceCreateOptions) valid() error {
 }
 
 // Create is used to create a new workspace.
-func (s *workspaces) Create(ctx context.Context, organization string, options WorkspaceCreateOptions) (*Workspace, error) {
-	if !validStringID(&organization) {
-		return nil, errors.New("invalid value for organization")
+func (s *workspaces) Create(ctx context.Context, environment string, options WorkspaceCreateOptions) (*Workspace, error) {
+	if !validStringID(&environment) {
+		return nil, errors.New("invalid value for environment")
 	}
 	if err := options.valid(); err != nil {
 		return nil, err
@@ -233,7 +218,7 @@ func (s *workspaces) Create(ctx context.Context, organization string, options Wo
 	// Make sure we don't send a user provided ID.
 	options.ID = ""
 
-	u := fmt.Sprintf("organizations/%s/workspaces", url.QueryEscape(organization))
+	u := fmt.Sprintf("organizations/%s/workspaces", url.QueryEscape(environment))
 	req, err := s.client.newRequest("POST", u, &options)
 	if err != nil {
 		return nil, err
@@ -249,9 +234,9 @@ func (s *workspaces) Create(ctx context.Context, organization string, options Wo
 }
 
 // Read a workspace by its name.
-func (s *workspaces) Read(ctx context.Context, organization, workspace string) (*Workspace, error) {
-	if !validStringID(&organization) {
-		return nil, errors.New("invalid value for organization")
+func (s *workspaces) Read(ctx context.Context, environment, workspace string) (*Workspace, error) {
+	if !validStringID(&environment) {
+		return nil, errors.New("invalid value for environment")
 	}
 	if !validStringID(&workspace) {
 		return nil, errors.New("invalid value for workspace")
@@ -265,7 +250,7 @@ func (s *workspaces) Read(ctx context.Context, organization, workspace string) (
 
 	u := fmt.Sprintf(
 		"organizations/%s/workspaces/%s",
-		url.QueryEscape(organization),
+		url.QueryEscape(environment),
 		url.QueryEscape(workspace),
 	)
 	req, err := s.client.newRequest("GET", u, options)
@@ -318,7 +303,7 @@ type WorkspaceUpdateOptions struct {
 
 	// A new name for the workspace, which can only include letters, numbers, -,
 	// and _. This will be used as an identifier and must be unique in the
-	// organization. Warning: Changing a workspace's name changes its URL in the
+	// environment. Warning: Changing a workspace's name changes its URL in the
 	// API and UI.
 	Name *string `jsonapi:"attr,name,omitempty"`
 
@@ -353,9 +338,9 @@ type WorkspaceUpdateOptions struct {
 }
 
 // Update settings of an existing workspace.
-func (s *workspaces) Update(ctx context.Context, organization, workspace string, options WorkspaceUpdateOptions) (*Workspace, error) {
-	if !validStringID(&organization) {
-		return nil, errors.New("invalid value for organization")
+func (s *workspaces) Update(ctx context.Context, environment, workspace string, options WorkspaceUpdateOptions) (*Workspace, error) {
+	if !validStringID(&environment) {
+		return nil, errors.New("invalid value for environment")
 	}
 	if !validStringID(&workspace) {
 		return nil, errors.New("invalid value for workspace")
@@ -366,7 +351,7 @@ func (s *workspaces) Update(ctx context.Context, organization, workspace string,
 
 	u := fmt.Sprintf(
 		"organizations/%s/workspaces/%s",
-		url.QueryEscape(organization),
+		url.QueryEscape(environment),
 		url.QueryEscape(workspace),
 	)
 	req, err := s.client.newRequest("PATCH", u, &options)
@@ -408,9 +393,9 @@ func (s *workspaces) UpdateByID(ctx context.Context, workspaceID string, options
 }
 
 // Delete a workspace by its name.
-func (s *workspaces) Delete(ctx context.Context, organization, workspace string) error {
-	if !validStringID(&organization) {
-		return errors.New("invalid value for organization")
+func (s *workspaces) Delete(ctx context.Context, environment, workspace string) error {
+	if !validStringID(&environment) {
+		return errors.New("invalid value for environment")
 	}
 	if !validStringID(&workspace) {
 		return errors.New("invalid value for workspace")
@@ -418,7 +403,7 @@ func (s *workspaces) Delete(ctx context.Context, organization, workspace string)
 
 	u := fmt.Sprintf(
 		"organizations/%s/workspaces/%s",
-		url.QueryEscape(organization),
+		url.QueryEscape(environment),
 		url.QueryEscape(workspace),
 	)
 	req, err := s.client.newRequest("DELETE", u, nil)
@@ -451,9 +436,9 @@ type workspaceRemoveVCSConnectionOptions struct {
 }
 
 // RemoveVCSConnection from a workspace.
-func (s *workspaces) RemoveVCSConnection(ctx context.Context, organization, workspace string) (*Workspace, error) {
-	if !validStringID(&organization) {
-		return nil, errors.New("invalid value for organization")
+func (s *workspaces) RemoveVCSConnection(ctx context.Context, environment, workspace string) (*Workspace, error) {
+	if !validStringID(&environment) {
+		return nil, errors.New("invalid value for environment")
 	}
 	if !validStringID(&workspace) {
 		return nil, errors.New("invalid value for workspace")
@@ -461,7 +446,7 @@ func (s *workspaces) RemoveVCSConnection(ctx context.Context, organization, work
 
 	u := fmt.Sprintf(
 		"organizations/%s/workspaces/%s",
-		url.QueryEscape(organization),
+		url.QueryEscape(environment),
 		url.QueryEscape(workspace),
 	)
 

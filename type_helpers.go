@@ -1,10 +1,5 @@
 package scalr
 
-// Access returns a pointer to the given team access type.
-func Access(v AccessType) *AccessType {
-	return &v
-}
-
 // AuthPolicy returns a pointer to the given authentication poliy.
 func AuthPolicy(v AuthPolicyType) *AuthPolicyType {
 	return &v
@@ -42,11 +37,6 @@ func NotificationDestination(v NotificationDestinationType) *NotificationDestina
 
 // PlanExportType returns a pointer to the given plan export data type.
 func PlanExportType(v PlanExportDataType) *PlanExportDataType {
-	return &v
-}
-
-// ServiceProvider returns a pointer to the given service provider type.
-func ServiceProvider(v ServiceProviderType) *ServiceProviderType {
 	return &v
 }
 

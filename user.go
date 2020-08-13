@@ -7,10 +7,7 @@ import (
 // Compile-time proof of interface implementation.
 var _ Users = (*users)(nil)
 
-// Users describes all the user related methods that the Terraform
-// Enterprise API supports.
-//
-// TFE API docs: https://www.terraform.io/docs/enterprise/api/user.html
+// Users describes all the user related methods that the Scalr API supports.
 type Users interface {
 	// ReadCurrent reads the details of the currently authenticated user.
 	ReadCurrent(ctx context.Context) (*User, error)
@@ -21,7 +18,7 @@ type users struct {
 	client *Client
 }
 
-// User represents a Terraform Enterprise user.
+// User represents a Scalr user.
 type User struct {
 	ID       string `jsonapi:"primary,users"`
 	Email    string `jsonapi:"attr,email"`
