@@ -60,7 +60,7 @@ func TestConfigurationVersionsList(t *testing.T) {
 		assert.Equal(t, 2, cvl.TotalCount)
 	})
 
-	t.Run("without a valid organization", func(t *testing.T) {
+	t.Run("without a valid environment", func(t *testing.T) {
 		options := ConfigurationVersionListOptions{}
 
 		cvl, err := client.ConfigurationVersions.List(ctx, badIdentifier, options)

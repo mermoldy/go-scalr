@@ -13,10 +13,7 @@ import (
 var _ StateVersions = (*stateVersions)(nil)
 
 // StateVersions describes all the state version related methods that
-// the Terraform Enterprise API supports.
-//
-// TFE API docs:
-// https://www.terraform.io/docs/enterprise/api/state-versions.html
+// the Scalr API supports.
 type StateVersions interface {
 	// List all the state versions for a given workspace.
 	List(ctx context.Context, options StateVersionListOptions) (*StateVersionList, error)
@@ -45,7 +42,7 @@ type StateVersionList struct {
 	Items []*StateVersion
 }
 
-// StateVersion represents a Terraform Enterprise state version.
+// StateVersion represents a Scalr state version.
 type StateVersion struct {
 	ID           string    `jsonapi:"primary,state-versions"`
 	CreatedAt    time.Time `jsonapi:"attr,created-at,iso8601"`
@@ -61,13 +58,13 @@ type StateVersion struct {
 // StateVersionListOptions represents the options for listing state versions.
 type StateVersionListOptions struct {
 	ListOptions
-	Organization *string `url:"filter[organization][name]"`
-	Workspace    *string `url:"filter[workspace][name]"`
+	Environment *string `url:"filter[organization][name]"`
+	Workspace   *string `url:"filter[workspace][name]"`
 }
 
 func (o StateVersionListOptions) valid() error {
-	if !validString(o.Organization) {
-		return errors.New("organization is required")
+	if !validString(o.Environment) {
+		return errors.New("environment is required")
 	}
 	if !validString(o.Workspace) {
 		return errors.New("workspace is required")

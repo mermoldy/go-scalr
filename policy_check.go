@@ -14,10 +14,7 @@ import (
 var _ PolicyChecks = (*policyChecks)(nil)
 
 // PolicyChecks describes all the policy check related methods that the
-// Terraform Enterprise API supports.
-//
-// TFE API docs:
-// https://www.terraform.io/docs/enterprise/api/policy-checks.html
+// Scalr API supports.
 type PolicyChecks interface {
 	// List all policy checks of the given run.
 	List(ctx context.Context, runID string, options PolicyCheckListOptions) (*PolicyCheckList, error)
@@ -42,8 +39,8 @@ type PolicyScope string
 
 // List all available policy scopes.
 const (
-	PolicyScopeOrganization PolicyScope = "organization"
-	PolicyScopeWorkspace    PolicyScope = "workspace"
+	PolicyScopeEnvironment PolicyScope = "environment"
+	PolicyScopeWorkspace   PolicyScope = "workspace"
 )
 
 // PolicyStatus represents a policy check state.
@@ -68,7 +65,7 @@ type PolicyCheckList struct {
 	Items []*PolicyCheck
 }
 
-// PolicyCheck represents a Terraform Enterprise policy check..
+// PolicyCheck represents a Scalr policy check..
 type PolicyCheck struct {
 	ID               string                  `jsonapi:"primary,policy-checks"`
 	Actions          *PolicyActions          `jsonapi:"attr,actions"`

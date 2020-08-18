@@ -13,10 +13,7 @@ import (
 var _ NotificationConfigurations = (*notificationConfigurations)(nil)
 
 // NotificationConfigurations describes all the Notification Configuration
-// related methods that the Terraform Enterprise API supports.
-//
-// TFE API docs:
-// https://www.terraform.io/docs/enterprise/api/notification-configurations.html
+// related methods that the Scalr API supports.
 type NotificationConfigurations interface {
 	// List all the notification configurations within a workspace.
 	List(ctx context.Context, workspaceID string, options NotificationConfigurationListOptions) (*NotificationConfigurationList, error)

@@ -12,10 +12,7 @@ import (
 // Compile-time proof of interface implementation.
 var _ Plans = (*plans)(nil)
 
-// Plans describes all the plan related methods that the Terraform Enterprise
-// API supports.
-//
-// TFE API docs: https://www.terraform.io/docs/enterprise/api/plan.html
+// Plans describes all the plan related methods that the Scalr API supports.
 type Plans interface {
 	// Read a plan by its ID.
 	Read(ctx context.Context, planID string) (*Plan, error)
@@ -45,7 +42,7 @@ const (
 	PlanUnreachable PlanStatus = "unreachable"
 )
 
-// Plan represents a Terraform Enterprise plan.
+// Plan represents a Scalr plan.
 type Plan struct {
 	ID                   string                `jsonapi:"primary,plans"`
 	HasChanges           bool                  `jsonapi:"attr,has-changes"`

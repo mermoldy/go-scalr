@@ -16,10 +16,7 @@ import (
 var _ ConfigurationVersions = (*configurationVersions)(nil)
 
 // ConfigurationVersions describes all the configuration version related
-// methods that the Terraform Enterprise API supports.
-//
-// TFE API docs:
-// https://www.terraform.io/docs/enterprise/api/configuration-versions.html
+// methods that the Scalr API supports.
 type ConfigurationVersions interface {
 	// List returns all configuration versions of a workspace.
 	List(ctx context.Context, workspaceID string, options ConfigurationVersionListOptions) (*ConfigurationVersionList, error)
@@ -83,7 +80,7 @@ type IngressAttributes struct {
 }
 
 // ConfigurationVersion is a representation of an uploaded or ingressed
-// Terraform configuration in TFE. A workspace must have at least one
+// Terraform configuration in Scalr. A workspace must have at least one
 // configuration version before any runs may be queued on it.
 type ConfigurationVersion struct {
 	ID                string              `jsonapi:"primary,configuration-versions"`
