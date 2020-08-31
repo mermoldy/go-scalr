@@ -64,8 +64,8 @@ type Variable struct {
 // VariableListOptions represents the options for listing variables.
 type VariableListOptions struct {
 	ListOptions
-	Environment *string `url:"filter[organization][name]"`
-	Workspace   *string `url:"filter[workspace][name]"`
+	Environment *string `url:"filter[environment]"`
+	Workspace   *string `url:"filter[workspace]"`
 }
 
 func (o VariableListOptions) valid() error {
