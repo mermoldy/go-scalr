@@ -110,7 +110,6 @@ type Client struct {
 	ConfigurationVersions      ConfigurationVersions
 	CostEstimates              CostEstimates
 	NotificationConfigurations NotificationConfigurations
-	Environments               Environments
 	Plans                      Plans
 	PlanExports                PlanExports
 	Policies                   Policies

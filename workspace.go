@@ -84,9 +84,9 @@ type Workspace struct {
 	WorkingDirectory     string                `jsonapi:"attr,working-directory"`
 
 	// Relations
-	CurrentRun   *Run         `jsonapi:"relation,current-run"`
-	Organization *Environment `jsonapi:"relation,organization"`
-	CreatedBy    *User        `jsonapi:"relation,created-by"`
+	CurrentRun   *Run          `jsonapi:"relation,current-run"`
+	Organization *Organization `jsonapi:"relation,organization"`
+	CreatedBy    *User         `jsonapi:"relation,created-by"`
 }
 
 // VCSRepo contains the configuration of a VCS integration.
