@@ -45,7 +45,6 @@ type Endpoint struct {
 	Url         string `jsonapi:"attr,url"`
 
 	// Relations
-	Workspace   *Workspace   `jsonapi:"relation,workspace"`
 	Environment *Environment `jsonapi:"relation,environment"`
 	Account     *Account     `jsonapi:"relation,account"`
 }
@@ -61,7 +60,6 @@ type EndpointListOptions struct {
 	Sort *string `url:"sort,omitempty"`
 
 	// Scope filters.
-	Workspace   *string `url:"filter[workspace],omitempty"`
 	Environment *string `url:"filter[environment],omitempty"`
 	Account     *string `url:"filter[account],omitempty"`
 }
@@ -94,7 +92,6 @@ type EndpointCreateOptions struct {
 	Timeout     *int    `jsonapi:"attr,timeout,omitempty"`
 
 	// Relations
-	Workspace   *Workspace   `jsonapi:"relation,workspace,omitempty"`
 	Environment *Environment `jsonapi:"relation,environment,omitempty"`
 	Account     *Account     `jsonapi:"relation,account"`
 }
@@ -103,10 +100,16 @@ func (o EndpointCreateOptions) valid() error {
 	if !validString(o.Name) {
 		return errors.New("name is required")
 	}
+	if !validString(o.Url) {
+		return errors.New("Url is required")
+	}
+	if !validString(o.SecretKey) {
+		return errors.New("secret key is required")
+	}
 	return nil
 }
 
-// Create is used to create a new workspace.
+// Create is used to create a new endpoint.
 func (s *endpoints) Create(ctx context.Context, options EndpointCreateOptions) (*Endpoint, error) {
 	if err := options.valid(); err != nil {
 		return nil, err
@@ -160,7 +163,6 @@ type EndpointUpdateOptions struct {
 	Timeout     *int    `jsonapi:"attr,timeout,omitempty"`
 
 	// Relations
-	Workspace   *Workspace   `jsonapi:"relation,workspace,omitempty"`
 	Environment *Environment `jsonapi:"relation,environment,omitempty"`
 	Account     *Account     `jsonapi:"relation,account"`
 }
