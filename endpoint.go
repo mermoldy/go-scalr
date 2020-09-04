@@ -157,6 +157,7 @@ func (s *endpoints) Read(ctx context.Context, endpointID string) (*Endpoint, err
 // EndpointUpdateOptions represents the options for updating an endpoint.
 type EndpointUpdateOptions struct {
 	ID          string  `jsonapi:"primary,endpoints"`
+	Name        *string `jsonapi:"attr,name,omitempty"`
 	MaxAttempts *int    `jsonapi:"attr,max-attempts,omitempty"`
 	Url         *string `jsonapi:"attr,url,omitempty"`
 	SecretKey   *string `jsonapi:"attr,secret-key,omitempty"`
