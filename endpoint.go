@@ -87,12 +87,11 @@ func (s *endpoints) List(ctx context.Context, options EndpointListOptions) (*End
 type EndpointCreateOptions struct {
 	// For internal use only!
 	ID          string  `jsonapi:"primary,endpoints"`
-	HTTPMethod  *string `jsonapi:"attr,http-method"`
-	MaxAttempts *int    `jsonapi:"attr,max-attempts"`
+	MaxAttempts *int    `jsonapi:"attr,max-attempts,omitempty"`
 	Name        *string `jsonapi:"attr,name"`
 	Url         *string `jsonapi:"attr,url"`
 	SecretKey   *string `jsonapi:"attr,secret-key"`
-	Timeout     *int    `jsonapi:"attr,timeout"`
+	Timeout     *int    `jsonapi:"attr,timeout,omitempty"`
 
 	// Relations
 	Workspace   *Workspace   `jsonapi:"relation,workspace,omitempty"`
@@ -101,10 +100,9 @@ type EndpointCreateOptions struct {
 }
 
 func (o EndpointCreateOptions) valid() error {
-	if !validString(o.HTTPMethod) {
-		return errors.New("HTTPMethod is required")
+	if !validString(o.Name) {
+		return errors.New("name is required")
 	}
-	// TODO: validate scope, HTTPMethod values, etc.
 	return nil
 }
 
@@ -144,19 +142,18 @@ func (s *endpoints) Read(ctx context.Context, endpointID string) (*Endpoint, err
 		return nil, err
 	}
 
-	w := &Endpoint{}
-	err = s.client.do(ctx, req, w)
+	e := &Endpoint{}
+	err = s.client.do(ctx, req, e)
 	if err != nil {
 		return nil, err
 	}
 
-	return w, nil
+	return e, nil
 }
 
 // EndpointUpdateOptions represents the options for updating an endpoint.
 type EndpointUpdateOptions struct {
 	ID          string  `jsonapi:"primary,endpoints"`
-	HTTPMethod  *string `jsonapi:"attr,http-method,omitempty"`
 	MaxAttempts *int    `jsonapi:"attr,max-attempts,omitempty"`
 	Url         *string `jsonapi:"attr,url,omitempty"`
 	SecretKey   *string `jsonapi:"attr,secret-key,omitempty"`
@@ -183,13 +180,13 @@ func (s *endpoints) Update(ctx context.Context, endpointID string, options Endpo
 		return nil, err
 	}
 
-	w := &Endpoint{}
-	err = s.client.do(ctx, req, w)
+	e := &Endpoint{}
+	err = s.client.do(ctx, req, e)
 	if err != nil {
 		return nil, err
 	}
 
-	return w, nil
+	return e, nil
 }
 
 // Delete an endpoint by its ID.

@@ -10,10 +10,7 @@ import (
 // Compile-time proof of interface implementation.
 var _ Variables = (*variables)(nil)
 
-// Variables describes all the variable related methods that the Terraform
-// Enterprise API supports.
-//
-// TFE API docs: https://www.terraform.io/docs/enterprise/api/variables.html
+// Variables describes all the variable related methods that the Scalr API supports.
 type Variables interface {
 	// List all the variables associated with the given workspace.
 	List(ctx context.Context, options VariableListOptions) (*VariableList, error)
@@ -51,7 +48,7 @@ type VariableList struct {
 	Items []*Variable
 }
 
-// Variable represents a Terraform Enterprise variable.
+// Variable represents a Scalr variable.
 type Variable struct {
 	ID        string       `jsonapi:"primary,vars"`
 	Key       string       `jsonapi:"attr,key"`
@@ -67,13 +64,13 @@ type Variable struct {
 // VariableListOptions represents the options for listing variables.
 type VariableListOptions struct {
 	ListOptions
-	Organization *string `url:"filter[organization][name]"`
-	Workspace    *string `url:"filter[workspace][name]"`
+	Environment *string `url:"filter[environment]"`
+	Workspace   *string `url:"filter[workspace]"`
 }
 
 func (o VariableListOptions) valid() error {
-	if !validString(o.Organization) {
-		return errors.New("organization is required")
+	if !validString(o.Environment) {
+		return errors.New("environment is required")
 	}
 	if !validString(o.Workspace) {
 		return errors.New("workspace is required")

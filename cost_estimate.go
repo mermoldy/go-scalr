@@ -14,9 +14,7 @@ import (
 var _ CostEstimates = (*costEstimates)(nil)
 
 // CostEstimates describes all the costEstimate related methods that
-// the Terraform Enterprise API supports.
-//
-// TFE API docs: https://www.terraform.io/docs/enterprise/api/ (TBD)
+// the Scalr API supports.
 type CostEstimates interface {
 	// Read a costEstimate by its ID.
 	Read(ctx context.Context, costEstimateID string) (*CostEstimate, error)
@@ -42,7 +40,7 @@ const (
 	CostEstimateQueued   CostEstimateStatus = "queued"
 )
 
-// CostEstimate represents a Terraform Enterprise costEstimate.
+// CostEstimate represents a Scalr costEstimate.
 type CostEstimate struct {
 	ID                      string                        `jsonapi:"primary,cost-estimates"`
 	DeltaMonthlyCost        string                        `jsonapi:"attr,delta-monthly-cost"`

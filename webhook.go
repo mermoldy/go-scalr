@@ -117,7 +117,7 @@ func (o WebhookCreateOptions) valid() error {
 	return nil
 }
 
-// Create is used to create a new workspace.
+// Create is used to create a new webhook.
 func (s *webhooks) Create(ctx context.Context, options WebhookCreateOptions) (*Webhook, error) {
 	if err := options.valid(); err != nil {
 		return nil, err

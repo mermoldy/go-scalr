@@ -12,14 +12,14 @@ func TestCostEstimatesRead(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	orgTest, orgTestCleanup := createOrganization(t, client)
+	orgTest, orgTestCleanup := createEnvironment(t, client)
 	defer orgTestCleanup()
 
-	// Enable cost estimation for the test organization.
-	orgTest, err := client.Organizations.Update(
+	// Enable cost estimation for the test environment.
+	orgTest, err := client.Environments.Update(
 		ctx,
 		orgTest.Name,
-		OrganizationUpdateOptions{
+		EnvironmentUpdateOptions{
 			CostEstimationEnabled: Bool(true),
 		},
 	)

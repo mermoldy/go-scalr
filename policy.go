@@ -12,10 +12,7 @@ import (
 // Compile-time proof of interface implementation.
 var _ Policies = (*policies)(nil)
 
-// Policies describes all the policy related methods that the Terraform
-// Enterprise API supports.
-//
-// TFE API docs: https://www.terraform.io/docs/enterprise/api/policies.html
+// Policies describes all the policy related methods that the Scalr API supports.
 type Policies interface {
 	// List all the policies for a given organization
 	List(ctx context.Context, organization string, options PolicyListOptions) (*PolicyList, error)
@@ -60,7 +57,7 @@ type PolicyList struct {
 	Items []*Policy
 }
 
-// Policy represents a Terraform Enterprise policy.
+// Policy represents a Scalr policy.
 type Policy struct {
 	ID             string         `jsonapi:"primary,policies"`
 	Name           string         `jsonapi:"attr,name"`
@@ -70,7 +67,7 @@ type Policy struct {
 	UpdatedAt      time.Time      `jsonapi:"attr,updated-at,iso8601"`
 
 	// Relations
-	Organization *Organization `jsonapi:"relation,organization"`
+	Environment *Environment `jsonapi:"relation,organization"`
 }
 
 // Enforcement describes a enforcement.

@@ -12,7 +12,7 @@ func TestPoliciesList(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	orgTest, orgTestCleanup := createOrganization(t, client)
+	orgTest, orgTestCleanup := createEnvironment(t, client)
 	defer orgTestCleanup()
 
 	pTest1, _ := createPolicy(t, client, orgTest)
@@ -59,10 +59,10 @@ func TestPoliciesList(t *testing.T) {
 		assert.Equal(t, 1, pl.TotalCount)
 	})
 
-	t.Run("without a valid organization", func(t *testing.T) {
+	t.Run("without a valid environment", func(t *testing.T) {
 		ps, err := client.Policies.List(ctx, badIdentifier, PolicyListOptions{})
 		assert.Nil(t, ps)
-		assert.EqualError(t, err, "invalid value for organization")
+		assert.EqualError(t, err, "invalid value for environment")
 	})
 }
 
@@ -70,7 +70,7 @@ func TestPoliciesCreate(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	orgTest, orgTestCleanup := createOrganization(t, client)
+	orgTest, orgTestCleanup := createEnvironment(t, client)
 	defer orgTestCleanup()
 
 	t.Run("with valid options", func(t *testing.T) {
@@ -171,12 +171,12 @@ func TestPoliciesCreate(t *testing.T) {
 		assert.EqualError(t, err, "enforcement mode is required")
 	})
 
-	t.Run("when options has an invalid organization", func(t *testing.T) {
+	t.Run("when options has an invalid environment", func(t *testing.T) {
 		p, err := client.Policies.Create(ctx, badIdentifier, PolicyCreateOptions{
 			Name: String("foo"),
 		})
 		assert.Nil(t, p)
-		assert.EqualError(t, err, "invalid value for organization")
+		assert.EqualError(t, err, "invalid value for environment")
 	})
 }
 
@@ -184,7 +184,7 @@ func TestPoliciesRead(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	orgTest, orgTestCleanup := createOrganization(t, client)
+	orgTest, orgTestCleanup := createEnvironment(t, client)
 	defer orgTestCleanup()
 
 	pTest, pTestCleanup := createPolicy(t, client, orgTest)
@@ -198,7 +198,7 @@ func TestPoliciesRead(t *testing.T) {
 		assert.Equal(t, pTest.Name, p.Name)
 		assert.Equal(t, pTest.PolicySetCount, p.PolicySetCount)
 		assert.Empty(t, p.Enforce)
-		assert.Equal(t, pTest.Organization.Name, p.Organization.Name)
+		assert.Equal(t, pTest.Environment.Name, p.Environment.Name)
 	})
 
 	err := client.Policies.Upload(ctx, pTest.ID, []byte(`main = rule { true }`))
@@ -213,7 +213,7 @@ func TestPoliciesRead(t *testing.T) {
 		assert.Equal(t, pTest.Description, p.Description)
 		assert.Equal(t, pTest.PolicySetCount, p.PolicySetCount)
 		assert.NotEmpty(t, p.Enforce)
-		assert.Equal(t, pTest.Organization.Name, p.Organization.Name)
+		assert.Equal(t, pTest.Environment.Name, p.Environment.Name)
 	})
 
 	t.Run("when the policy does not exist", func(t *testing.T) {
@@ -233,7 +233,7 @@ func TestPoliciesUpdate(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	orgTest, orgTestCleanup := createOrganization(t, client)
+	orgTest, orgTestCleanup := createEnvironment(t, client)
 	defer orgTestCleanup()
 
 	t.Run("when updating with an existing path", func(t *testing.T) {
@@ -308,7 +308,7 @@ func TestPoliciesDelete(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	orgTest, orgTestCleanup := createOrganization(t, client)
+	orgTest, orgTestCleanup := createEnvironment(t, client)
 	defer orgTestCleanup()
 
 	pTest, _ := createPolicy(t, client, orgTest)
