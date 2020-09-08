@@ -14,7 +14,7 @@ var _ Webhooks = (*webhooks)(nil)
 // Webhooks describes all the webhooks related methods that the Scalr
 // IACP API supports.
 //
-// IACP API docs: TODO
+// IACP API docs: https://www.scalr.com/docs/en/latest/api/index.html
 type Webhooks interface {
 	// List the webhooks.
 	List(ctx context.Context, options WebhookListOptions) (*WebhookList, error)
@@ -81,8 +81,7 @@ type WebhookListOptions struct {
 
 // List the webhooks.
 func (s *webhooks) List(ctx context.Context, options WebhookListOptions) (*WebhookList, error) {
-	u := fmt.Sprintf("webhooks")
-	req, err := s.client.newRequest("GET", u, &options)
+	req, err := s.client.newRequest("GET", "webhooks", &options)
 	if err != nil {
 		return nil, err
 	}
@@ -126,8 +125,7 @@ func (s *webhooks) Create(ctx context.Context, options WebhookCreateOptions) (*W
 	// Make sure we don't send a user provided ID.
 	options.ID = ""
 
-	u := fmt.Sprintf("webhooks")
-	req, err := s.client.newRequest("POST", u, &options)
+	req, err := s.client.newRequest("POST", "webhooks", &options)
 	if err != nil {
 		return nil, err
 	}

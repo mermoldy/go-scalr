@@ -13,7 +13,7 @@ var _ Endpoints = (*endpoints)(nil)
 // Endpoints describes all the endpoints related methods that the Scalr
 // IACP API supports.
 //
-// IACP API docs: TODO
+// IACP API docs: https://www.scalr.com/docs/en/latest/api/index.html
 type Endpoints interface {
 	// List the endpoints.
 	List(ctx context.Context, options EndpointListOptions) (*EndpointList, error)
@@ -66,19 +66,18 @@ type EndpointListOptions struct {
 
 // List the endpoints.
 func (s *endpoints) List(ctx context.Context, options EndpointListOptions) (*EndpointList, error) {
-	u := fmt.Sprintf("endpoints")
-	req, err := s.client.newRequest("GET", u, &options)
+	req, err := s.client.newRequest("GET", "endpoints", &options)
 	if err != nil {
 		return nil, err
 	}
 
-	wl := &EndpointList{}
-	err = s.client.do(ctx, req, wl)
+	el := &EndpointList{}
+	err = s.client.do(ctx, req, el)
 	if err != nil {
 		return nil, err
 	}
 
-	return wl, nil
+	return el, nil
 }
 
 // EndpointCreateOptions represents the options for creating a new endpoint.
@@ -118,8 +117,7 @@ func (s *endpoints) Create(ctx context.Context, options EndpointCreateOptions) (
 	// Make sure we don't send a user provided ID.
 	options.ID = ""
 
-	u := fmt.Sprintf("endpoints")
-	req, err := s.client.newRequest("POST", u, &options)
+	req, err := s.client.newRequest("POST", "endpoints", &options)
 	if err != nil {
 		return nil, err
 	}
