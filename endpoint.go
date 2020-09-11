@@ -160,10 +160,6 @@ type EndpointUpdateOptions struct {
 	Url         *string `jsonapi:"attr,url,omitempty"`
 	SecretKey   *string `jsonapi:"attr,secret-key,omitempty"`
 	Timeout     *int    `jsonapi:"attr,timeout,omitempty"`
-
-	// Relations
-	Environment *Environment `jsonapi:"relation,environment,omitempty"`
-	Account     *Account     `jsonapi:"relation,account"`
 }
 
 // Update settings of an existing endpoint.

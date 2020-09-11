@@ -168,9 +168,6 @@ type WebhookUpdateOptions struct {
 	Name    *string `jsonapi:"attr,name"`
 
 	// Relations
-	Workspace   *Workspace         `jsonapi:"relation,workspace,omitempty"`
-	Environment *Environment       `jsonapi:"relation,environment,omitempty"`
-	Account     *Account           `jsonapi:"relation,account"`
 	Endpoint    *Endpoint          `jsonapi:"relation,endpoint"`
 	Events      []*EventDefinition `jsonapi:"relation,events"`
 }
