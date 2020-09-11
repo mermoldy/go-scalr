@@ -84,9 +84,10 @@ type Workspace struct {
 	WorkingDirectory     string                `jsonapi:"attr,working-directory"`
 
 	// Relations
-	CurrentRun   *Run          `jsonapi:"relation,current-run"`
-	Organization *Organization `jsonapi:"relation,organization"`
-	CreatedBy    *User         `jsonapi:"relation,created-by"`
+	CurrentRun   *Run                `jsonapi:"relation,current-run"`
+	Organization *Organization        `jsonapi:"relation,organization"`
+	CreatedBy    *User               `jsonapi:"relation,created-by"`
+	VcsProvider  *VcsProviderOptions `jsonapi:"relation,vcs-provider"`
 }
 
 // VCSRepo contains the configuration of a VCS integration.
@@ -94,7 +95,6 @@ type VCSRepo struct {
 	Branch            string `json:"branch"`
 	Identifier        string `json:"identifier"`
 	IngressSubmodules bool   `json:"ingress-submodules"`
-	OAuthTokenID      string `json:"oauth-token-id"`
 	Path              string `json:"path"`
 }
 
@@ -179,6 +179,9 @@ type WorkspaceCreateOptions struct {
 	// root of your repository and is typically set to a subdirectory matching the
 	// environment when multiple environments exist within the same repository.
 	WorkingDirectory *string `jsonapi:"attr,working-directory,omitempty"`
+
+	// Specifies the VcsProvider for workspace vcs-repo. Required if vcs-repo attr passed
+	VcsProvider *VcsProviderOptions `jsonapi:"relation,vcs-provider,omitempty"`
 }
 
 // VCSRepoOptions represents the configuration options of a VCS integration.
@@ -186,8 +189,13 @@ type VCSRepoOptions struct {
 	Branch            *string `json:"branch,omitempty"`
 	Identifier        *string `json:"identifier,omitempty"`
 	IngressSubmodules *bool   `json:"ingress-submodules,omitempty"`
-	OAuthTokenID      *string `json:"oauth-token-id,omitempty"`
 	Path              *string `json:"path,omitempty"`
+}
+
+type VcsProviderOptions struct {
+	ID      string `jsonapi:"primary,vcs-providers"`
+	VcsType string `jsonapi:"attr,vcs-type"`
+	Url     string `jsonapi:"attr,url"`
 }
 
 func (o WorkspaceCreateOptions) valid() error {
@@ -329,6 +337,9 @@ type WorkspaceUpdateOptions struct {
 	// the environment when multiple environments exist within the same
 	// repository.
 	WorkingDirectory *string `jsonapi:"attr,working-directory,omitempty"`
+
+	// Specifies the VcsProvider for workspace vcs-repo.
+	VcsProvider *VcsProviderOptions `jsonapi:"relation,vcs-provider,omitempty"`
 }
 
 // Update settings of an existing workspace.
