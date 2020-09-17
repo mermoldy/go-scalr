@@ -1,10 +1,5 @@
 package scalr
 
-// AuthPolicy returns a pointer to the given authentication poliy.
-func AuthPolicy(v AuthPolicyType) *AuthPolicyType {
-	return &v
-}
-
 // Bool returns a pointer to the given bool
 func Bool(v bool) *bool {
 	return &v

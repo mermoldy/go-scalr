@@ -110,7 +110,6 @@ type Client struct {
 	ConfigurationVersions      ConfigurationVersions
 	CostEstimates              CostEstimates
 	NotificationConfigurations NotificationConfigurations
-	Environments               Environments
 	Plans                      Plans
 	PlanExports                PlanExports
 	Policies                   Policies
@@ -121,6 +120,9 @@ type Client struct {
 	Users                      Users
 	Variables                  Variables
 	Workspaces                 Workspaces
+	Endpoints                  Endpoints
+	Webhooks                   Webhooks
+	Environments               Environments
 }
 
 // NewClient creates a new Scalr API client.
@@ -207,6 +209,9 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.Users = &users{client: client}
 	client.Variables = &variables{client: client}
 	client.Workspaces = &workspaces{client: client}
+	client.Endpoints = &endpoints{client: client}
+	client.Webhooks = &webhooks{client: client}
+	client.Environments = &environments{client: client}
 
 	return client, nil
 }
