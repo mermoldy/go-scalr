@@ -37,11 +37,12 @@ type Environment struct {
 	Name                  string            `jsonapi:"attr,name"`
 	CostEstimationEnabled bool              `jsonapi:"attr,cost-estimation-enabled"`
 	CreatedAt             time.Time         `jsonapi:"attr,created-at,iso8601"`
-	CreatedBy             string            `jsonapi:"attr,created-by"`
 	Status                EnvironmentStatus `jsonapi:"attr,status"`
 
 	// Relations
 	Account *Account `jsonapi:"relation,account"`
+	CreatedBy *User `jsonapi:"relation,created-by"`
+
 }
 
 // duplicate Environment to change type to "organizations" (workspace.Organization)
