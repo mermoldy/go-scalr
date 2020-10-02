@@ -103,6 +103,7 @@ type Run struct {
 	Plan                 *Plan                 `jsonapi:"relation,plan"`
 	PolicyChecks         []*PolicyCheck        `jsonapi:"relation,policy-checks"`
 	Workspace            *Workspace            `jsonapi:"relation,workspace"`
+	VcsRevision          *VcsRevision          `jsonapi:"relation,vcs-revision"`
 }
 
 // RunActions represents the run actions.
@@ -219,8 +220,14 @@ func (s *runs) Read(ctx context.Context, runID string) (*Run, error) {
 		return nil, errors.New("invalid value for run ID")
 	}
 
+	options := struct {
+		Include string `url:"include"`
+	}{
+		Include: "vcs-revision",
+	}
+
 	u := fmt.Sprintf("runs/%s", url.QueryEscape(runID))
-	req, err := s.client.newRequest("GET", u, nil)
+	req, err := s.client.newRequest("GET", u, options)
 	if err != nil {
 		return nil, err
 	}
