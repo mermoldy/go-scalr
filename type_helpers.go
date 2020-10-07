@@ -10,11 +10,6 @@ func Category(v CategoryType) *CategoryType {
 	return &v
 }
 
-// EnforcementMode returns a pointer to the given enforcement level.
-func EnforcementMode(v EnforcementLevel) *EnforcementLevel {
-	return &v
-}
-
 // Int returns a pointer to the given int.
 func Int(v int) *int {
 	return &v
@@ -22,16 +17,6 @@ func Int(v int) *int {
 
 // Int64 returns a pointer to the given int64.
 func Int64(v int64) *int64 {
-	return &v
-}
-
-// NotificationDestination returns a pointer to the given notification configuration destination type
-func NotificationDestination(v NotificationDestinationType) *NotificationDestinationType {
-	return &v
-}
-
-// PlanExportType returns a pointer to the given plan export data type.
-func PlanExportType(v PlanExportDataType) *PlanExportDataType {
 	return &v
 }
 

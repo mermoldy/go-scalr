@@ -21,7 +21,7 @@ func main() {
 	ctx := context.Background()
 
 	// Create a new workspace
-	w, err := client.Workspaces.Create(ctx, "org-name", scalr.WorkspaceCreateOptions{
+	w, err := client.Workspaces.Create(ctx, "env-name", scalr.WorkspaceCreateOptions{
 		Name: scalr.String("my-app-tst"),
 	})
 	if err != nil {
@@ -29,7 +29,7 @@ func main() {
 	}
 
 	// Update the workspace
-	w, err = client.Workspaces.Update(ctx, "org-name", w.Name, scalr.WorkspaceUpdateOptions{
+	w, err = client.Workspaces.Update(ctx, "env-name", w.Name, scalr.WorkspaceUpdateOptions{
 		AutoApply:        scalr.Bool(false),
 		TerraformVersion: scalr.String("0.12.0"),
 		WorkingDirectory: scalr.String("my-app/infra"),

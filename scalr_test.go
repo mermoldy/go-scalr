@@ -90,7 +90,7 @@ func TestClient_defaultConfig(t *testing.T) {
 	})
 
 	t.Run("with environment variables", func(t *testing.T) {
-		defer setupEnvVars("abcd1234", "https://mytfe.local")()
+		defer setupEnvVars("abcd1234", "https://scalr.local")()
 	})
 }
 
@@ -169,7 +169,7 @@ func TestClient_userAgent(t *testing.T) {
 			return
 		}
 
-		if r.Header.Get("User-Agent") != "hashicorp" {
+		if r.Header.Get("User-Agent") != "go-scalr-tester" {
 			t.Fatalf("unexpected user agent header: %q", r.Header.Get("User-Agent"))
 		}
 	}))
@@ -183,7 +183,7 @@ func TestClient_userAgent(t *testing.T) {
 	}
 
 	// Set a custom user agent.
-	cfg.Headers.Set("User-Agent", "hashicorp")
+	cfg.Headers.Set("User-Agent", "go-scalr-tester")
 
 	client, err := NewClient(cfg)
 	if err != nil {
@@ -385,14 +385,14 @@ func TestClient_retryHTTPBackoff(t *testing.T) {
 }
 
 func setupEnvVars(token, address string) func() {
-	origToken := os.Getenv("TFE_TOKEN")
-	origAddress := os.Getenv("TFE_ADDRESS")
+	origToken := os.Getenv("SCALR_TOKEN")
+	origAddress := os.Getenv("SCALR_ADDRESS")
 
-	os.Setenv("TFE_TOKEN", token)
-	os.Setenv("TFE_ADDRESS", address)
+	os.Setenv("SCALR_TOKEN", token)
+	os.Setenv("SCALR_ADDRESS", address)
 
 	return func() {
-		os.Setenv("TFE_TOKEN", origToken)
-		os.Setenv("TFE_ADDRESS", origAddress)
+		os.Setenv("SCALR_TOKEN", origToken)
+		os.Setenv("SCALR_ADDRESS", origAddress)
 	}
 }

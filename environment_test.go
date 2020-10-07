@@ -53,7 +53,7 @@ func TestEnvironmentsCreate(t *testing.T) {
 	t.Run("with valid options", func(t *testing.T) {
 		options := EnvironmentCreateOptions{
 			Name:  String(randomString(t)),
-			Email: String(randomString(t) + "@tfe.local"),
+			Email: String(randomString(t) + "@scalr.local"),
 		}
 
 		org, err := client.Environments.Create(ctx, options)
@@ -134,7 +134,7 @@ func TestEnvironmentsUpdate(t *testing.T) {
 
 		options := EnvironmentUpdateOptions{
 			Name:            String(randomString(t)),
-			Email:           String(randomString(t) + "@tfe.local"),
+			Email:           String(randomString(t) + "@scalr.local"),
 			SessionTimeout:  Int(3600),
 			SessionRemember: Int(3600),
 		}
