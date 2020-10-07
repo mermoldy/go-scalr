@@ -168,8 +168,8 @@ type WebhookUpdateOptions struct {
 	Name    *string `jsonapi:"attr,name"`
 
 	// Relations
-	Endpoint    *Endpoint          `jsonapi:"relation,endpoint"`
-	Events      []*EventDefinition `jsonapi:"relation,events"`
+	Endpoint *Endpoint          `jsonapi:"relation,endpoint"`
+	Events   []*EventDefinition `jsonapi:"relation,events"`
 }
 
 // Update settings of an existing webhook.

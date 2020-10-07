@@ -85,7 +85,7 @@ type Workspace struct {
 
 	// Relations
 	CurrentRun   *Run                `jsonapi:"relation,current-run"`
-	Organization *Organization        `jsonapi:"relation,organization"`
+	Organization *Organization       `jsonapi:"relation,organization"`
 	CreatedBy    *User               `jsonapi:"relation,created-by"`
 	VcsProvider  *VcsProviderOptions `jsonapi:"relation,vcs-provider"`
 }

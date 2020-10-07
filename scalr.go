@@ -77,9 +77,9 @@ type Config struct {
 // DefaultConfig returns a default config structure.
 func DefaultConfig() *Config {
 	config := &Config{
-		Address:    os.Getenv("TFE_ADDRESS"),
+		Address:    os.Getenv("SCALR_ADDRESS"),
 		BasePath:   DefaultBasePath,
-		Token:      os.Getenv("TFE_TOKEN"),
+		Token:      os.Getenv("SCALR_TOKEN"),
 		Headers:    make(http.Header),
 		HTTPClient: cleanhttp.DefaultPooledClient(),
 	}
@@ -106,23 +106,13 @@ type Client struct {
 	retryLogHook      RetryLogHook
 	retryServerErrors bool
 
-	Applies                    Applies
-	ConfigurationVersions      ConfigurationVersions
-	CostEstimates              CostEstimates
-	NotificationConfigurations NotificationConfigurations
-	Plans                      Plans
-	PlanExports                PlanExports
-	Policies                   Policies
-	PolicyChecks               PolicyChecks
-	PolicySets                 PolicySets
-	Runs                       Runs
-	StateVersions              StateVersions
-	Users                      Users
-	Variables                  Variables
-	Workspaces                 Workspaces
-	Endpoints                  Endpoints
-	Webhooks                   Webhooks
-	Environments               Environments
+	Runs                  Runs
+	Variables             Variables
+	Workspaces            Workspaces
+	Endpoints             Endpoints
+	Webhooks              Webhooks
+	Environments          Environments
+	ConfigurationVersions ConfigurationVersions
 }
 
 // NewClient creates a new Scalr API client.
@@ -194,24 +184,13 @@ func NewClient(cfg *Config) (*Client, error) {
 	}
 
 	// Create the services.
-	client.Applies = &applies{client: client}
-	client.ConfigurationVersions = &configurationVersions{client: client}
-	client.CostEstimates = &costEstimates{client: client}
-	client.NotificationConfigurations = &notificationConfigurations{client: client}
 	client.Environments = &environments{client: client}
-	client.Plans = &plans{client: client}
-	client.PlanExports = &planExports{client: client}
-	client.Policies = &policies{client: client}
-	client.PolicyChecks = &policyChecks{client: client}
-	client.PolicySets = &policySets{client: client}
 	client.Runs = &runs{client: client}
-	client.StateVersions = &stateVersions{client: client}
-	client.Users = &users{client: client}
 	client.Variables = &variables{client: client}
 	client.Workspaces = &workspaces{client: client}
 	client.Endpoints = &endpoints{client: client}
 	client.Webhooks = &webhooks{client: client}
-	client.Environments = &environments{client: client}
+	client.ConfigurationVersions = &configurationVersions{client: client}
 
 	return client, nil
 }
