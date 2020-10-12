@@ -9,14 +9,14 @@ import (
 // Compile-time proof of interface implementation.
 var _ VcsRevisions = (*vcs_revisions)(nil)
 
-// workspaces implements Workspaces.
+// VCS revision implements VcsRevisions.
 type vcs_revisions struct {
 	client *Client
 }
 
 // VcsRevisions describes all the vcs revisions related methods that the Scalr API supports.
 type VcsRevisions interface {
-	// Read reads a vcs revisions by its ID.
+	// Read reads a VCS revision by its ID.
 	Read(ctx context.Context, vcsRevisionId string) (*VcsRevision, error)
 }
 
@@ -29,16 +29,11 @@ type VcsRevision struct {
 	SenderUsername string `jsonapi:"attr,sender-username"`
 }
 
-// Read a workspace by its name.
+// Read a VCS revision by its name.
 func (s *vcs_revisions) Read(ctx context.Context, vcsRevisionId string) (*VcsRevision, error) {
-	options := struct {
-		Include string `url:"include"`
-	}{
-		Include: "created-by",
-	}
 
 	u := fmt.Sprintf("vcs-revisions", url.QueryEscape(vcsRevisionId))
-	req, err := s.client.newRequest("GET", u, options)
+	req, err := s.client.newRequest("GET", u, nil)
 	if err != nil {
 		return nil, err
 	}
