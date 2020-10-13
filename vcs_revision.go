@@ -17,7 +17,7 @@ type vcs_revisions struct {
 // VcsRevisions describes all the vcs revisions related methods that the Scalr API supports.
 type VcsRevisions interface {
 	// Read reads a VCS revision by its ID.
-	Read(ctx context.Context, vcsRevisionId string) (*VcsRevision, error)
+	Read(ctx context.Context, vcsRevisionID string) (*VcsRevision, error)
 }
 
 // VcsRevision represents the VCS metadata
@@ -29,10 +29,10 @@ type VcsRevision struct {
 	SenderUsername string `jsonapi:"attr,sender-username"`
 }
 
-// Read a VCS revision by its name.
-func (s *vcs_revisions) Read(ctx context.Context, vcsRevisionId string) (*VcsRevision, error) {
+// Read a VCS revision by its ID.
+func (s *vcs_revisions) Read(ctx context.Context, vcsRevisionID string) (*VcsRevision, error) {
 
-	u := fmt.Sprintf("vcs-revisions", url.QueryEscape(vcsRevisionId))
+	u := fmt.Sprintf("vcs-revisions/%s", url.QueryEscape(vcsRevisionID))
 	req, err := s.client.newRequest("GET", u, nil)
 	if err != nil {
 		return nil, err
