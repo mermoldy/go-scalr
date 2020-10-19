@@ -57,11 +57,15 @@ type ConfigurationSource string
 
 // List all available configuration version sources.
 const (
-	ConfigurationSourceAPI       ConfigurationSource = "tfe-api"
-	ConfigurationSourceBitbucket ConfigurationSource = "bitbucket"
-	ConfigurationSourceGithub    ConfigurationSource = "github"
-	ConfigurationSourceGitlab    ConfigurationSource = "gitlab"
-	ConfigurationSourceTerraform ConfigurationSource = "terraform"
+	ConfigurationSourceAPI                 ConfigurationSource = "api"
+	ConfigurationSourceBitbucket           ConfigurationSource = "bitbucket"
+	ConfigurationSourceGithub              ConfigurationSource = "github"
+	ConfigurationSourceGitlab              ConfigurationSource = "gitlab"
+	ConfigurationSourceTerraform           ConfigurationSource = "terraform"
+	ConfigurationSourceGitlabEnterprise    ConfigurationSource = "gitlab_enterprise"
+	ConfigurationSourceGithubEnterprise    ConfigurationSource = "github_enterprise"
+	ConfigurationSourceAzureDevOpsServices ConfigurationSource = "azure_dev_ops_services"
+	ConfigurationSourceAzureDevOpsServer   ConfigurationSource = "azure_dev_ops_server"
 )
 
 // ConfigurationVersionList represents a list of configuration versions.

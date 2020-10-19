@@ -31,20 +31,20 @@ const (
 	EnvironmentStatusInactive EnvironmentStatus = "Inactive"
 )
 
-// Environment represents a Terraform Enterprise environment.
+// Environment represents a Scalr environment.
 type Environment struct {
 	ID                    string            `jsonapi:"primary,environments"`
 	Name                  string            `jsonapi:"attr,name"`
 	CostEstimationEnabled bool              `jsonapi:"attr,cost-estimation-enabled"`
 	CreatedAt             time.Time         `jsonapi:"attr,created-at,iso8601"`
-	CreatedBy             string            `jsonapi:"attr,created-by"`
 	Status                EnvironmentStatus `jsonapi:"attr,status"`
 
 	// Relations
-	Account *Account `jsonapi:"relation,account"`
+	Account   *Account `jsonapi:"relation,account"`
+	CreatedBy *User    `jsonapi:"relation,created-by"`
 }
 
-// duplicate Environment to change type to "organizations" (workspace.Organization)
+// Organization is Environment included in Workspace - always prefer Environment
 type Organization struct {
 	ID                    string            `jsonapi:"primary,organizations"`
 	Name                  string            `jsonapi:"attr,name"`

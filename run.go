@@ -70,9 +70,11 @@ type RunSource string
 
 // List all available run sources.
 const (
-	RunSourceAPI                  RunSource = "tfe-api"
-	RunSourceConfigurationVersion RunSource = "tfe-configuration-version"
-	RunSourceUI                   RunSource = "tfe-ui"
+	RunSourceAPI                  RunSource = "api"
+	RunSourceConfigurationVersion RunSource = "configuration-version"
+	RunSourceUI                   RunSource = "ui"
+	RunSourceVCS                  RunSource = "vcs"
+	RunSourceCLI                  RunSource = "cli"
 )
 
 // RunList represents a list of runs.

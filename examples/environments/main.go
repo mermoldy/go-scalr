@@ -3,14 +3,19 @@ package main
 import (
 	"context"
 	"log"
+	"net/http"
 
 	scalr "github.com/scalr/go-scalr"
 )
 
 func main() {
 	config := &scalr.Config{
-		Token: "insert-your-token-here",
+		Address:  "https://<example>.scalr.io",
+		BasePath: "/api/iacp/v3/",
+		Token:    "<your token>",
+		Headers:  make(http.Header),
 	}
+	config.Headers.Set("Prefer", "profile=internal")
 
 	client, err := scalr.NewClient(config)
 	if err != nil {
@@ -20,20 +25,11 @@ func main() {
 	// Create a context
 	ctx := context.Background()
 
-	// Create a new environment
-	options := scalr.EnvironmentCreateOptions{
-		Name:  scalr.String("example"),
-		Email: scalr.String("info@example.com"),
-	}
-
-	org, err := client.Environments.Create(ctx, options)
+	// Get an environment
+	env, err := client.Environments.Read(ctx, "env-...")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Delete an environment
-	err = client.Environments.Delete(ctx, org.Name)
-	if err != nil {
-		log.Fatal(err)
-	}
+	log.Printf("Environment created at %v", env.CreatedAt)
 }
