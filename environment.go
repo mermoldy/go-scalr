@@ -40,9 +40,8 @@ type Environment struct {
 	Status                EnvironmentStatus `jsonapi:"attr,status"`
 
 	// Relations
-	Account *Account `jsonapi:"relation,account"`
-	CreatedBy *User `jsonapi:"relation,created-by"`
-
+	Account   *Account `jsonapi:"relation,account"`
+	CreatedBy *User    `jsonapi:"relation,created-by"`
 }
 
 // Organization is Environment included in Workspace - always prefer Environment
