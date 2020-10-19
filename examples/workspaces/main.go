@@ -3,14 +3,19 @@ package main
 import (
 	"context"
 	"log"
+	"net/http"
 
 	scalr "github.com/scalr/go-scalr"
 )
 
 func main() {
 	config := &scalr.Config{
-		Token: "insert-your-token-here",
+		Address:  "https://<example>.scalr.io",
+		BasePath: "/api/iacp/v3/",
+		Token:    "<your token>",
+		Headers:  make(http.Header),
 	}
+	config.Headers.Set("Prefer", "profile=internal")
 
 	client, err := scalr.NewClient(config)
 	if err != nil {
@@ -20,18 +25,21 @@ func main() {
 	// Create a context
 	ctx := context.Background()
 
+	// Set your environment ID
+	environmentID := "env-..."
+
 	// Create a new workspace
-	w, err := client.Workspaces.Create(ctx, "env-name", scalr.WorkspaceCreateOptions{
-		Name: scalr.String("my-app-tst"),
+	w, err := client.Workspaces.Create(ctx, environmentID, scalr.WorkspaceCreateOptions{
+		Name: scalr.String("example-ws"),
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Update the workspace
-	w, err = client.Workspaces.Update(ctx, "env-name", w.Name, scalr.WorkspaceUpdateOptions{
+	w, err = client.Workspaces.Update(ctx, environmentID, w.Name, scalr.WorkspaceUpdateOptions{
 		AutoApply:        scalr.Bool(false),
-		TerraformVersion: scalr.String("0.12.0"),
+		TerraformVersion: scalr.String("0.12.28"),
 		WorkingDirectory: scalr.String("my-app/infra"),
 	})
 	if err != nil {
