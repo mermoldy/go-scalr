@@ -3,14 +3,19 @@ package main
 import (
 	"context"
 	"log"
+	"net/http"
 
 	scalr "github.com/scalr/go-scalr"
 )
 
 func main() {
 	config := &scalr.Config{
-		Token: "insert-your-token-here",
+		Address:  "https://<example>.scalr.io",
+		BasePath: "/api/iacp/v3/",
+		Token:    "<your token>",
+		Headers:  make(http.Header),
 	}
+	config.Headers.Set("Prefer", "profile=internal")
 
 	client, err := scalr.NewClient(config)
 	if err != nil {
