@@ -31,6 +31,16 @@ const (
 	EnvironmentStatusInactive EnvironmentStatus = "Inactive"
 )
 
+// CloudCredential relationship
+type CloudCredential struct {
+	ID string `jsonapi:"primary,cloud-credentials"`
+}
+
+// PolicyGroup relationship
+type PolicyGroup struct {
+	ID string `jsonapi:"primary,policy-groups"`
+}
+
 // Environment represents a Scalr environment.
 type Environment struct {
 	ID                    string            `jsonapi:"primary,environments"`
@@ -40,8 +50,10 @@ type Environment struct {
 	Status                EnvironmentStatus `jsonapi:"attr,status"`
 
 	// Relations
-	Account   *Account `jsonapi:"relation,account"`
-	CreatedBy *User    `jsonapi:"relation,created-by"`
+	Account          *Account           `jsonapi:"relation,account"`
+	CloudCredentials []*CloudCredential `jsonapi:"relation,cloud-credentials"`
+	PolicyGroups     []*PolicyGroup     `jsonapi:"relation,policy-groups"`
+	CreatedBy        *User              `jsonapi:"relation,created-by"`
 }
 
 // Organization is Environment included in Workspace - always prefer Environment
