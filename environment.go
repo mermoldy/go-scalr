@@ -63,8 +63,13 @@ func (s *environments) Read(ctx context.Context, environmentID string) (*Environ
 		return nil, fmt.Errorf("invalid value for environment ID: %v", environmentID)
 	}
 
+	options := struct {
+		Include string `url:"include"`
+	}{
+		Include: "created-by",
+	}
 	u := fmt.Sprintf("environments/%s", url.QueryEscape(environmentID))
-	req, err := s.client.newRequest("GET", u, nil)
+	req, err := s.client.newRequest("GET", u, options)
 	if err != nil {
 		return nil, err
 	}
