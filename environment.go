@@ -2,6 +2,7 @@ package scalr
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"time"
@@ -15,6 +16,7 @@ var _ Environments = (*environments)(nil)
 type Environments interface {
 	// Read an environment by its ID.
 	Read(ctx context.Context, environmentID string) (*Environment, error)
+	Create(ctx context.Context, options EnvironmentCreateOptions) (*Environment, error)
 }
 
 // environments implements Environments.
@@ -67,6 +69,43 @@ type Organization struct {
 
 	// Relations
 	Account *Account `jsonapi:"relation,account"`
+}
+
+// EnvironmentCreateOptions represents the options for creating a new Environment.
+type EnvironmentCreateOptions struct {
+	ID                    string  `jsonapi:"primary,environments"`
+	Name                  *string `jsonapi:"attr,name"`
+	CostEstimationEnabled *bool   `jsonapi:"attr,cost-estimation-enabled"`
+
+	// Relations
+	Account          *Account           `jsonapi:"relation,account"`
+	CloudCredentials []*CloudCredential `jsonapi:"relation,cloud-credentials"`
+	PolicyGroups     []*PolicyGroup     `jsonapi:"relation,policy-groups"`
+}
+
+// Create is used to create a new Environment.
+func (s *environments) Create(ctx context.Context, options EnvironmentCreateOptions) (*Environment, error) {
+	if !validStringID(&options.Account.ID) {
+		return nil, errors.New("invalid value for Account.ID")
+	}
+	// if err := options.valid(); err != nil {
+	// 	return nil, err
+	// }
+
+	// Make sure we don't send a user provided ID.
+	options.ID = ""
+	req, err := s.client.newRequest("POST", "environments", &options)
+	if err != nil {
+		return nil, err
+	}
+
+	environment := &Environment{}
+	err = s.client.do(ctx, req, environment)
+	if err != nil {
+		return nil, err
+	}
+
+	return environment, nil
 }
 
 // Read an environment by its ID.
