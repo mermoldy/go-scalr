@@ -17,6 +17,7 @@ type Environments interface {
 	// Read an environment by its ID.
 	Read(ctx context.Context, environmentID string) (*Environment, error)
 	Create(ctx context.Context, options EnvironmentCreateOptions) (*Environment, error)
+	Delete(ctx context.Context, environmentID string) error
 }
 
 // environments implements Environments.
@@ -132,4 +133,19 @@ func (s *environments) Read(ctx context.Context, environmentID string) (*Environ
 	}
 
 	return org, nil
+}
+
+// Delete an environment by its ID.
+func (s *environments) Delete(ctx context.Context, environmentID string) error {
+	if !validStringID(&environmentID) {
+		return errors.New("invalid value for environment ID")
+	}
+
+	u := fmt.Sprintf("environments/%s", url.QueryEscape(environmentID))
+	req, err := s.client.newRequest("DELETE", u, nil)
+	if err != nil {
+		return err
+	}
+
+	return s.client.do(ctx, req, nil)
 }
