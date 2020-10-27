@@ -14,9 +14,9 @@ var _ Environments = (*environments)(nil)
 // Environments describes all the environment related methods that the
 // Scalr IACP API supports.
 type Environments interface {
-	// Read an environment by its ID.
 	Read(ctx context.Context, environmentID string) (*Environment, error)
 	Create(ctx context.Context, options EnvironmentCreateOptions) (*Environment, error)
+	Update(ctx context.Context, environmentID string, options EnvironmentUpdateOptions) (*Environment, error)
 	Delete(ctx context.Context, environmentID string) error
 }
 
@@ -126,13 +126,49 @@ func (s *environments) Read(ctx context.Context, environmentID string) (*Environ
 		return nil, err
 	}
 
-	org := &Environment{}
-	err = s.client.do(ctx, req, org)
+	env := &Environment{}
+	err = s.client.do(ctx, req, env)
 	if err != nil {
 		return nil, err
 	}
 
-	return org, nil
+	return env, nil
+}
+
+// EnvironmentUpdateOptions represents the options for updating an environment.
+type EnvironmentUpdateOptions struct {
+	// For internal use only!
+	ID                    string  `jsonapi:"primary,environments"`
+	Name                  *string `jsonapi:"attr,name"`
+	CostEstimationEnabled *bool   `jsonapi:"attr,cost-estimation-enabled"`
+
+	// Relations
+	CloudCredentials []*CloudCredential `jsonapi:"relation,cloud-credentials"`
+	PolicyGroups     []*PolicyGroup     `jsonapi:"relation,policy-groups"`
+}
+
+// Update settings of an existing environment.
+func (s *environments) Update(ctx context.Context, environmentID string, options EnvironmentUpdateOptions) (*Environment, error) {
+	if !validStringID(&environmentID) {
+		return nil, errors.New("invalid value for environment ID")
+	}
+
+	// Make sure we don't send a user provided ID.
+	options.ID = ""
+
+	u := fmt.Sprintf("environments/%s", url.QueryEscape(environmentID))
+	req, err := s.client.newRequest("PATCH", u, &options)
+	if err != nil {
+		return nil, err
+	}
+
+	env := &Environment{}
+	err = s.client.do(ctx, req, env)
+	if err != nil {
+		return nil, err
+	}
+
+	return env, nil
 }
 
 // Delete an environment by its ID.
