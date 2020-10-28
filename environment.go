@@ -87,7 +87,7 @@ type EnvironmentCreateOptions struct {
 // Create is used to create a new Environment.
 func (s *environments) Create(ctx context.Context, options EnvironmentCreateOptions) (*Environment, error) {
 	if !validStringID(&options.Account.ID) {
-		return nil, errors.New("invalid value for Account.ID")
+		return nil, errors.New("invalid value for account_id")
 	}
 	// if err := options.valid(); err != nil {
 	// 	return nil, err
