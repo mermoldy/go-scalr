@@ -89,10 +89,6 @@ func (s *environments) Create(ctx context.Context, options EnvironmentCreateOpti
 	if !validStringID(&options.Account.ID) {
 		return nil, errors.New("invalid value for account_id")
 	}
-	// if err := options.valid(); err != nil {
-	// 	return nil, err
-	// }
-
 	// Make sure we don't send a user provided ID.
 	options.ID = ""
 	req, err := s.client.newRequest("POST", "environments", &options)
