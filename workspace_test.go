@@ -89,7 +89,6 @@ func TestWorkspacesCreate(t *testing.T) {
 			Name:             String("foo"),
 			AutoApply:        Bool(true),
 			Operations:       Bool(true),
-			QueueAllRuns:     Bool(true),
 			TerraformVersion: String("0.12.1"),
 			WorkingDirectory: String("bar/"),
 		}
@@ -109,7 +108,6 @@ func TestWorkspacesCreate(t *testing.T) {
 			assert.Equal(t, *options.Name, item.Name)
 			assert.Equal(t, *options.AutoApply, item.AutoApply)
 			assert.Equal(t, *options.Operations, item.Operations)
-			assert.Equal(t, *options.QueueAllRuns, item.QueueAllRuns)
 			assert.Equal(t, *options.TerraformVersion, item.TerraformVersion)
 			assert.Equal(t, *options.WorkingDirectory, item.WorkingDirectory)
 		}
@@ -255,7 +253,6 @@ func TestWorkspacesUpdate(t *testing.T) {
 			Name:             String(wTest.Name),
 			AutoApply:        Bool(true),
 			Operations:       Bool(true),
-			QueueAllRuns:     Bool(true),
 			TerraformVersion: String("0.12.0"),
 		}
 
@@ -264,7 +261,6 @@ func TestWorkspacesUpdate(t *testing.T) {
 
 		assert.Equal(t, wTest.Name, wAfter.Name)
 		assert.NotEqual(t, wTest.AutoApply, wAfter.AutoApply)
-		assert.NotEqual(t, wTest.QueueAllRuns, wAfter.QueueAllRuns)
 		assert.NotEqual(t, wTest.TerraformVersion, wAfter.TerraformVersion)
 		assert.Equal(t, wTest.WorkingDirectory, wAfter.WorkingDirectory)
 	})
@@ -274,7 +270,6 @@ func TestWorkspacesUpdate(t *testing.T) {
 			Name:             String(randomString(t)),
 			AutoApply:        Bool(false),
 			Operations:       Bool(false),
-			QueueAllRuns:     Bool(false),
 			TerraformVersion: String("0.12.2"),
 			WorkingDirectory: String("baz/"),
 		}
@@ -293,7 +288,6 @@ func TestWorkspacesUpdate(t *testing.T) {
 			assert.Equal(t, *options.Name, item.Name)
 			assert.Equal(t, *options.AutoApply, item.AutoApply)
 			assert.Equal(t, *options.Operations, item.Operations)
-			assert.Equal(t, *options.QueueAllRuns, item.QueueAllRuns)
 			assert.Equal(t, *options.TerraformVersion, item.TerraformVersion)
 			assert.Equal(t, *options.WorkingDirectory, item.WorkingDirectory)
 		}
@@ -334,7 +328,6 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 			Name:             String(wTest.Name),
 			AutoApply:        Bool(true),
 			Operations:       Bool(true),
-			QueueAllRuns:     Bool(true),
 			TerraformVersion: String("0.12.0"),
 		}
 
@@ -343,7 +336,6 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 
 		assert.Equal(t, wTest.Name, wAfter.Name)
 		assert.NotEqual(t, wTest.AutoApply, wAfter.AutoApply)
-		assert.NotEqual(t, wTest.QueueAllRuns, wAfter.QueueAllRuns)
 		assert.NotEqual(t, wTest.TerraformVersion, wAfter.TerraformVersion)
 		assert.Equal(t, wTest.WorkingDirectory, wAfter.WorkingDirectory)
 	})
@@ -353,7 +345,6 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 			Name:             String(randomString(t)),
 			AutoApply:        Bool(false),
 			Operations:       Bool(false),
-			QueueAllRuns:     Bool(false),
 			TerraformVersion: String("0.12.2"),
 			WorkingDirectory: String("baz/"),
 		}
@@ -372,7 +363,6 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 			assert.Equal(t, *options.Name, item.Name)
 			assert.Equal(t, *options.AutoApply, item.AutoApply)
 			assert.Equal(t, *options.Operations, item.Operations)
-			assert.Equal(t, *options.QueueAllRuns, item.QueueAllRuns)
 			assert.Equal(t, *options.TerraformVersion, item.TerraformVersion)
 			assert.Equal(t, *options.WorkingDirectory, item.WorkingDirectory)
 		}
