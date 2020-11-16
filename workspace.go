@@ -71,7 +71,6 @@ type Workspace struct {
 	AutoApply            bool                  `jsonapi:"attr,auto-apply"`
 	CanQueueDestroyPlan  bool                  `jsonapi:"attr,can-queue-destroy-plan"`
 	CreatedAt            time.Time             `jsonapi:"attr,created-at,iso8601"`
-	Environment          string                `jsonapi:"attr,environment"`
 	FileTriggersEnabled  bool                  `jsonapi:"attr,file-triggers-enabled"`
 	Locked               bool                  `jsonapi:"attr,locked"`
 	MigrationEnvironment string                `jsonapi:"attr,migration-environment"`
@@ -84,10 +83,10 @@ type Workspace struct {
 	WorkingDirectory     string                `jsonapi:"attr,working-directory"`
 
 	// Relations
-	CurrentRun   *Run                `jsonapi:"relation,current-run"`
-	Organization *Organization       `jsonapi:"relation,organization"`
-	CreatedBy    *User               `jsonapi:"relation,created-by"`
-	VcsProvider  *VcsProviderOptions `jsonapi:"relation,vcs-provider"`
+	CurrentRun  *Run                `jsonapi:"relation,current-run"`
+	Environment *Environment        `jsonapi:"relation,environment"`
+	CreatedBy   *User               `jsonapi:"relation,created-by"`
+	VcsProvider *VcsProviderOptions `jsonapi:"relation,vcs-provider"`
 }
 
 // VCSRepo contains the configuration of a VCS integration.
