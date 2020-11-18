@@ -29,10 +29,10 @@ const (
 	headerRateReset = "X-RateLimit-Reset"
 
 	// DefaultAddress of Scalr.
-	DefaultAddress = "https://my.scalr.com"
+	DefaultAddress = "https://scalr.io"
 	// DefaultBasePath on which the API is served.
 	DefaultBasePath = "/api/iacp/v3/"
-	// No-op API endpoint used to configure the rate limiter
+	// PingEndpoint is a no-op API endpoint used to configure the rate limiter
 	PingEndpoint = "ping"
 )
 
@@ -176,11 +176,6 @@ func NewClient(cfg *Config) (*Client, error) {
 		RetryWaitMin: 100 * time.Millisecond,
 		RetryWaitMax: 400 * time.Millisecond,
 		RetryMax:     30,
-	}
-
-	// Configure the rate limiter.
-	if err := client.configureLimiter(); err != nil {
-		return nil, err
 	}
 
 	// Create the services.

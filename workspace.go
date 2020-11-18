@@ -121,8 +121,9 @@ type WorkspacePermissions struct {
 type WorkspaceListOptions struct {
 	ListOptions
 
-	// A search string (partial workspace name) used to filter the results.
-	Search *string `url:"search[name],omitempty"`
+	Environment   *string `url:"filter[environment]"`
+	WorkspaceID   *string `url:"filter[workspace]"`
+	WorkspaceName *string `url:"filter[workspace][name]"`
 }
 
 // List all the workspaces within an environment.
