@@ -14,6 +14,7 @@ var _ Environments = (*environments)(nil)
 // Environments describes all the environment related methods that the
 // Scalr IACP API supports.
 type Environments interface {
+	List(ctx context.Context) (*EnvironmentList, error)
 	Read(ctx context.Context, environmentID string) (*Environment, error)
 	Create(ctx context.Context, options EnvironmentCreateOptions) (*Environment, error)
 	Update(ctx context.Context, environmentID string, options EnvironmentUpdateOptions) (*Environment, error)
@@ -42,6 +43,12 @@ type CloudCredential struct {
 // PolicyGroup relationship
 type PolicyGroup struct {
 	ID string `jsonapi:"primary,policy-groups"`
+}
+
+// EnvironmentList represents a list of environments.
+type EnvironmentList struct {
+	*Pagination
+	Items []*Environment
 }
 
 // Environment represents a Scalr environment.
@@ -82,6 +89,22 @@ type EnvironmentCreateOptions struct {
 	Account          *Account           `jsonapi:"relation,account"`
 	CloudCredentials []*CloudCredential `jsonapi:"relation,cloud-credentials"`
 	PolicyGroups     []*PolicyGroup     `jsonapi:"relation,policy-groups"`
+}
+
+// List all the environmens.
+func (s *environments) List(ctx context.Context) (*EnvironmentList, error) {
+	req, err := s.client.newRequest("GET", "environments", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	envl := &EnvironmentList{}
+	err = s.client.do(ctx, req, envl)
+	if err != nil {
+		return nil, err
+	}
+
+	return envl, nil
 }
 
 // Create is used to create a new Environment.
