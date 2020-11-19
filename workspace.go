@@ -19,8 +19,8 @@ type Workspaces interface {
 	// Create is used to create a new workspace.
 	Create(ctx context.Context, environment string, options WorkspaceCreateOptions) (*Workspace, error)
 
-	// Read a workspace by its name.
-	Read(ctx context.Context, environment string, workspace string) (*Workspace, error)
+	// Read a workspace by its environment_id and name.
+	Read(ctx context.Context, environmentID, workspaceName string) (*Workspace, error)
 
 	// ReadByID reads a workspace by its ID.
 	ReadByID(ctx context.Context, workspaceID string) (*Workspace, error)
@@ -118,9 +118,8 @@ type WorkspacePermissions struct {
 // WorkspaceListOptions represents the options for listing workspaces.
 type WorkspaceListOptions struct {
 	ListOptions
-
-	// A search string (partial workspace name) used to filter the results.
-	Search *string `url:"search[name],omitempty"`
+	Environment *string `url:"filter[environment],omitempty"`
+	Name        *string `url:"filter[workspace][name],omitempty"`
 }
 
 // List all the workspaces within an environment.
@@ -229,38 +228,33 @@ func (s *workspaces) Create(ctx context.Context, environment string, options Wor
 	return w, nil
 }
 
-// Read a workspace by its name.
-func (s *workspaces) Read(ctx context.Context, environment, workspace string) (*Workspace, error) {
-	if !validStringID(&environment) {
+// Read a workspace by environment_id and name.
+func (s *workspaces) Read(ctx context.Context, environmentID, workspaceName string) (*Workspace, error) {
+	if !validStringID(&environmentID) {
 		return nil, errors.New("invalid value for environment")
 	}
-	if !validStringID(&workspace) {
+	if !validStringID(&workspaceName) {
 		return nil, errors.New("invalid value for workspace")
 	}
 
-	options := struct {
-		Include string `url:"include"`
-	}{
-		Include: "created-by",
-	}
+	options := WorkspaceListOptions{Name: &workspaceName}
 
-	u := fmt.Sprintf(
-		"organizations/%s/workspaces/%s",
-		url.QueryEscape(environment),
-		url.QueryEscape(workspace),
-	)
+	u := fmt.Sprintf("workspaces")
 	req, err := s.client.newRequest("GET", u, options)
 	if err != nil {
 		return nil, err
 	}
 
-	w := &Workspace{}
-	err = s.client.do(ctx, req, w)
+	wl := &WorkspaceList{}
+	err = s.client.do(ctx, req, wl)
 	if err != nil {
 		return nil, err
 	}
+	if len(wl.Items) > 1 {
+		return nil, errors.New("invalid filters")
+	}
 
-	return w, nil
+	return wl.Items[0], nil
 }
 
 // ReadByID reads a workspace by its ID.
