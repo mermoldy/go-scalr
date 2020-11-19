@@ -29,8 +29,9 @@ func main() {
 	environmentID := "env-..."
 
 	// Create a new workspace
-	w, err := client.Workspaces.Create(ctx, environmentID, scalr.WorkspaceCreateOptions{
-		Name: scalr.String("example-ws"),
+	w, err := client.Workspaces.Create(ctx, scalr.WorkspaceCreateOptions{
+		Name:        scalr.String("example-ws"),
+		Environment: &scalr.Environment{ID: environmentID},
 	})
 	if err != nil {
 		log.Fatal(err)

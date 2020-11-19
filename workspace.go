@@ -17,7 +17,7 @@ type Workspaces interface {
 	List(ctx context.Context, environment string, options WorkspaceListOptions) (*WorkspaceList, error)
 
 	// Create is used to create a new workspace.
-	Create(ctx context.Context, environment string, options WorkspaceCreateOptions) (*Workspace, error)
+	Create(ctx context.Context, options WorkspaceCreateOptions) (*Workspace, error)
 
 	// Read a workspace by its environment_id and name.
 	Read(ctx context.Context, environmentID, workspaceName string) (*Workspace, error)
@@ -175,6 +175,9 @@ type WorkspaceCreateOptions struct {
 
 	// Specifies the VcsProvider for workspace vcs-repo. Required if vcs-repo attr passed
 	VcsProvider *VcsProviderOptions `jsonapi:"relation,vcs-provider,omitempty"`
+
+	// Specifies the Environmen for workpace.
+	Environment *Environment `jsonapi:"relation,environment"`
 }
 
 // VCSRepoOptions represents the configuration options of a VCS integration.
@@ -202,19 +205,14 @@ func (o WorkspaceCreateOptions) valid() error {
 }
 
 // Create is used to create a new workspace.
-func (s *workspaces) Create(ctx context.Context, environment string, options WorkspaceCreateOptions) (*Workspace, error) {
-	if !validStringID(&environment) {
-		return nil, errors.New("invalid value for environment")
-	}
+func (s *workspaces) Create(ctx context.Context, options WorkspaceCreateOptions) (*Workspace, error) {
 	if err := options.valid(); err != nil {
 		return nil, err
 	}
-
 	// Make sure we don't send a user provided ID.
 	options.ID = ""
 
-	u := fmt.Sprintf("organizations/%s/workspaces", url.QueryEscape(environment))
-	req, err := s.client.newRequest("POST", u, &options)
+	req, err := s.client.newRequest("POST", "workspaces", &options)
 	if err != nil {
 		return nil, err
 	}
@@ -240,7 +238,7 @@ func (s *workspaces) Read(ctx context.Context, environmentID, workspaceName stri
 	options := WorkspaceListOptions{Name: &workspaceName}
 
 	u := fmt.Sprintf("workspaces")
-	req, err := s.client.newRequest("GET", u, options)
+	req, err := s.client.newRequest("GET", u, &options)
 	if err != nil {
 		return nil, err
 	}

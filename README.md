@@ -68,8 +68,9 @@ func main() {
 	ctx := context.Background()
 
 	// Create a new workspace
-	w, err := client.Workspaces.Create(ctx, "env-name", scalr.WorkspaceCreateOptions{
+	w, err := client.Workspaces.Create(ctx, scalr.WorkspaceCreateOptions{
 		Name: scalr.String("my-app-tst"),
+		Environment: &scalr.Environment{ID: "env-ID"},
 	})
 	if err != nil {
 		log.Fatal(err)
