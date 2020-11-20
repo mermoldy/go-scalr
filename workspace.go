@@ -121,9 +121,12 @@ type WorkspacePermissions struct {
 type WorkspaceListOptions struct {
 	ListOptions
 
-	Environment   *string `url:"filter[environment]"`
-	WorkspaceID   *string `url:"filter[workspace]"`
-	WorkspaceName *string `url:"filter[workspace][name]"`
+	// Filter by exact environment ID
+	Environment *string `url:"filter[environment],omitempty"`
+	// Filter by exact workspace ID
+	WorkspaceID *string `url:"filter[workspace],omitempty"`
+	// Filter by exact workspace name
+	WorkspaceName *string `url:"filter[workspace][name],omitempty"`
 }
 
 // List all the workspaces within an environment.

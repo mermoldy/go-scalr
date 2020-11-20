@@ -166,6 +166,7 @@ func NewClient(cfg *Config) (*Client, error) {
 		token:        config.Token,
 		headers:      config.Headers,
 		retryLogHook: config.RetryLogHook,
+		limiter:      rate.NewLimiter(rate.Inf, 0),
 	}
 
 	client.http = &retryablehttp.Client{
@@ -258,6 +259,7 @@ func rateLimitBackoff(min, max time.Duration, attemptNum int, resp *http.Respons
 	return min + jitter
 }
 
+// nolint:unused
 // configureLimiter configures the rate limiter.
 func (c *Client) configureLimiter() error {
 	// Create a new request.
