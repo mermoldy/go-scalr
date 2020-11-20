@@ -87,8 +87,8 @@ type EnvironmentCreateOptions struct {
 
 	// Relations
 	Account          *Account           `jsonapi:"relation,account"`
-	CloudCredentials []*CloudCredential `jsonapi:"relation,cloud-credentials"`
-	PolicyGroups     []*PolicyGroup     `jsonapi:"relation,policy-groups"`
+	CloudCredentials []*CloudCredential `jsonapi:"relation,cloud-credentials,omitempty"`
+	PolicyGroups     []*PolicyGroup     `jsonapi:"relation,policy-groups,omitempty"`
 }
 
 // List all the environmens.
@@ -162,8 +162,8 @@ type EnvironmentUpdateOptions struct {
 	CostEstimationEnabled *bool   `jsonapi:"attr,cost-estimation-enabled"`
 
 	// Relations
-	CloudCredentials []*CloudCredential `jsonapi:"relation,cloud-credentials"`
-	PolicyGroups     []*PolicyGroup     `jsonapi:"relation,policy-groups"`
+	CloudCredentials []*CloudCredential `jsonapi:"relation,cloud-credentials,omitempty"`
+	PolicyGroups     []*PolicyGroup     `jsonapi:"relation,policy-groups,omitempty"`
 }
 
 // Update settings of an existing environment.
