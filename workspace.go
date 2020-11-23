@@ -114,6 +114,7 @@ type WorkspaceListOptions struct {
 	ListOptions
 	Environment *string `url:"filter[environment],omitempty"`
 	Name        *string `url:"filter[workspace][name],omitempty"`
+	Include     string  `url:"include,omitempty"`
 }
 
 // List all the workspaces within an environment.
@@ -224,10 +225,9 @@ func (s *workspaces) Read(ctx context.Context, environmentID, workspaceName stri
 		return nil, errors.New("invalid value for workspace")
 	}
 
-	options := WorkspaceListOptions{Environment: &environmentID, Name: &workspaceName}
+	options := WorkspaceListOptions{Environment: &environmentID, Name: &workspaceName, Include: "created-by"}
 
-	u := fmt.Sprintf("workspaces")
-	req, err := s.client.newRequest("GET", u, &options)
+	req, err := s.client.newRequest("GET", "workspaces", &options)
 	if err != nil {
 		return nil, err
 	}
