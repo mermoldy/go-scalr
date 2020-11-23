@@ -331,7 +331,7 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 			TerraformVersion: String("0.12.0"),
 		}
 
-		wAfter, err := client.Workspaces.UpdateByID(ctx, wTest.ID, options)
+		wAfter, err := client.Workspaces.Update(ctx, wTest.ID, options)
 		require.NoError(t, err)
 
 		assert.Equal(t, wTest.Name, wAfter.Name)
@@ -349,7 +349,7 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 			WorkingDirectory: String("baz/"),
 		}
 
-		w, err := client.Workspaces.UpdateByID(ctx, wTest.ID, options)
+		w, err := client.Workspaces.Update(ctx, wTest.ID, options)
 		require.NoError(t, err)
 
 		// Get a refreshed view of the workspace from the API
@@ -369,7 +369,7 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 	})
 
 	t.Run("when an error is returned from the api", func(t *testing.T) {
-		w, err := client.Workspaces.UpdateByID(ctx, wTest.ID, WorkspaceUpdateOptions{
+		w, err := client.Workspaces.Update(ctx, wTest.ID, WorkspaceUpdateOptions{
 			TerraformVersion: String("nonexisting"),
 		})
 		assert.Nil(t, w)
@@ -377,7 +377,7 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 	})
 
 	t.Run("without a valid workspace ID", func(t *testing.T) {
-		w, err := client.Workspaces.UpdateByID(ctx, badIdentifier, WorkspaceUpdateOptions{})
+		w, err := client.Workspaces.Update(ctx, badIdentifier, WorkspaceUpdateOptions{})
 		assert.Nil(t, w)
 		assert.EqualError(t, err, "invalid value for workspace ID")
 	})
@@ -393,36 +393,7 @@ func TestWorkspacesDelete(t *testing.T) {
 	wTest, _ := createWorkspace(t, client, orgTest)
 
 	t.Run("with valid options", func(t *testing.T) {
-		err := client.Workspaces.Delete(ctx, orgTest.Name, wTest.Name)
-		require.NoError(t, err)
-
-		// Try loading the workspace - it should fail.
-		_, err = client.Workspaces.Read(ctx, orgTest.Name, wTest.Name)
-		assert.Equal(t, ErrResourceNotFound, err)
-	})
-
-	t.Run("when environment is invalid", func(t *testing.T) {
-		err := client.Workspaces.Delete(ctx, badIdentifier, wTest.Name)
-		assert.EqualError(t, err, "invalid value for environment")
-	})
-
-	t.Run("when workspace is invalid", func(t *testing.T) {
-		err := client.Workspaces.Delete(ctx, orgTest.Name, badIdentifier)
-		assert.EqualError(t, err, "invalid value for workspace")
-	})
-}
-
-func TestWorkspacesDeleteByID(t *testing.T) {
-	client := testClient(t)
-	ctx := context.Background()
-
-	orgTest, orgTestCleanup := createEnvironment(t, client)
-	defer orgTestCleanup()
-
-	wTest, _ := createWorkspace(t, client, orgTest)
-
-	t.Run("with valid options", func(t *testing.T) {
-		err := client.Workspaces.DeleteByID(ctx, wTest.ID)
+		err := client.Workspaces.Delete(ctx, wTest.ID)
 		require.NoError(t, err)
 
 		// Try loading the workspace - it should fail.
@@ -431,7 +402,7 @@ func TestWorkspacesDeleteByID(t *testing.T) {
 	})
 
 	t.Run("without a valid workspace ID", func(t *testing.T) {
-		err := client.Workspaces.DeleteByID(ctx, badIdentifier)
+		err := client.Workspaces.Delete(ctx, badIdentifier)
 		assert.EqualError(t, err, "invalid value for workspace ID")
 	})
 }

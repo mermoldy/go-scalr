@@ -77,7 +77,7 @@ func main() {
 	}
 
 	// Update the workspace
-	w, err = client.Workspaces.Update(ctx, "env-name", w.Name, scalr.WorkspaceUpdateOptions{
+	w, err = client.Workspaces.Update(ctx, w.ID, scalr.WorkspaceUpdateOptions{
 		AutoApply:        scalr.Bool(false),
 		TerraformVersion: scalr.String("0.12.0"),
 		WorkingDirectory: scalr.String("my-app/infra"),
