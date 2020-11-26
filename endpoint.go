@@ -37,7 +37,6 @@ type EndpointList struct {
 // Endpoint represents a Scalr IACP endpoint.
 type Endpoint struct {
 	ID          string `jsonapi:"primary,endpoints"`
-	HTTPMethod  string `jsonapi:"attr,http-method"`
 	MaxAttempts int    `jsonapi:"attr,max-attempts"`
 	Name        string `jsonapi:"attr,name"`
 	SecretKey   string `jsonapi:"attr,secret-key"`
@@ -87,7 +86,7 @@ type EndpointCreateOptions struct {
 	MaxAttempts *int    `jsonapi:"attr,max-attempts,omitempty"`
 	Name        *string `jsonapi:"attr,name"`
 	Url         *string `jsonapi:"attr,url"`
-	SecretKey   *string `jsonapi:"attr,secret-key"`
+	SecretKey   *string `jsonapi:"attr,secret-key,omitempty"`
 	Timeout     *int    `jsonapi:"attr,timeout,omitempty"`
 
 	// Relations
@@ -101,9 +100,6 @@ func (o EndpointCreateOptions) valid() error {
 	}
 	if !validString(o.Url) {
 		return errors.New("Url is required")
-	}
-	if !validString(o.SecretKey) {
-		return errors.New("secret key is required")
 	}
 	return nil
 }
