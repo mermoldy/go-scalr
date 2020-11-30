@@ -19,7 +19,7 @@ type Workspaces interface {
 	// Create is used to create a new workspace.
 	Create(ctx context.Context, options WorkspaceCreateOptions) (*Workspace, error)
 
-	// Read a workspace by its environment_id and name.
+	// Read a workspace by its environment ID and name.
 	Read(ctx context.Context, environmentID, workspaceName string) (*Workspace, error)
 
 	// ReadByID reads a workspace by its ID.
@@ -216,7 +216,7 @@ func (s *workspaces) Create(ctx context.Context, options WorkspaceCreateOptions)
 	return w, nil
 }
 
-// Read a workspace by environment_id and name.
+// Read a workspace by environment ID and name.
 func (s *workspaces) Read(ctx context.Context, environmentID, workspaceName string) (*Workspace, error) {
 	if !validStringID(&environmentID) {
 		return nil, errors.New("invalid value for environment")
