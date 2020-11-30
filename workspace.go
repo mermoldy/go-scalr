@@ -25,7 +25,7 @@ type Workspaces interface {
 	// ReadByID reads a workspace by its ID.
 	ReadByID(ctx context.Context, workspaceID string) (*Workspace, error)
 
-	// Update updates the settings of an existing workspace.
+	// Update settings of an existing workspace.
 	Update(ctx context.Context, workspaceID string, options WorkspaceUpdateOptions) (*Workspace, error)
 
 	// Delete deletes a workspace by its ID.
@@ -237,7 +237,7 @@ func (s *workspaces) Read(ctx context.Context, environmentID, workspaceName stri
 	if err != nil {
 		return nil, err
 	}
-	if len(wl.Items) > 1 {
+	if len(wl.Items) != 1 {
 		return nil, errors.New("invalid filters")
 	}
 
@@ -313,7 +313,7 @@ type WorkspaceUpdateOptions struct {
 	VcsProvider *VcsProviderOptions `jsonapi:"relation,vcs-provider,omitempty"`
 }
 
-// Update updates the settings of an existing workspace.
+// Update settings of an existing workspace.
 func (s *workspaces) Update(ctx context.Context, workspaceID string, options WorkspaceUpdateOptions) (*Workspace, error) {
 	if !validStringID(&workspaceID) {
 		return nil, errors.New("invalid value for workspace ID")
