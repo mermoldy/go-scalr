@@ -91,6 +91,8 @@ func DefaultConfig() *Config {
 
 	// Set the default user agent.
 	config.Headers.Set("User-Agent", userAgent)
+	// Set the default API Profile.
+	config.Headers.Set("Prefer", "profile=preview")
 
 	return config
 }

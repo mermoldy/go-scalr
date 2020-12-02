@@ -89,7 +89,6 @@ func TestWorkspacesCreate(t *testing.T) {
 			Name:             String("foo"),
 			AutoApply:        Bool(true),
 			Operations:       Bool(true),
-			QueueAllRuns:     Bool(true),
 			TerraformVersion: String("0.12.1"),
 			WorkingDirectory: String("bar/"),
 		}
@@ -109,7 +108,6 @@ func TestWorkspacesCreate(t *testing.T) {
 			assert.Equal(t, *options.Name, item.Name)
 			assert.Equal(t, *options.AutoApply, item.AutoApply)
 			assert.Equal(t, *options.Operations, item.Operations)
-			assert.Equal(t, *options.QueueAllRuns, item.QueueAllRuns)
 			assert.Equal(t, *options.TerraformVersion, item.TerraformVersion)
 			assert.Equal(t, *options.WorkingDirectory, item.WorkingDirectory)
 		}
@@ -255,7 +253,6 @@ func TestWorkspacesUpdate(t *testing.T) {
 			Name:             String(wTest.Name),
 			AutoApply:        Bool(true),
 			Operations:       Bool(true),
-			QueueAllRuns:     Bool(true),
 			TerraformVersion: String("0.12.0"),
 		}
 
@@ -264,7 +261,6 @@ func TestWorkspacesUpdate(t *testing.T) {
 
 		assert.Equal(t, wTest.Name, wAfter.Name)
 		assert.NotEqual(t, wTest.AutoApply, wAfter.AutoApply)
-		assert.NotEqual(t, wTest.QueueAllRuns, wAfter.QueueAllRuns)
 		assert.NotEqual(t, wTest.TerraformVersion, wAfter.TerraformVersion)
 		assert.Equal(t, wTest.WorkingDirectory, wAfter.WorkingDirectory)
 	})
@@ -274,7 +270,6 @@ func TestWorkspacesUpdate(t *testing.T) {
 			Name:             String(randomString(t)),
 			AutoApply:        Bool(false),
 			Operations:       Bool(false),
-			QueueAllRuns:     Bool(false),
 			TerraformVersion: String("0.12.2"),
 			WorkingDirectory: String("baz/"),
 		}
@@ -293,7 +288,6 @@ func TestWorkspacesUpdate(t *testing.T) {
 			assert.Equal(t, *options.Name, item.Name)
 			assert.Equal(t, *options.AutoApply, item.AutoApply)
 			assert.Equal(t, *options.Operations, item.Operations)
-			assert.Equal(t, *options.QueueAllRuns, item.QueueAllRuns)
 			assert.Equal(t, *options.TerraformVersion, item.TerraformVersion)
 			assert.Equal(t, *options.WorkingDirectory, item.WorkingDirectory)
 		}
@@ -334,16 +328,14 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 			Name:             String(wTest.Name),
 			AutoApply:        Bool(true),
 			Operations:       Bool(true),
-			QueueAllRuns:     Bool(true),
 			TerraformVersion: String("0.12.0"),
 		}
 
-		wAfter, err := client.Workspaces.UpdateByID(ctx, wTest.ID, options)
+		wAfter, err := client.Workspaces.Update(ctx, wTest.ID, options)
 		require.NoError(t, err)
 
 		assert.Equal(t, wTest.Name, wAfter.Name)
 		assert.NotEqual(t, wTest.AutoApply, wAfter.AutoApply)
-		assert.NotEqual(t, wTest.QueueAllRuns, wAfter.QueueAllRuns)
 		assert.NotEqual(t, wTest.TerraformVersion, wAfter.TerraformVersion)
 		assert.Equal(t, wTest.WorkingDirectory, wAfter.WorkingDirectory)
 	})
@@ -353,12 +345,11 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 			Name:             String(randomString(t)),
 			AutoApply:        Bool(false),
 			Operations:       Bool(false),
-			QueueAllRuns:     Bool(false),
 			TerraformVersion: String("0.12.2"),
 			WorkingDirectory: String("baz/"),
 		}
 
-		w, err := client.Workspaces.UpdateByID(ctx, wTest.ID, options)
+		w, err := client.Workspaces.Update(ctx, wTest.ID, options)
 		require.NoError(t, err)
 
 		// Get a refreshed view of the workspace from the API
@@ -372,14 +363,13 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 			assert.Equal(t, *options.Name, item.Name)
 			assert.Equal(t, *options.AutoApply, item.AutoApply)
 			assert.Equal(t, *options.Operations, item.Operations)
-			assert.Equal(t, *options.QueueAllRuns, item.QueueAllRuns)
 			assert.Equal(t, *options.TerraformVersion, item.TerraformVersion)
 			assert.Equal(t, *options.WorkingDirectory, item.WorkingDirectory)
 		}
 	})
 
 	t.Run("when an error is returned from the api", func(t *testing.T) {
-		w, err := client.Workspaces.UpdateByID(ctx, wTest.ID, WorkspaceUpdateOptions{
+		w, err := client.Workspaces.Update(ctx, wTest.ID, WorkspaceUpdateOptions{
 			TerraformVersion: String("nonexisting"),
 		})
 		assert.Nil(t, w)
@@ -387,7 +377,7 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 	})
 
 	t.Run("without a valid workspace ID", func(t *testing.T) {
-		w, err := client.Workspaces.UpdateByID(ctx, badIdentifier, WorkspaceUpdateOptions{})
+		w, err := client.Workspaces.Update(ctx, badIdentifier, WorkspaceUpdateOptions{})
 		assert.Nil(t, w)
 		assert.EqualError(t, err, "invalid value for workspace ID")
 	})
@@ -403,36 +393,7 @@ func TestWorkspacesDelete(t *testing.T) {
 	wTest, _ := createWorkspace(t, client, orgTest)
 
 	t.Run("with valid options", func(t *testing.T) {
-		err := client.Workspaces.Delete(ctx, orgTest.Name, wTest.Name)
-		require.NoError(t, err)
-
-		// Try loading the workspace - it should fail.
-		_, err = client.Workspaces.Read(ctx, orgTest.Name, wTest.Name)
-		assert.Equal(t, ErrResourceNotFound, err)
-	})
-
-	t.Run("when environment is invalid", func(t *testing.T) {
-		err := client.Workspaces.Delete(ctx, badIdentifier, wTest.Name)
-		assert.EqualError(t, err, "invalid value for environment")
-	})
-
-	t.Run("when workspace is invalid", func(t *testing.T) {
-		err := client.Workspaces.Delete(ctx, orgTest.Name, badIdentifier)
-		assert.EqualError(t, err, "invalid value for workspace")
-	})
-}
-
-func TestWorkspacesDeleteByID(t *testing.T) {
-	client := testClient(t)
-	ctx := context.Background()
-
-	orgTest, orgTestCleanup := createEnvironment(t, client)
-	defer orgTestCleanup()
-
-	wTest, _ := createWorkspace(t, client, orgTest)
-
-	t.Run("with valid options", func(t *testing.T) {
-		err := client.Workspaces.DeleteByID(ctx, wTest.ID)
+		err := client.Workspaces.Delete(ctx, wTest.ID)
 		require.NoError(t, err)
 
 		// Try loading the workspace - it should fail.
@@ -441,7 +402,7 @@ func TestWorkspacesDeleteByID(t *testing.T) {
 	})
 
 	t.Run("without a valid workspace ID", func(t *testing.T) {
-		err := client.Workspaces.DeleteByID(ctx, badIdentifier)
+		err := client.Workspaces.Delete(ctx, badIdentifier)
 		assert.EqualError(t, err, "invalid value for workspace ID")
 	})
 }
