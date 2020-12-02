@@ -98,7 +98,7 @@ func (s *webhooks) List(ctx context.Context, options WebhookListOptions) (*Webho
 // WebhookCreateOptions represents the options for creating a new webhook.
 type WebhookCreateOptions struct {
 	ID      string  `jsonapi:"primary,webhooks"`
-	Enabled *bool   `jsonapi:"attr,enabled"`
+	Enabled *bool   `jsonapi:"attr,enabled,omitempty"`
 	Name    *string `jsonapi:"attr,name"`
 
 	// Relations
@@ -164,7 +164,7 @@ func (s *webhooks) Read(ctx context.Context, webhookID string) (*Webhook, error)
 type WebhookUpdateOptions struct {
 	// For internal use only!
 	ID      string  `jsonapi:"primary,webhooks"`
-	Enabled *bool   `jsonapi:"attr,enabled"`
+	Enabled *bool   `jsonapi:"attr,enabled,omitempty"`
 	Name    *string `jsonapi:"attr,name"`
 
 	// Relations
