@@ -112,6 +112,7 @@ type WorkspacePermissions struct {
 // WorkspaceListOptions represents the options for listing workspaces.
 type WorkspaceListOptions struct {
 	ListOptions
+
 	Environment *string `url:"filter[environment],omitempty"`
 	Name        *string `url:"filter[workspace][name],omitempty"`
 	Include     string  `url:"include,omitempty"`
