@@ -1,15 +1,10 @@
 package scalr
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
 	"net/url"
-	"os"
-	"time"
-
-	slug "github.com/hashicorp/go-slug"
 )
 
 // Compile-time proof of interface implementation.
@@ -18,23 +13,12 @@ var _ ConfigurationVersions = (*configurationVersions)(nil)
 // ConfigurationVersions describes all the configuration version related
 // methods that the Scalr API supports.
 type ConfigurationVersions interface {
-	// List returns all configuration versions of a workspace.
-	List(ctx context.Context, workspaceID string, options ConfigurationVersionListOptions) (*ConfigurationVersionList, error)
-
 	// Create is used to create a new configuration version. The created
 	// configuration version will be usable once data is uploaded to it.
-	Create(ctx context.Context, workspaceID string, options ConfigurationVersionCreateOptions) (*ConfigurationVersion, error)
+	Create(ctx context.Context, options ConfigurationVersionCreateOptions) (*ConfigurationVersion, error)
 
 	// Read a configuration version by its ID.
 	Read(ctx context.Context, cvID string) (*ConfigurationVersion, error)
-
-	// Read ingress attributes by configuration version ID.
-	ReadIngressAttributes(ctx context.Context, cvID string) (*IngressAttributes, error)
-
-	// Upload packages and uploads Terraform configuration files. It requires
-	// the upload URL from a configuration version and the full path to the
-	// configuration files on disk.
-	Upload(ctx context.Context, url string, path string) error
 }
 
 // configurationVersions implements ConfigurationVersions.
@@ -52,86 +36,14 @@ const (
 	ConfigurationUploaded ConfigurationStatus = "uploaded"
 )
 
-// ConfigurationSource represents a source of a configuration version.
-type ConfigurationSource string
-
-// List all available configuration version sources.
-const (
-	ConfigurationSourceAPI                 ConfigurationSource = "api"
-	ConfigurationSourceBitbucket           ConfigurationSource = "bitbucket"
-	ConfigurationSourceGithub              ConfigurationSource = "github"
-	ConfigurationSourceGitlab              ConfigurationSource = "gitlab"
-	ConfigurationSourceTerraform           ConfigurationSource = "terraform"
-	ConfigurationSourceGitlabEnterprise    ConfigurationSource = "gitlab_enterprise"
-	ConfigurationSourceGithubEnterprise    ConfigurationSource = "github_enterprise"
-	ConfigurationSourceAzureDevOpsServices ConfigurationSource = "azure_dev_ops_services"
-	ConfigurationSourceAzureDevOpsServer   ConfigurationSource = "azure_dev_ops_server"
-)
-
-// ConfigurationVersionList represents a list of configuration versions.
-type ConfigurationVersionList struct {
-	*Pagination
-	Items []*ConfigurationVersion
-}
-
-// IngressAttributes represents the VCS metadata
-type IngressAttributes struct {
-	ID             string `jsonapi:"primary,ingress-attributes"`
-	Branch         string `jsonapi:"attr,branch"`
-	CommitSha      string `jsonapi:"attr,commit-sha"`
-	CommitMessage  string `jsonapi:"attr,commit-message"`
-	SenderUsername string `jsonapi:"attr,sender-username"`
-}
-
 // ConfigurationVersion is a representation of an uploaded or ingressed
 // Terraform configuration in Scalr. A workspace must have at least one
 // configuration version before any runs may be queued on it.
 type ConfigurationVersion struct {
-	ID                string              `jsonapi:"primary,configuration-versions"`
-	AutoQueueRuns     bool                `jsonapi:"attr,auto-queue-runs"`
-	Error             string              `jsonapi:"attr,error"`
-	ErrorMessage      string              `jsonapi:"attr,error-message"`
-	Source            ConfigurationSource `jsonapi:"attr,source"`
-	Speculative       bool                `jsonapi:"attr,speculative "`
-	Status            ConfigurationStatus `jsonapi:"attr,status"`
-	StatusTimestamps  *CVStatusTimestamps `jsonapi:"attr,status-timestamps"`
-	UploadURL         string              `jsonapi:"attr,upload-url"`
-	IngressAttributes *IngressAttributes  `jsonapi:"relation,ingress-attributes"`
-}
-
-// CVStatusTimestamps holds the timestamps for individual configuration version
-// statuses.
-type CVStatusTimestamps struct {
-	FinishedAt time.Time `json:"finished-at"`
-	QueuedAt   time.Time `json:"queued-at"`
-	StartedAt  time.Time `json:"started-at"`
-}
-
-// ConfigurationVersionListOptions represents the options for listing
-// configuration versions.
-type ConfigurationVersionListOptions struct {
-	ListOptions
-}
-
-// List returns all configuration versions of a workspace.
-func (s *configurationVersions) List(ctx context.Context, workspaceID string, options ConfigurationVersionListOptions) (*ConfigurationVersionList, error) {
-	if !validStringID(&workspaceID) {
-		return nil, errors.New("invalid value for workspace ID")
-	}
-
-	u := fmt.Sprintf("workspaces/%s/configuration-versions", url.QueryEscape(workspaceID))
-	req, err := s.client.newRequest("GET", u, &options)
-	if err != nil {
-		return nil, err
-	}
-
-	cvl := &ConfigurationVersionList{}
-	err = s.client.do(ctx, req, cvl)
-	if err != nil {
-		return nil, err
-	}
-
-	return cvl, nil
+	ID     string              `jsonapi:"primary,configuration-versions"`
+	Status ConfigurationStatus `jsonapi:"attr,status"`
+	// Relations
+	Workspace *Workspace `jsonapi:"relation,workspace"`
 }
 
 // ConfigurationVersionCreateOptions represents the options for creating a
@@ -140,26 +52,29 @@ type ConfigurationVersionCreateOptions struct {
 	// For internal use only!
 	ID string `jsonapi:"primary,configuration-versions"`
 
-	// When true, runs are queued automatically when the configuration version
-	// is uploaded.
-	AutoQueueRuns *bool `jsonapi:"attr,auto-queue-runs,omitempty"`
-
-	// When true, this configuration version can only be used for planning.
-	Speculative *bool `jsonapi:"attr,speculative,omitempty"`
+	Workspace *Workspace `jsonapi:"relation,workspace"`
 }
 
-// Create is used to create a new configuration version. The created
-// configuration version will be usable once data is uploaded to it.
-func (s *configurationVersions) Create(ctx context.Context, workspaceID string, options ConfigurationVersionCreateOptions) (*ConfigurationVersion, error) {
-	if !validStringID(&workspaceID) {
-		return nil, errors.New("invalid value for workspace ID")
+func (o ConfigurationVersionCreateOptions) valid() error {
+	if o.Workspace == nil {
+		return errors.New("workspace is required")
+	}
+	if !validStringID(&o.Workspace.ID) {
+		return errors.New("invalid value for workspace ID")
+	}
+	return nil
+}
+
+// Create is used to create a new configuration version.
+func (s *configurationVersions) Create(ctx context.Context, options ConfigurationVersionCreateOptions) (*ConfigurationVersion, error) {
+	if err := options.valid(); err != nil {
+		return nil, err
 	}
 
 	// Make sure we don't send a user provided ID.
 	options.ID = ""
 
-	u := fmt.Sprintf("workspaces/%s/configuration-versions", url.QueryEscape(workspaceID))
-	req, err := s.client.newRequest("POST", u, &options)
+	req, err := s.client.newRequest("POST", "configuration-versions", &options)
 	if err != nil {
 		return nil, err
 	}
@@ -192,52 +107,4 @@ func (s *configurationVersions) Read(ctx context.Context, cvID string) (*Configu
 	}
 
 	return cv, nil
-}
-
-// Read ingress attributes by configuration version ID.
-func (s *configurationVersions) ReadIngressAttributes(ctx context.Context, cvID string) (*IngressAttributes, error) {
-	if !validStringID(&cvID) {
-		return nil, errors.New("invalid value for configuration version ID")
-	}
-
-	u := fmt.Sprintf("configuration-versions/%s/ingress-attributes", url.QueryEscape(cvID))
-	req, err := s.client.newRequest("GET", u, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	cv := &IngressAttributes{}
-	err = s.client.do(ctx, req, cv)
-	if err != nil {
-		return nil, err
-	}
-
-	return cv, nil
-}
-
-// Upload packages and uploads Terraform configuration files. It requires the
-// upload URL from a configuration version and the path to the configuration
-// files on disk.
-func (s *configurationVersions) Upload(ctx context.Context, url, path string) error {
-	file, err := os.Stat(path)
-	if err != nil {
-		return err
-	}
-	if !file.Mode().IsDir() {
-		return errors.New("path needs to be an existing directory")
-	}
-
-	body := bytes.NewBuffer(nil)
-
-	_, err = slug.Pack(path, body, true)
-	if err != nil {
-		return err
-	}
-
-	req, err := s.client.newRequest("PUT", url, body)
-	if err != nil {
-		return err
-	}
-
-	return s.client.do(ctx, req, nil)
 }

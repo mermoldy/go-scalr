@@ -8,81 +8,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestVariablesList(t *testing.T) {
-	client := testClient(t)
-	ctx := context.Background()
-
-	orgTest, orgTestCleanup := createEnvironment(t, client)
-	defer orgTestCleanup()
-
-	wTest, _ := createWorkspace(t, client, orgTest)
-
-	vTest1, _ := createVariable(t, client, wTest)
-	vTest2, _ := createVariable(t, client, wTest)
-
-	t.Run("without list options", func(t *testing.T) {
-		vl, err := client.Variables.List(ctx, VariableListOptions{
-			Environment: String(orgTest.Name),
-			Workspace:   String(wTest.Name),
-		})
-		require.NoError(t, err)
-		assert.Contains(t, vl.Items, vTest1)
-		assert.Contains(t, vl.Items, vTest2)
-
-		t.Skip("paging not supported yet in API")
-		assert.Equal(t, 1, vl.CurrentPage)
-		assert.Equal(t, 2, vl.TotalCount)
-	})
-
-	t.Run("with list options", func(t *testing.T) {
-		t.Skip("paging not supported yet in API")
-		// Request a page number which is out of range. The result should
-		// be successful, but return no results if the paging options are
-		// properly passed along.
-		vl, err := client.Variables.List(ctx, VariableListOptions{
-			ListOptions: ListOptions{
-				PageNumber: 999,
-				PageSize:   100,
-			},
-			Environment: String(orgTest.Name),
-			Workspace:   String(wTest.Name),
-		})
-		require.NoError(t, err)
-		assert.Empty(t, vl.Items)
-		assert.Equal(t, 999, vl.CurrentPage)
-		assert.Equal(t, 2, vl.TotalCount)
-	})
-
-	t.Run("when options is missing an environment", func(t *testing.T) {
-		vl, err := client.Variables.List(ctx, VariableListOptions{
-			Workspace: String(wTest.Name),
-		})
-		assert.Nil(t, vl)
-		assert.EqualError(t, err, "environment is required")
-	})
-
-	t.Run("when options is missing an workspace", func(t *testing.T) {
-		vl, err := client.Variables.List(ctx, VariableListOptions{
-			Environment: String(orgTest.Name),
-		})
-		assert.Nil(t, vl)
-		assert.EqualError(t, err, "workspace is required")
-	})
-}
-
 func TestVariablesCreate(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	wTest, wTestCleanup := createWorkspace(t, client, nil)
-	defer wTestCleanup()
+	wsTest, wsTestCleanup := createWorkspace(t, client, nil)
+	defer wsTestCleanup()
 
 	t.Run("with valid options", func(t *testing.T) {
 		options := VariableCreateOptions{
 			Key:       String(randomString(t)),
 			Value:     String(randomString(t)),
 			Category:  Category(CategoryTerraform),
-			Workspace: wTest,
+			Workspace: wsTest,
 		}
 
 		v, err := client.Variables.Create(ctx, options)
@@ -92,8 +30,7 @@ func TestVariablesCreate(t *testing.T) {
 		assert.Equal(t, *options.Key, v.Key)
 		assert.Equal(t, *options.Value, v.Value)
 		assert.Equal(t, *options.Category, v.Category)
-		// The workspace isn't returned correcly by the API.
-		// assert.Equal(t, *options.Workspace, v.Workspace)
+		assert.Equal(t, options.Workspace.ID, v.Workspace.ID)
 	})
 
 	t.Run("when options has an empty string value", func(t *testing.T) {
@@ -101,7 +38,7 @@ func TestVariablesCreate(t *testing.T) {
 			Key:       String(randomString(t)),
 			Value:     String(""),
 			Category:  Category(CategoryTerraform),
-			Workspace: wTest,
+			Workspace: wsTest,
 		}
 
 		v, err := client.Variables.Create(ctx, options)
@@ -117,7 +54,7 @@ func TestVariablesCreate(t *testing.T) {
 		options := VariableCreateOptions{
 			Key:       String(randomString(t)),
 			Category:  Category(CategoryTerraform),
-			Workspace: wTest,
+			Workspace: wsTest,
 		}
 
 		v, err := client.Variables.Create(ctx, options)
@@ -133,7 +70,7 @@ func TestVariablesCreate(t *testing.T) {
 		options := VariableCreateOptions{
 			Value:     String(randomString(t)),
 			Category:  Category(CategoryTerraform),
-			Workspace: wTest,
+			Workspace: wsTest,
 		}
 
 		_, err := client.Variables.Create(ctx, options)
@@ -145,7 +82,7 @@ func TestVariablesCreate(t *testing.T) {
 			Key:       String(""),
 			Value:     String(randomString(t)),
 			Category:  Category(CategoryTerraform),
-			Workspace: wTest,
+			Workspace: wsTest,
 		}
 
 		_, err := client.Variables.Create(ctx, options)
@@ -156,7 +93,7 @@ func TestVariablesCreate(t *testing.T) {
 		options := VariableCreateOptions{
 			Key:       String(randomString(t)),
 			Value:     String(randomString(t)),
-			Workspace: wTest,
+			Workspace: wsTest,
 		}
 
 		_, err := client.Variables.Create(ctx, options)
