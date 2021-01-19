@@ -56,25 +56,23 @@ type Variable struct {
 	Category  CategoryType `jsonapi:"attr,category"`
 	HCL       bool         `jsonapi:"attr,hcl"`
 	Sensitive bool         `jsonapi:"attr,sensitive"`
+	Final     bool         `jsonapi:"attr,final"`
 
 	// Relations
-	Workspace *Workspace `jsonapi:"relation,workspace"`
+	Workspace   *Workspace   `jsonapi:"relation,workspace"`
+	Environment *Environment `jsonapi:"relation,environment"`
+	Account     *Account     `jsonapi:"relation,account"`
 }
 
 // VariableListOptions represents the options for listing variables.
 type VariableListOptions struct {
 	ListOptions
-	Environment *string `url:"filter[environment]"`
-	Workspace   *string `url:"filter[workspace]"`
+	Account     *string `url:"filter[account],omitempty"`
+	Environment *string `url:"filter[environment],omitempty"`
+	Workspace   *string `url:"filter[workspace],omitempty"`
 }
 
 func (o VariableListOptions) valid() error {
-	if !validString(o.Environment) {
-		return errors.New("environment is required")
-	}
-	if !validString(o.Workspace) {
-		return errors.New("workspace is required")
-	}
 	return nil
 }
 
@@ -118,8 +116,21 @@ type VariableCreateOptions struct {
 	// Whether the value is sensitive.
 	Sensitive *bool `jsonapi:"attr,sensitive,omitempty"`
 
+	// Whether the value is final.
+	Final *bool `jsonapi:"attr,final,omitempty"`
+
 	// The workspace that owns the variable.
-	Workspace *Workspace `jsonapi:"relation,workspace"`
+	Workspace *Workspace `jsonapi:"relation,workspace,omitempty"`
+
+	// The environment that owns the variable.
+	Environment *Environment `jsonapi:"relation,environment,omitempty"`
+
+	// The account  that owns the variable.
+	Account *Account `jsonapi:"relation,account,omitempty"`
+
+	// Force flag used to check whether final variable may be created.
+	// TODO: handle in Create func
+	Force *bool `url:"force"`
 }
 
 func (o VariableCreateOptions) valid() error {
@@ -128,9 +139,6 @@ func (o VariableCreateOptions) valid() error {
 	}
 	if o.Category == nil {
 		return errors.New("category is required")
-	}
-	if o.Workspace == nil {
-		return errors.New("workspace is required")
 	}
 	return nil
 }
@@ -195,6 +203,13 @@ type VariableUpdateOptions struct {
 
 	// Whether the value is sensitive.
 	Sensitive *bool `jsonapi:"attr,sensitive,omitempty"`
+
+	// Whether the value is final.
+	Final *bool `jsonapi:"attr,final,omitempty"`
+
+	// Force flag used to check whether final variable may be created.
+	// TODO: handle in Update func
+	Force *bool `url:"force"`
 }
 
 // Update values of an existing variable.
