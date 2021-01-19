@@ -19,8 +19,6 @@ func TestEnvironmentsList(t *testing.T) {
 	totalCount := envl.TotalCount
 	envTest1, envTest1Cleanup := createEnvironment(t, client)
 	defer envTest1Cleanup()
-	envTest2, envTest2Cleanup := createEnvironment(t, client)
-	defer envTest2Cleanup()
 
 	t.Run("with no list options", func(t *testing.T) {
 		envl, err := client.Environments.List(ctx)
@@ -30,10 +28,9 @@ func TestEnvironmentsList(t *testing.T) {
 		}
 		require.NoError(t, err)
 		assert.Contains(t, envlIDs, envTest1.ID)
-		assert.Contains(t, envlIDs, envTest2.ID)
 
 		assert.Equal(t, 1, envl.CurrentPage)
-		assert.Equal(t, 2+totalCount, envl.TotalCount)
+		assert.Equal(t, 1+totalCount, envl.TotalCount)
 	})
 
 }

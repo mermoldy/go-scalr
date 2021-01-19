@@ -134,13 +134,13 @@ func TestWorkspacesRead(t *testing.T) {
 	envTest, envTestCleanup := createEnvironment(t, client)
 	defer envTestCleanup()
 
-	wTest, wTestCleanup := createWorkspace(t, client, envTest)
-	defer wTestCleanup()
+	wsTest, wsTestCleanup := createWorkspace(t, client, envTest)
+	defer wsTestCleanup()
 
 	t.Run("when the workspace exists", func(t *testing.T) {
-		ws, err := client.Workspaces.Read(ctx, envTest.ID, wTest.Name)
+		ws, err := client.Workspaces.Read(ctx, envTest.ID, wsTest.Name)
 		require.NoError(t, err)
-		assert.Equal(t, wTest.ID, ws.ID)
+		assert.Equal(t, wsTest.ID, ws.ID)
 
 		t.Run("relationships are properly decoded", func(t *testing.T) {
 			assert.Equal(t, envTest.ID, ws.Environment.ID)
@@ -162,14 +162,14 @@ func TestWorkspacesRead(t *testing.T) {
 	})
 
 	t.Run("without a valid environment", func(t *testing.T) {
-		_, err := client.Workspaces.Read(ctx, badIdentifier, wTest.Name)
+		_, err := client.Workspaces.Read(ctx, badIdentifier, wsTest.Name)
 		assert.Error(t, err)
 		assert.EqualError(t, err, "invalid value for environment")
 	})
 
 	t.Run("without a valid workspace", func(t *testing.T) {
-		w, err := client.Workspaces.Read(ctx, envTest.Name, badIdentifier)
-		assert.Nil(t, w)
+		ws, err := client.Workspaces.Read(ctx, envTest.Name, badIdentifier)
+		assert.Nil(t, ws)
 		assert.EqualError(t, err, "invalid value for workspace")
 	})
 }
@@ -181,32 +181,32 @@ func TestWorkspacesReadByID(t *testing.T) {
 	envTest, envTestCleanup := createEnvironment(t, client)
 	defer envTestCleanup()
 
-	wTest, wTestCleanup := createWorkspace(t, client, envTest)
-	defer wTestCleanup()
+	wsTest, wsTestCleanup := createWorkspace(t, client, envTest)
+	defer wsTestCleanup()
 
 	t.Run("when the workspace exists", func(t *testing.T) {
-		w, err := client.Workspaces.ReadByID(ctx, wTest.ID)
+		ws, err := client.Workspaces.ReadByID(ctx, wsTest.ID)
 		require.NoError(t, err)
-		assert.Equal(t, wTest, w)
+		assert.Equal(t, wsTest.ID, ws.ID)
 
 		t.Run("relationships are properly decoded", func(t *testing.T) {
-			assert.Equal(t, envTest.ID, w.Environment.ID)
+			assert.Equal(t, envTest.ID, ws.Environment.ID)
 		})
 
 		t.Run("timestamps are properly decoded", func(t *testing.T) {
-			assert.NotEmpty(t, w.CreatedAt)
+			assert.NotEmpty(t, ws.CreatedAt)
 		})
 	})
 
 	t.Run("when the workspace does not exist", func(t *testing.T) {
-		w, err := client.Workspaces.ReadByID(ctx, "nonexisting")
-		assert.Nil(t, w)
+		ws, err := client.Workspaces.ReadByID(ctx, "nonexisting")
+		assert.Nil(t, ws)
 		assert.Error(t, err)
 	})
 
 	t.Run("without a valid workspace ID", func(t *testing.T) {
-		w, err := client.Workspaces.ReadByID(ctx, badIdentifier)
-		assert.Nil(t, w)
+		ws, err := client.Workspaces.ReadByID(ctx, badIdentifier)
+		assert.Nil(t, ws)
 		assert.EqualError(t, err, "invalid value for workspace ID")
 	})
 }
@@ -218,23 +218,23 @@ func TestWorkspacesUpdate(t *testing.T) {
 	envTest, envTestCleanup := createEnvironment(t, client)
 	defer envTestCleanup()
 
-	wTest, _ := createWorkspace(t, client, envTest)
+	wsTest, _ := createWorkspace(t, client, envTest)
 
 	t.Run("when updating a subset of values", func(t *testing.T) {
 		options := WorkspaceUpdateOptions{
-			Name:             String(wTest.Name),
+			Name:             String(wsTest.Name),
 			AutoApply:        Bool(true),
 			Operations:       Bool(true),
 			TerraformVersion: String("0.12.25"),
 		}
 
-		wAfter, err := client.Workspaces.Update(ctx, wTest.ID, options)
+		wsAfter, err := client.Workspaces.Update(ctx, wsTest.ID, options)
 		require.NoError(t, err)
 
-		assert.Equal(t, wTest.Name, wAfter.Name)
-		assert.NotEqual(t, wTest.AutoApply, wAfter.AutoApply)
-		assert.NotEqual(t, wTest.TerraformVersion, wAfter.TerraformVersion)
-		assert.Equal(t, wTest.WorkingDirectory, wAfter.WorkingDirectory)
+		assert.Equal(t, wsTest.Name, wsAfter.Name)
+		assert.NotEqual(t, wsTest.AutoApply, wsAfter.AutoApply)
+		assert.NotEqual(t, wsTest.TerraformVersion, wsAfter.TerraformVersion)
+		assert.Equal(t, wsTest.WorkingDirectory, wsAfter.WorkingDirectory)
 	})
 
 	t.Run("with valid options", func(t *testing.T) {
@@ -246,7 +246,7 @@ func TestWorkspacesUpdate(t *testing.T) {
 			WorkingDirectory: String("baz/"),
 		}
 
-		w, err := client.Workspaces.Update(ctx, wTest.ID, options)
+		w, err := client.Workspaces.Update(ctx, wsTest.ID, options)
 		require.NoError(t, err)
 
 		// Get a refreshed view of the workspace from the API
@@ -266,7 +266,7 @@ func TestWorkspacesUpdate(t *testing.T) {
 	})
 
 	t.Run("when an error is returned from the api", func(t *testing.T) {
-		w, err := client.Workspaces.Update(ctx, wTest.ID, WorkspaceUpdateOptions{
+		w, err := client.Workspaces.Update(ctx, wsTest.ID, WorkspaceUpdateOptions{
 			TerraformVersion: String("nonexisting"),
 		})
 		assert.Nil(t, w)

@@ -191,13 +191,13 @@ func TestVariablesUpdate(t *testing.T) {
 	})
 
 	t.Run("without any changes", func(t *testing.T) {
-		vTest, vTestCleanup := createVariable(t, client, nil)
+		created, vTestCleanup := createVariable(t, client, vTest.Workspace)
 		defer vTestCleanup()
 
-		v, err := client.Variables.Update(ctx, vTest.ID, VariableUpdateOptions{})
+		updated, err := client.Variables.Update(ctx, created.ID, VariableUpdateOptions{})
 		require.NoError(t, err)
 
-		assert.Equal(t, vTest, v)
+		assert.Equal(t, created, updated)
 	})
 
 	t.Run("with invalid variable ID", func(t *testing.T) {
