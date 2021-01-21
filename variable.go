@@ -16,13 +16,13 @@ type Variables interface {
 	List(ctx context.Context, options VariableListOptions) (*VariableList, error)
 
 	// Create is used to create a new variable.
-	Create(ctx context.Context, options VariableCreateOptions) (*Variable, error)
+	Create(ctx context.Context, options VariableCreateOptions, force bool) (*Variable, error)
 
 	// Read a variable by its ID.
 	Read(ctx context.Context, variableID string) (*Variable, error)
 
 	// Update values of an existing variable.
-	Update(ctx context.Context, variableID string, options VariableUpdateOptions) (*Variable, error)
+	Update(ctx context.Context, variableID string, options VariableUpdateOptions, force bool) (*Variable, error)
 
 	// Delete a variable by its ID.
 	Delete(ctx context.Context, variableID string) error
@@ -57,7 +57,6 @@ type Variable struct {
 	HCL       bool         `jsonapi:"attr,hcl"`
 	Sensitive bool         `jsonapi:"attr,sensitive"`
 	Final     bool         `jsonapi:"attr,final"`
-	Force     bool         `jsonapi:"attr,force"`
 
 	// Relations
 	Workspace   *Workspace   `jsonapi:"relation,workspace"`
@@ -128,10 +127,6 @@ type VariableCreateOptions struct {
 
 	// The account  that owns the variable.
 	Account *Account `jsonapi:"relation,account,omitempty"`
-
-	// Force flag used to check whether final variable may be created.
-	// TODO: handle in Create func
-	Force *bool `url:"force"`
 }
 
 func (o VariableCreateOptions) valid() error {
@@ -145,7 +140,7 @@ func (o VariableCreateOptions) valid() error {
 }
 
 // Create is used to create a new variable.
-func (s *variables) Create(ctx context.Context, options VariableCreateOptions) (*Variable, error) {
+func (s *variables) Create(ctx context.Context, options VariableCreateOptions, force bool) (*Variable, error) {
 	if err := options.valid(); err != nil {
 		return nil, err
 	}
@@ -153,10 +148,8 @@ func (s *variables) Create(ctx context.Context, options VariableCreateOptions) (
 	// Make sure we don't send a user provided ID.
 	options.ID = ""
 
-	//TODO: rewrite smth like that for force to work
-	//u := fmt.Sprintf("vars?force=%t", url.QueryEscape(fmt.Sprintf("%s",options.Force)))
-	//req, err := s.client.newRequest("POST", u, &options)
-	req, err := s.client.newRequest("POST", "vars", &options)
+	u := fmt.Sprintf("vars?force=%t", force)
+	req, err := s.client.newRequest("POST", u, &options)
 
 	if err != nil {
 		return nil, err
@@ -211,14 +204,10 @@ type VariableUpdateOptions struct {
 
 	// Whether the value is final.
 	Final *bool `jsonapi:"attr,final,omitempty"`
-
-	// Force flag used to check whether final variable may be created.
-	// TODO: handle in Update func
-	Force *bool `url:"force"`
 }
 
 // Update values of an existing variable.
-func (s *variables) Update(ctx context.Context, variableID string, options VariableUpdateOptions) (*Variable, error) {
+func (s *variables) Update(ctx context.Context, variableID string, options VariableUpdateOptions, force bool) (*Variable, error) {
 	if !validStringID(&variableID) {
 		return nil, errors.New("invalid value for variable ID")
 	}
@@ -226,7 +215,7 @@ func (s *variables) Update(ctx context.Context, variableID string, options Varia
 	// Make sure we don't send a user provided ID.
 	options.ID = variableID
 
-	u := fmt.Sprintf("vars/%s", url.QueryEscape(variableID))
+	u := fmt.Sprintf("vars/%s?force=%t", url.QueryEscape(variableID), force)
 	req, err := s.client.newRequest("PATCH", u, &options)
 	if err != nil {
 		return nil, err

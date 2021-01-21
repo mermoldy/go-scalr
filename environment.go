@@ -91,7 +91,7 @@ type EnvironmentCreateOptions struct {
 	PolicyGroups     []*PolicyGroup     `jsonapi:"relation,policy-groups,omitempty"`
 }
 
-// List all the environmens.
+// List all the environments.
 func (s *environments) List(ctx context.Context) (*EnvironmentList, error) {
 	req, err := s.client.newRequest("GET", "environments", nil)
 	if err != nil {
