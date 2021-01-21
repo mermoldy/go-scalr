@@ -57,6 +57,7 @@ type Variable struct {
 	HCL       bool         `jsonapi:"attr,hcl"`
 	Sensitive bool         `jsonapi:"attr,sensitive"`
 	Final     bool         `jsonapi:"attr,final"`
+	Force     bool         `jsonapi:"attr,force"`
 
 	// Relations
 	Workspace   *Workspace   `jsonapi:"relation,workspace"`
@@ -152,7 +153,11 @@ func (s *variables) Create(ctx context.Context, options VariableCreateOptions) (
 	// Make sure we don't send a user provided ID.
 	options.ID = ""
 
+	//TODO: rewrite smth like that for force to work
+	//u := fmt.Sprintf("vars?force=%t", url.QueryEscape(fmt.Sprintf("%s",options.Force)))
+	//req, err := s.client.newRequest("POST", u, &options)
 	req, err := s.client.newRequest("POST", "vars", &options)
+
 	if err != nil {
 		return nil, err
 	}
