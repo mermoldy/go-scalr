@@ -2,13 +2,12 @@ package scalr
 
 import (
 	"context"
-	"os"
 	"testing"
-	"time"
 
 	"github.com/hashicorp/go-uuid"
 )
 
+const defaultAccountID = "acc-svrcncgh453bi8g"
 const badIdentifier = "! / nope"
 
 func testClient(t *testing.T) *Client {
@@ -20,172 +19,101 @@ func testClient(t *testing.T) *Client {
 	return client
 }
 
-func createConfigurationVersion(t *testing.T, client *Client, w *Workspace) (*ConfigurationVersion, func()) {
-	var wCleanup func()
-
-	if w == nil {
-		w, wCleanup = createWorkspace(t, client, nil)
-	}
-
+func createEnvironment(t *testing.T, client *Client) (*Environment, func()) {
 	ctx := context.Background()
-	cv, err := client.ConfigurationVersions.Create(
-		ctx,
-		w.ID,
-		ConfigurationVersionCreateOptions{AutoQueueRuns: Bool(false)},
-	)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return cv, func() {
-		if wCleanup != nil {
-			wCleanup()
-		}
-	}
-}
-
-func createUploadedConfigurationVersion(t *testing.T, client *Client, w *Workspace) (*ConfigurationVersion, func()) {
-	cv, cvCleanup := createConfigurationVersion(t, client, w)
-
-	ctx := context.Background()
-	err := client.ConfigurationVersions.Upload(ctx, cv.UploadURL, "test-fixtures/config-version")
-	if err != nil {
-		cvCleanup()
-		t.Fatal(err)
-	}
-
-	for i := 0; ; i++ {
-		cv, err = client.ConfigurationVersions.Read(ctx, cv.ID)
-		if err != nil {
-			cvCleanup()
-			t.Fatal(err)
-		}
-
-		if cv.Status == ConfigurationUploaded {
-			break
-		}
-
-		if i > 10 {
-			cvCleanup()
-			t.Fatal("Timeout waiting for the configuration version to be uploaded")
-		}
-
-		time.Sleep(1 * time.Second)
-	}
-
-	return cv, cvCleanup
-}
-
-func createRun(t *testing.T, client *Client, w *Workspace) (*Run, func()) {
-	var wCleanup func()
-
-	if w == nil {
-		w, wCleanup = createWorkspace(t, client, nil)
-	}
-
-	cv, cvCleanup := createUploadedConfigurationVersion(t, client, w)
-
-	ctx := context.Background()
-	r, err := client.Runs.Create(ctx, RunCreateOptions{
-		ConfigurationVersion: cv,
-		Workspace:            w,
+	env, err := client.Environments.Create(ctx, EnvironmentCreateOptions{
+		Name:    String("tst-" + randomString(t)),
+		Account: &Account{ID: defaultAccountID},
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	return r, func() {
-		if wCleanup != nil {
-			wCleanup()
+	return env, func() {
+		if err := client.Environments.Delete(ctx, env.ID); err != nil {
+			t.Errorf("Error destroying environment! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"Environment: %s\nError: %s", env.ID, err)
+		}
+	}
+}
+
+func createWorkspace(t *testing.T, client *Client, env *Environment) (*Workspace, func()) {
+	var envCleanup func()
+
+	if env == nil {
+		env, envCleanup = createEnvironment(t, client)
+	}
+	ctx := context.Background()
+	ws, err := client.Workspaces.Create(
+		ctx,
+		WorkspaceCreateOptions{Name: String("tst-" + randomString(t)), Environment: env},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return ws, func() {
+		if err := client.Workspaces.Delete(ctx, ws.ID); err != nil {
+			t.Errorf("Error destroying workspace! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"Workspace: %s\nError: %s", ws.ID, err)
+		}
+		if envCleanup != nil {
+			envCleanup()
+		}
+	}
+}
+
+func createConfigurationVersion(t *testing.T, client *Client, ws *Workspace) (*ConfigurationVersion, func()) {
+	var wsCleanup func()
+
+	if ws == nil {
+		ws, wsCleanup = createWorkspace(t, client, nil)
+	}
+	ctx := context.Background()
+	cv, err := client.ConfigurationVersions.Create(ctx, ConfigurationVersionCreateOptions{Workspace: ws})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return cv, func() {
+		if wsCleanup != nil {
+			wsCleanup()
+		}
+	}
+}
+
+func createRun(t *testing.T, client *Client, ws *Workspace, cv *ConfigurationVersion) (*Run, func()) {
+	var wsCleanup func()
+
+	if ws == nil {
+		ws, wsCleanup = createWorkspace(t, client, nil)
+	}
+	cv, cvCleanup := createConfigurationVersion(t, client, ws)
+
+	ctx := context.Background()
+	run, err := client.Runs.Create(ctx, RunCreateOptions{
+		Workspace:            ws,
+		ConfigurationVersion: cv,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return run, func() {
+		if wsCleanup != nil {
+			wsCleanup()
 		} else {
 			cvCleanup()
 		}
 	}
 }
 
-func createPlannedRun(t *testing.T, client *Client, w *Workspace) (*Run, func()) {
-	r, rCleanup := createRun(t, client, w)
+func createVariable(t *testing.T, client *Client, ws *Workspace) (*Variable, func()) {
+	var wsCleanup func()
 
-	var err error
-	ctx := context.Background()
-	for i := 0; ; i++ {
-		r, err = client.Runs.Read(ctx, r.ID)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		switch r.Status {
-		case RunPlanned, RunCostEstimated, RunPolicyChecked, RunPolicyOverride:
-			return r, rCleanup
-		}
-
-		if i > 45 {
-			rCleanup()
-			t.Fatal("Timeout waiting for run to be planned")
-		}
-
-		time.Sleep(1 * time.Second)
-	}
-}
-
-func createCostEstimatedRun(t *testing.T, client *Client, w *Workspace) (*Run, func()) {
-	r, rCleanup := createRun(t, client, w)
-
-	var err error
-	ctx := context.Background()
-	for i := 0; ; i++ {
-		r, err = client.Runs.Read(ctx, r.ID)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		switch r.Status {
-		case RunCostEstimated, RunPolicyChecked, RunPolicyOverride:
-			return r, rCleanup
-		}
-
-		if i > 45 {
-			rCleanup()
-			t.Fatal("Timeout waiting for run to be cost estimated")
-		}
-
-		time.Sleep(2 * time.Second)
-	}
-}
-
-func createAppliedRun(t *testing.T, client *Client, w *Workspace) (*Run, func()) {
-	r, rCleanup := createPlannedRun(t, client, w)
-	ctx := context.Background()
-
-	err := client.Runs.Apply(ctx, r.ID, RunApplyOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	for i := 0; ; i++ {
-		r, err = client.Runs.Read(ctx, r.ID)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if r.Status == RunApplied {
-			return r, rCleanup
-		}
-
-		if i > 45 {
-			rCleanup()
-			t.Fatal("Timeout waiting for run to be applied")
-		}
-
-		time.Sleep(1 * time.Second)
-	}
-}
-
-func createVariable(t *testing.T, client *Client, w *Workspace) (*Variable, func()) {
-	var wCleanup func()
-
-	if w == nil {
-		w, wCleanup = createWorkspace(t, client, nil)
+	if ws == nil {
+		ws, wsCleanup = createWorkspace(t, client, nil)
 	}
 
 	ctx := context.Background()
@@ -193,7 +121,7 @@ func createVariable(t *testing.T, client *Client, w *Workspace) (*Variable, func
 		Key:       String(randomString(t)),
 		Value:     String(randomString(t)),
 		Category:  Category(CategoryTerraform),
-		Workspace: w,
+		Workspace: ws,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -206,81 +134,8 @@ func createVariable(t *testing.T, client *Client, w *Workspace) (*Variable, func
 				"Variable: %s\nError: %s", v.Key, err)
 		}
 
-		if wCleanup != nil {
-			wCleanup()
-		}
-	}
-}
-
-func createWorkspace(t *testing.T, client *Client, org *Environment) (*Workspace, func()) {
-	var orgCleanup func()
-
-	if org == nil {
-		org, orgCleanup = createEnvironment(t, client)
-	}
-
-	ctx := context.Background()
-	w, err := client.Workspaces.Create(ctx, org.Name, WorkspaceCreateOptions{
-		Name: String(randomString(t)),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return w, func() {
-		if err := client.Workspaces.Delete(ctx, org.Name, w.Name); err != nil {
-			t.Errorf("Error destroying workspace! WARNING: Dangling resources\n"+
-				"may exist! The full error is shown below.\n\n"+
-				"Workspace: %s\nError: %s", w.Name, err)
-		}
-
-		if orgCleanup != nil {
-			orgCleanup()
-		}
-	}
-}
-
-func createWorkspaceWithVCS(t *testing.T, client *Client, org *Environment) (*Workspace, func()) {
-	var orgCleanup func()
-
-	if org == nil {
-		org, orgCleanup = createEnvironment(t, client)
-	}
-
-	oc, ocCleanup := createOAuthToken(t, client, org)
-
-	githubIdentifier := os.Getenv("GITHUB_POLICY_SET_IDENTIFIER")
-	if githubIdentifier == "" {
-		t.Fatal("Export a valid GITHUB_POLICY_SET_IDENTIFIER before running this test!")
-	}
-
-	options := WorkspaceCreateOptions{
-		Name: String(randomString(t)),
-		VCSRepo: &VCSRepoOptions{
-			Identifier:   String(githubIdentifier),
-			OAuthTokenID: String(oc.ID),
-		},
-	}
-
-	ctx := context.Background()
-	w, err := client.Workspaces.Create(ctx, org.Name, options)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return w, func() {
-		if err := client.Workspaces.Delete(ctx, org.Name, w.Name); err != nil {
-			t.Errorf("Error destroying workspace! WARNING: Dangling resources\n"+
-				"may exist! The full error is shown below.\n\n"+
-				"Workspace: %s\nError: %s", w.Name, err)
-		}
-
-		if ocCleanup != nil {
-			ocCleanup()
-		}
-
-		if orgCleanup != nil {
-			orgCleanup()
+		if wsCleanup != nil {
+			wsCleanup()
 		}
 	}
 }
