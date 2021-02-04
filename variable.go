@@ -12,9 +12,6 @@ var _ Variables = (*variables)(nil)
 
 // Variables describes all the variable related methods that the Scalr API supports.
 type Variables interface {
-	// List all the variables associated with the given workspace.
-	List(ctx context.Context, options VariableListOptions) (*VariableList, error)
-
 	// Create is used to create a new variable.
 	Create(ctx context.Context, options VariableCreateOptions, force bool) (*Variable, error)
 
@@ -62,38 +59,6 @@ type Variable struct {
 	Workspace   *Workspace   `jsonapi:"relation,workspace"`
 	Environment *Environment `jsonapi:"relation,environment"`
 	Account     *Account     `jsonapi:"relation,account"`
-}
-
-// VariableListOptions represents the options for listing variables.
-type VariableListOptions struct {
-	ListOptions
-	Account     *string `url:"filter[account],omitempty"`
-	Environment *string `url:"filter[environment],omitempty"`
-	Workspace   *string `url:"filter[workspace],omitempty"`
-}
-
-func (o VariableListOptions) valid() error {
-	return nil
-}
-
-// List all the variables associated with the given workspace.
-func (s *variables) List(ctx context.Context, options VariableListOptions) (*VariableList, error) {
-	if err := options.valid(); err != nil {
-		return nil, err
-	}
-
-	req, err := s.client.newRequest("GET", "vars", &options)
-	if err != nil {
-		return nil, err
-	}
-
-	vl := &VariableList{}
-	err = s.client.do(ctx, req, vl)
-	if err != nil {
-		return nil, err
-	}
-
-	return vl, nil
 }
 
 // VariableCreateOptions represents the options for creating a new variable.

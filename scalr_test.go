@@ -7,9 +7,6 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
-	"time"
-
-	"golang.org/x/time/rate"
 )
 
 func TestClient_newClient(t *testing.T) {
@@ -95,17 +92,7 @@ func TestClient_defaultConfig(t *testing.T) {
 }
 
 func TestClient_headers(t *testing.T) {
-	testedCalls := 0
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		testedCalls++
-
-		if testedCalls == 1 {
-			w.Header().Set("Content-Type", "application/vnd.api+json")
-			w.Header().Set("X-RateLimit-Limit", "30")
-			w.WriteHeader(204) // We query the configured ping URL which should return a 204.
-			return
-		}
-
 		if r.Header.Get("Accept") != "application/vnd.api+json" {
 			t.Fatalf("unexpected accept header: %q", r.Header.Get("Accept"))
 		}
@@ -114,9 +101,6 @@ func TestClient_headers(t *testing.T) {
 		}
 		if r.Header.Get("My-Custom-Header") != "foobar" {
 			t.Fatalf("unexpected custom header: %q", r.Header.Get("My-Custom-Header"))
-		}
-		if r.Header.Get("Terraform-Version") != "0.11.9" {
-			t.Fatalf("unexpected Terraform version header: %q", r.Header.Get("Terraform-Version"))
 		}
 		if r.Header.Get("User-Agent") != "go-scalr" {
 			t.Fatalf("unexpected user agent header: %q", r.Header.Get("User-Agent"))
@@ -133,7 +117,6 @@ func TestClient_headers(t *testing.T) {
 
 	// Set some custom header.
 	cfg.Headers.Set("My-Custom-Header", "foobar")
-	cfg.Headers.Set("Terraform-Version", "0.11.9")
 
 	// This one should be overridden!
 	cfg.Headers.Set("Authorization", "bad-token")
@@ -146,29 +129,13 @@ func TestClient_headers(t *testing.T) {
 	ctx := context.Background()
 
 	// Make a few calls so we can check they all send the expected headers.
-	_, _ = client.Environments.List(ctx, EnvironmentListOptions{})
-	_, _ = client.Plans.Logs(ctx, "plan-123456789")
-	_ = client.Runs.Apply(ctx, "run-123456789", RunApplyOptions{})
-	_, _ = client.Workspaces.Lock(ctx, "ws-123456789", WorkspaceLockOptions{})
-	_, _ = client.Workspaces.Read(ctx, "environment", "workspace")
+	_, _ = client.Environments.Read(ctx, "environmentID")
+	_, _ = client.Workspaces.Read(ctx, "environmentID", "workspaceName")
 
-	if testedCalls != 6 {
-		t.Fatalf("expected 6 tested calls, got: %d", testedCalls)
-	}
 }
 
 func TestClient_userAgent(t *testing.T) {
-	testedCalls := 0
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		testedCalls++
-
-		if testedCalls == 1 {
-			w.Header().Set("Content-Type", "application/vnd.api+json")
-			w.Header().Set("X-RateLimit-Limit", "30")
-			w.WriteHeader(204) // We query the configured ping URL which should return a 204.
-			return
-		}
-
 		if r.Header.Get("User-Agent") != "go-scalr-tester" {
 			t.Fatalf("unexpected user agent header: %q", r.Header.Get("User-Agent"))
 		}
@@ -193,83 +160,14 @@ func TestClient_userAgent(t *testing.T) {
 	ctx := context.Background()
 
 	// Make a few calls so we can check they all send the expected headers.
-	_, _ = client.Environments.List(ctx, EnvironmentListOptions{})
-	_, _ = client.Plans.Logs(ctx, "plan-123456789")
-	_ = client.Runs.Apply(ctx, "run-123456789", RunApplyOptions{})
-	_, _ = client.Workspaces.Lock(ctx, "ws-123456789", WorkspaceLockOptions{})
-	_, _ = client.Workspaces.Read(ctx, "environment", "workspace")
+	_, _ = client.Environments.Read(ctx, "environmentID")
+	_, _ = client.Workspaces.Read(ctx, "environmentID", "workspaceName")
 
-	if testedCalls != 6 {
-		t.Fatalf("expected 6 tested calls, got: %d", testedCalls)
-	}
-}
-
-func TestClient_configureLimiter(t *testing.T) {
-	rateLimit := ""
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/vnd.api+json")
-		w.Header().Set("X-RateLimit-Limit", rateLimit)
-		w.WriteHeader(204) // We query the configured ping URL which should return a 204.
-	}))
-	defer ts.Close()
-
-	cfg := &Config{
-		Address:    ts.URL,
-		Token:      "dummy-token",
-		HTTPClient: ts.Client(),
-	}
-
-	cases := map[string]struct {
-		rate  string
-		limit rate.Limit
-		burst int
-	}{
-		"no-value": {
-			rate:  "",
-			limit: rate.Inf,
-			burst: 0,
-		},
-		"limit-0": {
-			rate:  "0",
-			limit: rate.Inf,
-			burst: 0,
-		},
-		"limit-30": {
-			rate:  "30",
-			limit: rate.Limit(19.8),
-			burst: 9,
-		},
-		"limit-100": {
-			rate:  "100",
-			limit: rate.Limit(66),
-			burst: 33,
-		},
-	}
-
-	for name, tc := range cases {
-		// First set the test rate limit.
-		rateLimit = tc.rate
-
-		client, err := NewClient(cfg)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if client.limiter.Limit() != tc.limit {
-			t.Fatalf("test %s expected limit %f, got: %f", name, tc.limit, client.limiter.Limit())
-		}
-
-		if client.limiter.Burst() != tc.burst {
-			t.Fatalf("test %s expected burst %d, got: %d", name, tc.burst, client.limiter.Burst())
-		}
-	}
 }
 
 func TestClient_retryHTTPCheck(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
-		w.Header().Set("X-RateLimit-Limit", "30")
-		w.WriteHeader(204) // We query the configured ping URL which should return a 204.
 	}))
 	defer ts.Close()
 
@@ -344,43 +242,6 @@ func TestClient_retryHTTPCheck(t *testing.T) {
 		if checkErr != tc.checkErr {
 			t.Fatalf("test %s expected checkErr %v, got: %v", name, tc.checkErr, checkErr)
 		}
-	}
-}
-
-func TestClient_retryHTTPBackoff(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/vnd.api+json")
-		w.Header().Set("X-RateLimit-Limit", "30")
-		w.WriteHeader(204) // We query the configured ping URL which should return a 204.
-	}))
-	defer ts.Close()
-
-	var attempts int
-	retryLogHook := func(attemptNum int, resp *http.Response) {
-		attempts++
-	}
-
-	cfg := &Config{
-		Address:      ts.URL,
-		Token:        "dummy-token",
-		HTTPClient:   ts.Client(),
-		RetryLogHook: retryLogHook,
-	}
-
-	client, err := NewClient(cfg)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	retries := 3
-	resp := &http.Response{StatusCode: 500}
-
-	for i := 0; i < retries; i++ {
-		client.retryHTTPBackoff(time.Second, time.Second, i, resp)
-	}
-
-	if attempts != retries {
-		t.Fatalf("expected %d log hook callbacks, got: %d callbacks", retries, attempts)
 	}
 }
 

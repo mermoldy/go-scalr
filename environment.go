@@ -83,7 +83,7 @@ type Organization struct {
 type EnvironmentCreateOptions struct {
 	ID                    string  `jsonapi:"primary,environments"`
 	Name                  *string `jsonapi:"attr,name"`
-	CostEstimationEnabled *bool   `jsonapi:"attr,cost-estimation-enabled"`
+	CostEstimationEnabled *bool   `jsonapi:"attr,cost-estimation-enabled,omitempty"`
 
 	// Relations
 	Account          *Account           `jsonapi:"relation,account"`
@@ -91,7 +91,20 @@ type EnvironmentCreateOptions struct {
 	PolicyGroups     []*PolicyGroup     `jsonapi:"relation,policy-groups,omitempty"`
 }
 
-// List all the environments.
+func (o EnvironmentCreateOptions) valid() error {
+	if o.Account == nil {
+		return errors.New("account is required")
+	}
+	if !validStringID(&o.Account.ID) {
+		return errors.New("invalid value for account ID")
+	}
+	if o.Name == nil {
+		return errors.New("name is required")
+	}
+	return nil
+}
+
+// List all the environmens.
 func (s *environments) List(ctx context.Context) (*EnvironmentList, error) {
 	req, err := s.client.newRequest("GET", "environments", nil)
 	if err != nil {
@@ -109,8 +122,8 @@ func (s *environments) List(ctx context.Context) (*EnvironmentList, error) {
 
 // Create is used to create a new Environment.
 func (s *environments) Create(ctx context.Context, options EnvironmentCreateOptions) (*Environment, error) {
-	if !validStringID(&options.Account.ID) {
-		return nil, errors.New("invalid value for account_id")
+	if err := options.valid(); err != nil {
+		return nil, err
 	}
 	// Make sure we don't send a user provided ID.
 	options.ID = ""
@@ -131,7 +144,7 @@ func (s *environments) Create(ctx context.Context, options EnvironmentCreateOpti
 // Read an environment by its ID.
 func (s *environments) Read(ctx context.Context, environmentID string) (*Environment, error) {
 	if !validStringID(&environmentID) {
-		return nil, fmt.Errorf("invalid value for environment ID: %v", environmentID)
+		return nil, errors.New("invalid value for environment ID")
 	}
 
 	options := struct {
@@ -158,8 +171,8 @@ func (s *environments) Read(ctx context.Context, environmentID string) (*Environ
 type EnvironmentUpdateOptions struct {
 	// For internal use only!
 	ID                    string  `jsonapi:"primary,environments"`
-	Name                  *string `jsonapi:"attr,name"`
-	CostEstimationEnabled *bool   `jsonapi:"attr,cost-estimation-enabled"`
+	Name                  *string `jsonapi:"attr,name,omitempty"`
+	CostEstimationEnabled *bool   `jsonapi:"attr,cost-estimation-enabled,omitempty"`
 
 	// Relations
 	CloudCredentials []*CloudCredential `jsonapi:"relation,cloud-credentials,omitempty"`
@@ -168,10 +181,6 @@ type EnvironmentUpdateOptions struct {
 
 // Update settings of an existing environment.
 func (s *environments) Update(ctx context.Context, environmentID string, options EnvironmentUpdateOptions) (*Environment, error) {
-	if !validStringID(&environmentID) {
-		return nil, errors.New("invalid value for environment ID")
-	}
-
 	// Make sure we don't send a user provided ID.
 	options.ID = ""
 
