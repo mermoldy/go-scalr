@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+
+	"github.com/google/go-querystring/query"
 )
 
 // Compile-time proof of interface implementation.
@@ -13,13 +15,13 @@ var _ Variables = (*variables)(nil)
 // Variables describes all the variable related methods that the Scalr API supports.
 type Variables interface {
 	// Create is used to create a new variable.
-	Create(ctx context.Context, options VariableCreateOptions, force bool) (*Variable, error)
+	Create(ctx context.Context, options VariableCreateOptions) (*Variable, error)
 
 	// Read a variable by its ID.
 	Read(ctx context.Context, variableID string) (*Variable, error)
 
 	// Update values of an existing variable.
-	Update(ctx context.Context, variableID string, options VariableUpdateOptions, force bool) (*Variable, error)
+	Update(ctx context.Context, variableID string, options VariableUpdateOptions) (*Variable, error)
 
 	// Delete a variable by its ID.
 	Delete(ctx context.Context, variableID string) error
@@ -61,6 +63,10 @@ type Variable struct {
 	Account     *Account     `jsonapi:"relation,account"`
 }
 
+type VariableWriteQueryOptions struct {
+	Force *bool `url:"force,omitempty"`
+}
+
 // VariableCreateOptions represents the options for creating a new variable.
 type VariableCreateOptions struct {
 	// For internal use only!
@@ -92,6 +98,8 @@ type VariableCreateOptions struct {
 
 	// The account  that owns the variable.
 	Account *Account `jsonapi:"relation,account,omitempty"`
+
+	QueryOptions *VariableWriteQueryOptions
 }
 
 func (o VariableCreateOptions) valid() error {
@@ -105,7 +113,7 @@ func (o VariableCreateOptions) valid() error {
 }
 
 // Create is used to create a new variable.
-func (s *variables) Create(ctx context.Context, options VariableCreateOptions, force bool) (*Variable, error) {
+func (s *variables) Create(ctx context.Context, options VariableCreateOptions) (*Variable, error) {
 	if err := options.valid(); err != nil {
 		return nil, err
 	}
@@ -113,7 +121,14 @@ func (s *variables) Create(ctx context.Context, options VariableCreateOptions, f
 	// Make sure we don't send a user provided ID.
 	options.ID = ""
 
-	u := fmt.Sprintf("vars?force=%t", force)
+	u := "vars"
+	if options.QueryOptions != nil {
+		q, err := query.Values(options.QueryOptions)
+		if err != nil {
+			return nil, err
+		}
+		u = fmt.Sprintf("vars?%s", q.Encode())
+	}
 	req, err := s.client.newRequest("POST", u, &options)
 
 	if err != nil {
@@ -168,11 +183,12 @@ type VariableUpdateOptions struct {
 	Sensitive *bool `jsonapi:"attr,sensitive,omitempty"`
 
 	// Whether the value is final.
-	Final *bool `jsonapi:"attr,final,omitempty"`
+	Final        *bool `jsonapi:"attr,final,omitempty"`
+	QueryOptions *VariableWriteQueryOptions
 }
 
 // Update values of an existing variable.
-func (s *variables) Update(ctx context.Context, variableID string, options VariableUpdateOptions, force bool) (*Variable, error) {
+func (s *variables) Update(ctx context.Context, variableID string, options VariableUpdateOptions) (*Variable, error) {
 	if !validStringID(&variableID) {
 		return nil, errors.New("invalid value for variable ID")
 	}
@@ -180,7 +196,15 @@ func (s *variables) Update(ctx context.Context, variableID string, options Varia
 	// Make sure we don't send a user provided ID.
 	options.ID = variableID
 
-	u := fmt.Sprintf("vars/%s?force=%t", url.QueryEscape(variableID), force)
+	u := fmt.Sprintf("vars/%s", url.QueryEscape(variableID))
+	if options.QueryOptions != nil {
+		q, err := query.Values(options.QueryOptions)
+		if err != nil {
+			return nil, err
+		}
+		u = fmt.Sprintf("%s?%s", u, q.Encode())
+	}
+
 	req, err := s.client.newRequest("PATCH", u, &options)
 	if err != nil {
 		return nil, err
