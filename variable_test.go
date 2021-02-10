@@ -21,7 +21,7 @@ func TestVariablesCreate(t *testing.T) {
 		options := VariableCreateOptions{
 			Key:       String(randomString(t)),
 			Value:     String(""),
-			Category:  Category(CategoryTerraform),
+			Category:  Category(CategoryEnv),
 			Workspace: wsTest,
 		}
 
@@ -37,7 +37,7 @@ func TestVariablesCreate(t *testing.T) {
 	t.Run("when options is missing value", func(t *testing.T) {
 		options := VariableCreateOptions{
 			Key:       String(randomString(t)),
-			Category:  Category(CategoryTerraform),
+			Category:  Category(CategoryEnv),
 			Workspace: wsTest,
 		}
 
@@ -53,7 +53,7 @@ func TestVariablesCreate(t *testing.T) {
 	t.Run("when options is missing key", func(t *testing.T) {
 		options := VariableCreateOptions{
 			Value:     String(randomString(t)),
-			Category:  Category(CategoryTerraform),
+			Category:  Category(CategoryEnv),
 			Workspace: wsTest,
 		}
 
@@ -65,7 +65,7 @@ func TestVariablesCreate(t *testing.T) {
 		options := VariableCreateOptions{
 			Key:       String(""),
 			Value:     String(randomString(t)),
-			Category:  Category(CategoryTerraform),
+			Category:  Category(CategoryEnv),
 			Workspace: wsTest,
 		}
 
@@ -88,7 +88,7 @@ func TestVariablesCreate(t *testing.T) {
 		options := VariableCreateOptions{
 			Key:         String(randomString(t)),
 			Value:       String(randomString(t)),
-			Category:    Category(CategoryTerraform),
+			Category:    Category(CategoryEnv),
 			Environment: wsTest.Environment,
 			Workspace:   wsTest,
 		}
@@ -101,7 +101,7 @@ func TestVariablesCreate(t *testing.T) {
 		options := VariableCreateOptions{
 			Key:       String(randomString(t)),
 			Value:     String(randomString(t)),
-			Category:  Category(CategoryTerraform),
+			Category:  Category(CategoryEnv),
 			Account:   account,
 			Workspace: wsTest,
 		}
@@ -114,7 +114,7 @@ func TestVariablesCreate(t *testing.T) {
 		options := VariableCreateOptions{
 			Key:         String(randomString(t)),
 			Value:       String(randomString(t)),
-			Category:    Category(CategoryTerraform),
+			Category:    Category(CategoryEnv),
 			Account:     account,
 			Environment: wsTest.Environment,
 		}
@@ -127,7 +127,7 @@ func TestVariablesCreate(t *testing.T) {
 		options := VariableCreateOptions{
 			Key:       String(randomString(t)),
 			Value:     String(randomString(t)),
-			Category:  Category(CategoryTerraform),
+			Category:  Category(CategoryEnv),
 			Workspace: wsTest,
 		}
 
