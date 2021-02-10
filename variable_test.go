@@ -23,7 +23,6 @@ func TestVariablesCreate(t *testing.T) {
 			Value:     String(""),
 			Category:  Category(CategoryTerraform),
 			Workspace: wsTest,
-			// QueryOptions: &VariableCreateQueryOptions{Force: Bool(true)},
 		}
 
 		v, err := client.Variables.Create(ctx, options)
