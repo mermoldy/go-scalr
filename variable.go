@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+
+	"github.com/google/go-querystring/query"
 )
 
 // Compile-time proof of interface implementation.
@@ -53,9 +55,16 @@ type Variable struct {
 	Category  CategoryType `jsonapi:"attr,category"`
 	HCL       bool         `jsonapi:"attr,hcl"`
 	Sensitive bool         `jsonapi:"attr,sensitive"`
+	Final     bool         `jsonapi:"attr,final"`
 
 	// Relations
-	Workspace *Workspace `jsonapi:"relation,workspace"`
+	Workspace   *Workspace   `jsonapi:"relation,workspace"`
+	Environment *Environment `jsonapi:"relation,environment"`
+	Account     *Account     `jsonapi:"relation,account"`
+}
+
+type VariableWriteQueryOptions struct {
+	Force *bool `url:"force,omitempty"`
 }
 
 // VariableCreateOptions represents the options for creating a new variable.
@@ -78,8 +87,19 @@ type VariableCreateOptions struct {
 	// Whether the value is sensitive.
 	Sensitive *bool `jsonapi:"attr,sensitive,omitempty"`
 
+	// Whether the value is final.
+	Final *bool `jsonapi:"attr,final,omitempty"`
+
 	// The workspace that owns the variable.
-	Workspace *Workspace `jsonapi:"relation,workspace"`
+	Workspace *Workspace `jsonapi:"relation,workspace,omitempty"`
+
+	// The environment that owns the variable.
+	Environment *Environment `jsonapi:"relation,environment,omitempty"`
+
+	// The account  that owns the variable.
+	Account *Account `jsonapi:"relation,account,omitempty"`
+
+	QueryOptions *VariableWriteQueryOptions
 }
 
 func (o VariableCreateOptions) valid() error {
@@ -88,9 +108,6 @@ func (o VariableCreateOptions) valid() error {
 	}
 	if o.Category == nil {
 		return errors.New("category is required")
-	}
-	if o.Workspace == nil {
-		return errors.New("workspace is required")
 	}
 	return nil
 }
@@ -104,7 +121,16 @@ func (s *variables) Create(ctx context.Context, options VariableCreateOptions) (
 	// Make sure we don't send a user provided ID.
 	options.ID = ""
 
-	req, err := s.client.newRequest("POST", "vars", &options)
+	u := "vars"
+	if options.QueryOptions != nil {
+		q, err := query.Values(options.QueryOptions)
+		if err != nil {
+			return nil, err
+		}
+		u = fmt.Sprintf("vars?%s", q.Encode())
+	}
+	req, err := s.client.newRequest("POST", u, &options)
+
 	if err != nil {
 		return nil, err
 	}
@@ -155,6 +181,10 @@ type VariableUpdateOptions struct {
 
 	// Whether the value is sensitive.
 	Sensitive *bool `jsonapi:"attr,sensitive,omitempty"`
+
+	// Whether the value is final.
+	Final        *bool `jsonapi:"attr,final,omitempty"`
+	QueryOptions *VariableWriteQueryOptions
 }
 
 // Update values of an existing variable.
@@ -167,6 +197,14 @@ func (s *variables) Update(ctx context.Context, variableID string, options Varia
 	options.ID = variableID
 
 	u := fmt.Sprintf("vars/%s", url.QueryEscape(variableID))
+	if options.QueryOptions != nil {
+		q, err := query.Values(options.QueryOptions)
+		if err != nil {
+			return nil, err
+		}
+		u = fmt.Sprintf("%s?%s", u, q.Encode())
+	}
+
 	req, err := s.client.newRequest("PATCH", u, &options)
 	if err != nil {
 		return nil, err
