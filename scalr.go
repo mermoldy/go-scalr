@@ -15,9 +15,9 @@ import (
 	"time"
 
 	"github.com/google/go-querystring/query"
+	"github.com/google/jsonapi"
 	"github.com/hashicorp/go-cleanhttp"
 	retryablehttp "github.com/hashicorp/go-retryablehttp"
-	"github.com/svanharmelen/jsonapi"
 )
 
 const (
@@ -107,7 +107,7 @@ type Client struct {
 	Webhooks              Webhooks
 	Environments          Environments
 	ConfigurationVersions ConfigurationVersions
-	VcsRevisions VcsRevisions
+	VcsRevisions          VcsRevisions
 }
 
 // NewClient creates a new Scalr API client.

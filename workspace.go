@@ -69,10 +69,11 @@ type Workspace struct {
 
 // VCSRepo contains the configuration of a VCS integration.
 type VCSRepo struct {
-	Branch            string `json:"branch"`
-	Identifier        string `json:"identifier"`
-	IngressSubmodules bool   `json:"ingress-submodules"`
-	Path              string `json:"path"`
+	Branch            string   `json:"branch"`
+	Identifier        string   `json:"identifier"`
+	IngressSubmodules bool     `json:"ingress-submodules"`
+	Path              string   `json:"path"`
+	TriggerPrefixes   []string `json:"trigger-prefixes,omitempty"`
 }
 
 // WorkspaceActions represents the workspace actions.
@@ -158,10 +159,11 @@ type WorkspaceCreateOptions struct {
 
 // VCSRepoOptions represents the configuration options of a VCS integration.
 type VCSRepoOptions struct {
-	Branch            *string `json:"branch,omitempty"`
-	Identifier        *string `json:"identifier,omitempty"`
-	IngressSubmodules *bool   `json:"ingress-submodules,omitempty"`
-	Path              *string `json:"path,omitempty"`
+	Branch            *string   `json:"branch,omitempty"`
+	Identifier        *string   `json:"identifier,omitempty"`
+	IngressSubmodules *bool     `json:"ingress-submodules,omitempty"`
+	Path              *string   `json:"path,omitempty"`
+	TriggerPrefixes   *[]string `json:"trigger-prefixes,omitempty"`
 }
 
 type VcsProviderOptions struct {

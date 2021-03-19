@@ -2,6 +2,7 @@ package scalr
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/go-uuid"
@@ -146,4 +147,8 @@ func randomString(t *testing.T) string {
 		t.Fatal(err)
 	}
 	return v
+}
+
+func randomVariableKey(t *testing.T) string {
+	return "_" + strings.ReplaceAll(randomString(t), "-", "")
 }
