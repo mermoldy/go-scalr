@@ -2,6 +2,7 @@ package scalr
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 )
@@ -31,6 +32,9 @@ type VcsRevision struct {
 
 // Read a VCS revision by its ID.
 func (s *vcs_revisions) Read(ctx context.Context, vcsRevisionID string) (*VcsRevision, error) {
+	if !validStringID(&vcsRevisionID) {
+		return nil, errors.New("invalid value for vcs revision ID")
+	}
 
 	u := fmt.Sprintf("vcs-revisions/%s", url.QueryEscape(vcsRevisionID))
 	req, err := s.client.newRequest("GET", u, nil)
