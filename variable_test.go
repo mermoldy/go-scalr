@@ -19,7 +19,7 @@ func TestVariablesCreate(t *testing.T) {
 
 	t.Run("when options has an empty string value", func(t *testing.T) {
 		options := VariableCreateOptions{
-			Key:       String(randomString(t)),
+			Key:       String(randomVariableKey(t)),
 			Value:     String(""),
 			Category:  Category(CategoryEnv),
 			Workspace: wsTest,
@@ -36,7 +36,7 @@ func TestVariablesCreate(t *testing.T) {
 
 	t.Run("when options is missing value", func(t *testing.T) {
 		options := VariableCreateOptions{
-			Key:       String(randomString(t)),
+			Key:       String(randomVariableKey(t)),
 			Category:  Category(CategoryEnv),
 			Workspace: wsTest,
 		}
@@ -75,7 +75,7 @@ func TestVariablesCreate(t *testing.T) {
 
 	t.Run("when options is missing category", func(t *testing.T) {
 		options := VariableCreateOptions{
-			Key:       String(randomString(t)),
+			Key:       String(randomVariableKey(t)),
 			Value:     String(randomString(t)),
 			Workspace: wsTest,
 		}
@@ -86,7 +86,7 @@ func TestVariablesCreate(t *testing.T) {
 
 	t.Run("when options is missing account", func(t *testing.T) {
 		options := VariableCreateOptions{
-			Key:         String(randomString(t)),
+			Key:         String(randomVariableKey(t)),
 			Value:       String(randomString(t)),
 			Category:    Category(CategoryEnv),
 			Environment: wsTest.Environment,
@@ -99,7 +99,7 @@ func TestVariablesCreate(t *testing.T) {
 
 	t.Run("when options is missing environment", func(t *testing.T) {
 		options := VariableCreateOptions{
-			Key:       String(randomString(t)),
+			Key:       String(randomVariableKey(t)),
 			Value:     String(randomString(t)),
 			Category:  Category(CategoryEnv),
 			Account:   account,
@@ -112,7 +112,7 @@ func TestVariablesCreate(t *testing.T) {
 
 	t.Run("when options is missing workspace", func(t *testing.T) {
 		options := VariableCreateOptions{
-			Key:         String(randomString(t)),
+			Key:         String(randomVariableKey(t)),
 			Value:       String(randomString(t)),
 			Category:    Category(CategoryEnv),
 			Account:     account,
@@ -125,7 +125,7 @@ func TestVariablesCreate(t *testing.T) {
 
 	t.Run("when options is missing account, environment, workspace", func(t *testing.T) {
 		options := VariableCreateOptions{
-			Key:       String(randomString(t)),
+			Key:       String(randomVariableKey(t)),
 			Value:     String(randomString(t)),
 			Category:  Category(CategoryEnv),
 			Workspace: wsTest,

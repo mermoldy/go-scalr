@@ -107,7 +107,7 @@ type Client struct {
 	Webhooks              Webhooks
 	Environments          Environments
 	ConfigurationVersions ConfigurationVersions
-	VcsRevisions VcsRevisions
+	VcsRevisions          VcsRevisions
 }
 
 // NewClient creates a new Scalr API client.
