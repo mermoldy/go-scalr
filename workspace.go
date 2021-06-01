@@ -62,6 +62,7 @@ type Workspace struct {
 
 	// Relations
 	CurrentRun  *Run                `jsonapi:"relation,current-run"`
+	LatestRun   *Run                `jsonapi:"relation,latest-run"`
 	Environment *Environment        `jsonapi:"relation,environment"`
 	CreatedBy   *User               `jsonapi:"relation,created-by"`
 	VcsProvider *VcsProviderOptions `jsonapi:"relation,vcs-provider"`
@@ -213,7 +214,7 @@ func (s *workspaces) Read(ctx context.Context, environmentID, workspaceName stri
 		return nil, errors.New("invalid value for workspace")
 	}
 
-	options := WorkspaceListOptions{Environment: &environmentID, Name: &workspaceName, Include: "created-by"}
+	options := WorkspaceListOptions{Environment: &environmentID, Name: &workspaceName, Include: "created-by,latest-run"}
 
 	req, err := s.client.newRequest("GET", "workspaces", &options)
 	if err != nil {
@@ -241,7 +242,7 @@ func (s *workspaces) ReadByID(ctx context.Context, workspaceID string) (*Workspa
 	options := struct {
 		Include string `url:"include"`
 	}{
-		Include: "created-by",
+		Include: "created-by,latest-run",
 	}
 	u := fmt.Sprintf("workspaces/%s", url.QueryEscape(workspaceID))
 	req, err := s.client.newRequest("GET", u, options)
