@@ -43,7 +43,9 @@ func TestStateVersionCreate(t *testing.T) {
 
 	t.Run("with valid options", func(t *testing.T) {
 		options := GetStateVersionCreateOptions(wsTest, runTest)
+		client.headers.Set("Prefer", "profile=internal")
 		sv, err := client.StateVersions.Create(ctx, options)
+		client.headers.Set("Prefer", "profile=preview")
 		require.NoError(t, err)
 
 		// // Get a refreshed view from the API.
@@ -88,7 +90,9 @@ func TestReadCurrentFromWorkspace(t *testing.T) {
 
 	t.Run("with valid options", func(t *testing.T) {
 		options := GetStateVersionCreateOptions(wsTest, runTest)
+		client.headers.Set("Prefer", "profile=internal")
 		sv, err := client.StateVersions.Create(ctx, options)
+		client.headers.Set("Prefer", "profile=preview")
 		require.NoError(t, err)
 
 		// // Get a refreshed view from the API.
