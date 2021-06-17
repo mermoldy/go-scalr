@@ -103,7 +103,6 @@ type Client struct {
 	Runs                  Runs
 	Variables             Variables
 	Workspaces            Workspaces
-	StateVersions         StateVersions
 	Endpoints             Endpoints
 	Webhooks              Webhooks
 	Environments          Environments
@@ -178,7 +177,6 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.Runs = &runs{client: client}
 	client.Variables = &variables{client: client}
 	client.Workspaces = &workspaces{client: client}
-	client.StateVersions = &state_versions{client: client}
 	client.Endpoints = &endpoints{client: client}
 	client.Webhooks = &webhooks{client: client}
 	client.ConfigurationVersions = &configurationVersions{client: client}
