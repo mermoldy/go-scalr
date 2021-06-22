@@ -59,12 +59,21 @@ type Workspace struct {
 	TerraformVersion     string                `jsonapi:"attr,terraform-version"`
 	VCSRepo              *VCSRepo              `jsonapi:"attr,vcs-repo"`
 	WorkingDirectory     string                `jsonapi:"attr,working-directory"`
+	Hooks                *Hooks                `jsonapi:"attr,hooks"`
 
 	// Relations
 	CurrentRun  *Run                `jsonapi:"relation,current-run"`
 	Environment *Environment        `jsonapi:"relation,environment"`
 	CreatedBy   *User               `jsonapi:"relation,created-by"`
 	VcsProvider *VcsProviderOptions `jsonapi:"relation,vcs-provider"`
+}
+
+// Hooks contains the custom hooks field.
+type Hooks struct {
+	PrePlan   string `json:"pre_plan"`
+	PostPlan  string `json:"post_plan"`
+	PreApply  string `json:"pre_apply"`
+	PostApply string `json:"post_apply"`
 }
 
 // VCSRepo contains the configuration of a VCS integration.
@@ -153,8 +162,12 @@ type WorkspaceCreateOptions struct {
 	// Specifies the VcsProvider for workspace vcs-repo. Required if vcs-repo attr passed
 	VcsProvider *VcsProviderOptions `jsonapi:"relation,vcs-provider,omitempty"`
 
-	// Specifies the Environmen for workpace.
+	// Specifies the Environment for workspace.
 	Environment *Environment `jsonapi:"relation,environment"`
+
+	// Contains configuration for custom hooks,
+	// which can be triggered before or after plan or apply phases
+	Hooks *HooksOptions `jsonapi:"relation,hooks,omitempty"`
 }
 
 // VCSRepoOptions represents the configuration options of a VCS integration.
@@ -170,6 +183,14 @@ type VcsProviderOptions struct {
 	ID      string `jsonapi:"primary,vcs-providers"`
 	VcsType string `jsonapi:"attr,vcs-type"`
 	Url     string `jsonapi:"attr,url"`
+}
+
+// HooksOptions represents the WorkspaceHooks configuration.
+type HooksOptions struct {
+	PrePlan   *string `json:"pre_plan,omitempty"`
+	PostPlan  *string `json:"post_plan,omitempty"`
+	PreApply  *string `json:"pre_apply,omitempty"`
+	PostApply *string `json:"post_apply,omitempty"`
 }
 
 func (o WorkspaceCreateOptions) valid() error {
@@ -299,6 +320,10 @@ type WorkspaceUpdateOptions struct {
 
 	// Specifies the VcsProvider for workspace vcs-repo.
 	VcsProvider *VcsProviderOptions `jsonapi:"relation,vcs-provider,omitempty"`
+
+	// Contains configuration for custom hooks,
+	// which can be triggered before or after plan or apply phases
+	Hooks *HooksOptions `jsonapi:"relation,hooks,omitempty"`
 }
 
 // Update settings of an existing workspace.
