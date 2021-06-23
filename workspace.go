@@ -154,6 +154,10 @@ type WorkspaceCreateOptions struct {
 	// oauth-token-id and identifier keys below.
 	VCSRepo *VCSRepoOptions `jsonapi:"attr,vcs-repo,omitempty"`
 
+	// Contains configuration for custom hooks,
+	// which can be triggered before or after plan or apply phases
+	Hooks *HooksOptions `jsonapi:"attr,hooks,omitempty"`
+
 	// A relative path that Terraform will execute within. This defaults to the
 	// root of your repository and is typically set to a subdirectory matching the
 	// environment when multiple environments exist within the same repository.
@@ -164,10 +168,6 @@ type WorkspaceCreateOptions struct {
 
 	// Specifies the Environment for workspace.
 	Environment *Environment `jsonapi:"relation,environment"`
-
-	// Contains configuration for custom hooks,
-	// which can be triggered before or after plan or apply phases
-	Hooks *HooksOptions `jsonapi:"relation,hooks,omitempty"`
 }
 
 // VCSRepoOptions represents the configuration options of a VCS integration.
@@ -312,6 +312,10 @@ type WorkspaceUpdateOptions struct {
 	// identifier keys.
 	VCSRepo *VCSRepoOptions `jsonapi:"attr,vcs-repo,omitempty"`
 
+	// Contains configuration for custom hooks,
+	// which can be triggered before or after plan or apply phases
+	Hooks *HooksOptions `jsonapi:"attr,hooks,omitempty"`
+
 	// A relative path that Terraform will execute within. This defaults to the
 	// root of your repository and is typically set to a subdirectory matching
 	// the environment when multiple environments exist within the same
@@ -320,10 +324,6 @@ type WorkspaceUpdateOptions struct {
 
 	// Specifies the VcsProvider for workspace vcs-repo.
 	VcsProvider *VcsProviderOptions `jsonapi:"relation,vcs-provider,omitempty"`
-
-	// Contains configuration for custom hooks,
-	// which can be triggered before or after plan or apply phases
-	Hooks *HooksOptions `jsonapi:"relation,hooks,omitempty"`
 }
 
 // Update settings of an existing workspace.
