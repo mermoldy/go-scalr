@@ -70,10 +70,10 @@ type Workspace struct {
 
 // Hooks contains the custom hooks field.
 type Hooks struct {
-	PrePlan   string `json:"pre_plan"`
-	PostPlan  string `json:"post_plan"`
-	PreApply  string `json:"pre_apply"`
-	PostApply string `json:"post_apply"`
+	PrePlan   string `json:"pre-plan"`
+	PostPlan  string `json:"post-plan"`
+	PreApply  string `json:"pre-apply"`
+	PostApply string `json:"post-apply"`
 }
 
 // VCSRepo contains the configuration of a VCS integration.
@@ -187,10 +187,10 @@ type VcsProviderOptions struct {
 
 // HooksOptions represents the WorkspaceHooks configuration.
 type HooksOptions struct {
-	PrePlan   *string `json:"pre_plan,omitempty"`
-	PostPlan  *string `json:"post_plan,omitempty"`
-	PreApply  *string `json:"pre_apply,omitempty"`
-	PostApply *string `json:"post_apply,omitempty"`
+	PrePlan   *string `json:"pre-plan,omitempty"`
+	PostPlan  *string `json:"post-plan,omitempty"`
+	PreApply  *string `json:"pre-apply,omitempty"`
+	PostApply *string `json:"post-apply,omitempty"`
 }
 
 func (o WorkspaceCreateOptions) valid() error {
