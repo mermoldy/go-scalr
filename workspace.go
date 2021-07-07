@@ -59,12 +59,21 @@ type Workspace struct {
 	TerraformVersion     string                `jsonapi:"attr,terraform-version"`
 	VCSRepo              *VCSRepo              `jsonapi:"attr,vcs-repo"`
 	WorkingDirectory     string                `jsonapi:"attr,working-directory"`
+	Hooks                *Hooks                `jsonapi:"attr,hooks"`
 
 	// Relations
 	CurrentRun  *Run                `jsonapi:"relation,current-run"`
 	Environment *Environment        `jsonapi:"relation,environment"`
 	CreatedBy   *User               `jsonapi:"relation,created-by"`
 	VcsProvider *VcsProviderOptions `jsonapi:"relation,vcs-provider"`
+}
+
+// Hooks contains the custom hooks field.
+type Hooks struct {
+	PrePlan   string `json:"pre-plan"`
+	PostPlan  string `json:"post-plan"`
+	PreApply  string `json:"pre-apply"`
+	PostApply string `json:"post-apply"`
 }
 
 // VCSRepo contains the configuration of a VCS integration.
@@ -145,6 +154,10 @@ type WorkspaceCreateOptions struct {
 	// oauth-token-id and identifier keys below.
 	VCSRepo *VCSRepoOptions `jsonapi:"attr,vcs-repo,omitempty"`
 
+	// Contains configuration for custom hooks,
+	// which can be triggered before or after plan or apply phases
+	Hooks *HooksOptions `jsonapi:"attr,hooks,omitempty"`
+
 	// A relative path that Terraform will execute within. This defaults to the
 	// root of your repository and is typically set to a subdirectory matching the
 	// environment when multiple environments exist within the same repository.
@@ -153,7 +166,7 @@ type WorkspaceCreateOptions struct {
 	// Specifies the VcsProvider for workspace vcs-repo. Required if vcs-repo attr passed
 	VcsProvider *VcsProviderOptions `jsonapi:"relation,vcs-provider,omitempty"`
 
-	// Specifies the Environmen for workpace.
+	// Specifies the Environment for workspace.
 	Environment *Environment `jsonapi:"relation,environment"`
 }
 
@@ -170,6 +183,14 @@ type VcsProviderOptions struct {
 	ID      string `jsonapi:"primary,vcs-providers"`
 	VcsType string `jsonapi:"attr,vcs-type"`
 	Url     string `jsonapi:"attr,url"`
+}
+
+// HooksOptions represents the WorkspaceHooks configuration.
+type HooksOptions struct {
+	PrePlan   *string `json:"pre-plan,omitempty"`
+	PostPlan  *string `json:"post-plan,omitempty"`
+	PreApply  *string `json:"pre-apply,omitempty"`
+	PostApply *string `json:"post-apply,omitempty"`
 }
 
 func (o WorkspaceCreateOptions) valid() error {
@@ -290,6 +311,10 @@ type WorkspaceUpdateOptions struct {
 	// that didn't previously have one, include at least the oauth-token-id and
 	// identifier keys.
 	VCSRepo *VCSRepoOptions `jsonapi:"attr,vcs-repo,omitempty"`
+
+	// Contains configuration for custom hooks,
+	// which can be triggered before or after plan or apply phases
+	Hooks *HooksOptions `jsonapi:"attr,hooks,omitempty"`
 
 	// A relative path that Terraform will execute within. This defaults to the
 	// root of your repository and is typically set to a subdirectory matching
