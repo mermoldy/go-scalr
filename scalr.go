@@ -101,6 +101,7 @@ type Client struct {
 	retryServerErrors bool
 
 	Runs                  Runs
+	Roles                 Roles
 	Variables             Variables
 	Workspaces            Workspaces
 	Endpoints             Endpoints
@@ -174,6 +175,7 @@ func NewClient(cfg *Config) (*Client, error) {
 
 	// Create the services.
 	client.Environments = &environments{client: client}
+	client.Roles = &roles{client: client}
 	client.Runs = &runs{client: client}
 	client.Variables = &variables{client: client}
 	client.Workspaces = &workspaces{client: client}

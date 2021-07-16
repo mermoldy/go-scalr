@@ -39,6 +39,26 @@ func createEnvironment(t *testing.T, client *Client) (*Environment, func()) {
 	}
 }
 
+func createRole(t *testing.T, client *Client, permissions []*Permission) (*Role, func()) {
+	ctx := context.Background()
+	role, err := client.Roles.Create(ctx, RoleCreateOptions{
+		Name:        String("tst-role-" + randomString(t)),
+		Permissions: permissions,
+		Account:     &Account{ID: defaultAccountID},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return role, func() {
+		if err := client.Roles.Delete(ctx, role.ID); err != nil {
+			t.Errorf("Error destroying role! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"Environment: %s\nError: %s", role.ID, err)
+		}
+	}
+}
+
 func createWorkspace(t *testing.T, client *Client, env *Environment) (*Workspace, func()) {
 	var envCleanup func()
 
