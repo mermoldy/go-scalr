@@ -54,7 +54,36 @@ func createRole(t *testing.T, client *Client, permissions []*Permission) (*Role,
 		if err := client.Roles.Delete(ctx, role.ID); err != nil {
 			t.Errorf("Error destroying role! WARNING: Dangling resources\n"+
 				"may exist! The full error is shown below.\n\n"+
-				"Environment: %s\nError: %s", role.ID, err)
+				"Role: %s\nError: %s", role.ID, err)
+		}
+	}
+}
+
+func createAccessPolicy(t *testing.T, client *Client, roles []*Role, object interface{}) (*AccessPolicy, func()) {
+	ctx := context.Background()
+	options := AccessPolicyCreateOptions{
+		Roles:   roles,
+		Account: &Account{ID: defaultAccountID},
+	}
+
+	if user, ok := object.(*User); ok {
+		options.User = user
+	} else if team, ok := object.(*Team); ok {
+		options.Team = team
+	} else {
+		t.Fatal("got object of undefined type")
+	}
+
+	ap, err := client.AccessPolicies.Create(ctx, options)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return ap, func() {
+		if err := client.AccessPolicies.Delete(ctx, ap.ID); err != nil {
+			t.Errorf("Error destroying access policy! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"AccessPolicy: %s\nError: %s", ap.ID, err)
 		}
 	}
 }
