@@ -108,7 +108,7 @@ func (o AccessPolicyCreateOptions) valid() error {
 	return nil
 }
 
-// AccessPolicyListOptions represents the options for listing workspaces.
+// AccessPolicyListOptions represents the options for listing access policies.
 type AccessPolicyListOptions struct {
 	ListOptions
 

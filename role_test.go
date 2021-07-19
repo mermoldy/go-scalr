@@ -22,7 +22,17 @@ func TestRolesList(t *testing.T) {
 	defer roleTest2Cleanup()
 
 	t.Run("without options", func(t *testing.T) {
-		rolel, err := client.Roles.List(ctx)
+		rolel, err := client.Roles.List(ctx, RoleListOptions{})
+		require.NoError(t, err)
+		rolelIDs := make([]string, len(rolel.Items))
+		for _, role := range rolel.Items {
+			rolelIDs = append(rolelIDs, role.ID)
+		}
+		assert.Contains(t, rolelIDs, roleTest1.ID)
+		assert.Contains(t, rolelIDs, roleTest2.ID)
+	})
+	t.Run("with options", func(t *testing.T) {
+		rolel, err := client.Roles.List(ctx, RoleListOptions{Account: String(defaultAccountID)})
 		require.NoError(t, err)
 		rolelIDs := make([]string, len(rolel.Items))
 		for _, role := range rolel.Items {
@@ -177,7 +187,8 @@ func TestRolesUpdate(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	roleTest, _ := createRole(t, client, readPermissions)
+	roleTest, roleTestCleanup := createRole(t, client, readPermissions)
+	defer roleTestCleanup()
 
 	t.Run("when updating a subset of values", func(t *testing.T) {
 		options := RoleUpdateOptions{
