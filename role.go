@@ -15,7 +15,7 @@ var _ Roles = (*roles)(nil)
 // Roles describes all the role related methods that the
 // Scalr IACP API supports.
 type Roles interface {
-	List(ctx context.Context) (*RoleList, error)
+	List(ctx context.Context, options RoleListOptions) (*RoleList, error)
 	Read(ctx context.Context, roleID string) (*Role, error)
 	Create(ctx context.Context, options RoleCreateOptions) (*Role, error)
 	Update(ctx context.Context, roleID string, options RoleUpdateOptions) (*Role, error)
@@ -54,7 +54,7 @@ type Role struct {
 type RoleCreateOptions struct {
 	ID          string  `jsonapi:"primary,roles"`
 	Name        *string `jsonapi:"attr,name"`
-	Description *string `jsonapi:"attr,description"`
+	Description *string `jsonapi:"attr,description,omitempty"`
 
 	// Relations
 	Account     *Account      `jsonapi:"relation,account"`
@@ -78,9 +78,20 @@ func (o RoleCreateOptions) valid() error {
 	return nil
 }
 
+// RoleListOptions represents the options for listing roles.
+type RoleListOptions struct {
+	ListOptions
+
+	Account *string `url:"filter[account],omitempty"`
+	Name    string  `url:"filter[name],omitempty"`
+	Role    string  `url:"filter[role],omitempty"`
+	Query   string  `url:"query,omitempty"`
+	Include string  `url:"include,omitempty"`
+}
+
 // List all the roles.
-func (s *roles) List(ctx context.Context) (*RoleList, error) {
-	req, err := s.client.newRequest("GET", "roles", nil)
+func (s *roles) List(ctx context.Context, options RoleListOptions) (*RoleList, error) {
+	req, err := s.client.newRequest("GET", "roles", &options)
 	if err != nil {
 		return nil, err
 	}
