@@ -182,7 +182,7 @@ func TestAccessPoliciesRead(t *testing.T) {
 	t.Run("with invalid accessPolicy id", func(t *testing.T) {
 		ap, err := client.AccessPolicies.Read(ctx, badIdentifier)
 		assert.Nil(t, ap)
-		assert.EqualError(t, err, "invalid value for accessPolicy")
+		assert.EqualError(t, err, "invalid value for access policy ID")
 	})
 }
 
@@ -249,6 +249,6 @@ func TestAccessPoliciesDelete(t *testing.T) {
 
 	t.Run("without a valid accessPolicy ID", func(t *testing.T) {
 		err := client.AccessPolicies.Delete(ctx, badIdentifier)
-		assert.EqualError(t, err, "invalid value for accessPolicy ID")
+		assert.EqualError(t, err, "invalid value for access policy ID")
 	})
 }
