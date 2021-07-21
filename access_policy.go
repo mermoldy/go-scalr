@@ -50,7 +50,7 @@ type AccessPolicyCreateOptions struct {
 
 	// Relations
 	Roles []*Role `jsonapi:"relation,roles"`
-	// The object of access policy, one of this fields must be filled
+	// The subject of access policy, one of this fields must be filled
 	User           *User           `jsonapi:"relation,user,omitempty"`
 	Team           *Team           `jsonapi:"relation,team,omitempty"`
 	ServiceAccount *ServiceAccount `jsonapi:"relation,service-account,omitempty"`
@@ -89,20 +89,20 @@ func (o AccessPolicyCreateOptions) valid() error {
 		return errors.New("one of: user,team,service_account must be provided")
 	}
 
-	var object string
+	var subjectId string
 	if o.User != nil {
-		object = o.User.ID
+		subjectId = o.User.ID
 		field = "user"
 	} else if o.Team != nil {
-		object = o.Team.ID
+		subjectId = o.Team.ID
 		field = "team"
 	} else {
-		object = o.ServiceAccount.ID
-		field = "service_account"
+		subjectId = o.ServiceAccount.ID
+		field = "service account"
 	}
 
-	if !validStringID(&object) {
-		return fmt.Errorf("invalid value for %v ID: %v", field, object)
+	if !validStringID(&subjectId) {
+		return fmt.Errorf("invalid value for %v ID: %v", field, subjectId)
 	}
 
 	return nil
@@ -161,7 +161,7 @@ func (s *accessPolicies) Create(ctx context.Context, options AccessPolicyCreateO
 // Read an accessPolicy by its ID.
 func (s *accessPolicies) Read(ctx context.Context, accessPolicyID string) (*AccessPolicy, error) {
 	if !validStringID(&accessPolicyID) {
-		return nil, errors.New("invalid value for accessPolicy")
+		return nil, errors.New("invalid value for access policy ID")
 	}
 
 	u := fmt.Sprintf("access-policies/%s", url.QueryEscape(accessPolicyID))
@@ -213,7 +213,7 @@ func (s *accessPolicies) Update(ctx context.Context, accessPolicyID string, opti
 // Delete an accessPolicy by its ID.
 func (s *accessPolicies) Delete(ctx context.Context, accessPolicyID string) error {
 	if !validStringID(&accessPolicyID) {
-		return errors.New("invalid value for accessPolicy ID")
+		return errors.New("invalid value for access policy ID")
 	}
 
 	u := fmt.Sprintf("access-policies/%s", url.QueryEscape(accessPolicyID))
