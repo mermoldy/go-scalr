@@ -29,7 +29,7 @@ type roles struct {
 
 // Permission relationship
 type Permission struct {
-	ID string `jsonapi:"primary,permissions"`
+	ID string `jsonapi:"primary,permissions,omitempty"`
 }
 
 // RoleList represents a list of roles.
@@ -47,7 +47,7 @@ type Role struct {
 
 	// Relations
 	Account     *Account      `jsonapi:"relation,account"`
-	Permissions []*Permission `jsonapi:"relation,permissions"`
+	Permissions []*Permission `jsonapi:"relation,permissions,omitempty"`
 }
 
 // RoleCreateOptions represents the options for creating a new Role.
@@ -58,7 +58,7 @@ type RoleCreateOptions struct {
 
 	// Relations
 	Account     *Account      `jsonapi:"relation,account"`
-	Permissions []*Permission `jsonapi:"relation,permissions"`
+	Permissions []*Permission `jsonapi:"relation,permissions,omitempty"`
 }
 
 func (o RoleCreateOptions) valid() error {
@@ -155,7 +155,7 @@ type RoleUpdateOptions struct {
 	Description *string `jsonapi:"attr,description,omitempty"`
 
 	// Relations
-	Permissions []*Permission `jsonapi:"relation,permissions"`
+	Permissions []*Permission `jsonapi:"relation,permissions,omitempty"`
 }
 
 // Update settings of an existing role.
