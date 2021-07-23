@@ -39,6 +39,55 @@ func createEnvironment(t *testing.T, client *Client) (*Environment, func()) {
 	}
 }
 
+func createRole(t *testing.T, client *Client, permissions []*Permission) (*Role, func()) {
+	ctx := context.Background()
+	role, err := client.Roles.Create(ctx, RoleCreateOptions{
+		Name:        String("tst-role-" + randomString(t)),
+		Permissions: permissions,
+		Account:     &Account{ID: defaultAccountID},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return role, func() {
+		if err := client.Roles.Delete(ctx, role.ID); err != nil {
+			t.Errorf("Error destroying role! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"Role: %s\nError: %s", role.ID, err)
+		}
+	}
+}
+
+func createAccessPolicy(t *testing.T, client *Client, roles []*Role, object interface{}) (*AccessPolicy, func()) {
+	ctx := context.Background()
+	options := AccessPolicyCreateOptions{
+		Roles:   roles,
+		Account: &Account{ID: defaultAccountID},
+	}
+
+	if user, ok := object.(*User); ok {
+		options.User = user
+	} else if team, ok := object.(*Team); ok {
+		options.Team = team
+	} else {
+		t.Fatal("got object of undefined type")
+	}
+
+	ap, err := client.AccessPolicies.Create(ctx, options)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return ap, func() {
+		if err := client.AccessPolicies.Delete(ctx, ap.ID); err != nil {
+			t.Errorf("Error destroying access policy! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"AccessPolicy: %s\nError: %s", ap.ID, err)
+		}
+	}
+}
+
 func createWorkspace(t *testing.T, client *Client, env *Environment) (*Workspace, func()) {
 	var envCleanup func()
 
