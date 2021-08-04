@@ -175,8 +175,8 @@ type EnvironmentUpdateOptions struct {
 	CostEstimationEnabled *bool   `jsonapi:"attr,cost-estimation-enabled,omitempty"`
 
 	// Relations
-	CloudCredentials []*CloudCredential `jsonapi:"relation,cloud-credentials,omitempty"`
-	PolicyGroups     []*PolicyGroup     `jsonapi:"relation,policy-groups,omitempty"`
+	CloudCredentials []*CloudCredential `jsonapi:"relation,cloud-credentials"`
+	PolicyGroups     []*PolicyGroup     `jsonapi:"relation,policy-groups"`
 }
 
 // Update settings of an existing environment.
