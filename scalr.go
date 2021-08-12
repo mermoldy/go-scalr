@@ -415,6 +415,20 @@ func checkResponseCode(r *http.Response) error {
 		return nil
 	}
 
+	switch r.StatusCode {
+	case 401:
+		return ErrUnauthorized
+	case 409:
+		switch {
+		case strings.HasSuffix(r.Request.URL.Path, "actions/lock"):
+			return ErrWorkspaceLocked
+		case strings.HasSuffix(r.Request.URL.Path, "actions/unlock"):
+			return ErrWorkspaceNotLocked
+		case strings.HasSuffix(r.Request.URL.Path, "actions/force-unlock"):
+			return ErrWorkspaceNotLocked
+		}
+	}
+
 	// Decode the error payload.
 	errPayload := &jsonapi.ErrorsPayload{}
 	err := json.NewDecoder(r.Body).Decode(errPayload)
@@ -432,22 +446,12 @@ func checkResponseCode(r *http.Response) error {
 		}
 	}
 
-	switch r.StatusCode {
-	case 401:
-		return ErrUnauthorized
-	case 404:
-		ErrResourceNotFound = errors.New(fmt.Sprintf(strings.Join(errs, "\n")))
+	var result = fmt.Errorf(strings.Join(errs, "\n"))
+
+	if r.StatusCode == 404 {
+		ErrResourceNotFound = result
 		return ErrResourceNotFound
-	case 409:
-		switch {
-		case strings.HasSuffix(r.Request.URL.Path, "actions/lock"):
-			return ErrWorkspaceLocked
-		case strings.HasSuffix(r.Request.URL.Path, "actions/unlock"):
-			return ErrWorkspaceNotLocked
-		case strings.HasSuffix(r.Request.URL.Path, "actions/force-unlock"):
-			return ErrWorkspaceNotLocked
-		}
 	}
 
-	return fmt.Errorf(strings.Join(errs, "\n"))
+	return result
 }
