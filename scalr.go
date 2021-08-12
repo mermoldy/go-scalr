@@ -39,6 +39,8 @@ var (
 
 	// ErrUnauthorized is returned when a receiving a 401.
 	ErrUnauthorized = errors.New("unauthorized")
+	// ErrResourceNotFound is returned when a receiving a 404.
+	ErrResourceNotFound = errors.New("resource not found")
 )
 
 // RetryLogHook allows a function to run before each retry.
@@ -413,20 +415,6 @@ func checkResponseCode(r *http.Response) error {
 		return nil
 	}
 
-	switch r.StatusCode {
-	case 401:
-		return ErrUnauthorized
-	case 409:
-		switch {
-		case strings.HasSuffix(r.Request.URL.Path, "actions/lock"):
-			return ErrWorkspaceLocked
-		case strings.HasSuffix(r.Request.URL.Path, "actions/unlock"):
-			return ErrWorkspaceNotLocked
-		case strings.HasSuffix(r.Request.URL.Path, "actions/force-unlock"):
-			return ErrWorkspaceNotLocked
-		}
-	}
-
 	// Decode the error payload.
 	errPayload := &jsonapi.ErrorsPayload{}
 	err := json.NewDecoder(r.Body).Decode(errPayload)
@@ -441,6 +429,23 @@ func checkResponseCode(r *http.Response) error {
 			errs = append(errs, e.Title)
 		} else {
 			errs = append(errs, fmt.Sprintf("%s\n\n%s", e.Title, e.Detail))
+		}
+	}
+
+	switch r.StatusCode {
+	case 401:
+		return ErrUnauthorized
+	case 404:
+		ErrResourceNotFound = errors.New(fmt.Sprintf(strings.Join(errs, "\n")))
+		return ErrResourceNotFound
+	case 409:
+		switch {
+		case strings.HasSuffix(r.Request.URL.Path, "actions/lock"):
+			return ErrWorkspaceLocked
+		case strings.HasSuffix(r.Request.URL.Path, "actions/unlock"):
+			return ErrWorkspaceNotLocked
+		case strings.HasSuffix(r.Request.URL.Path, "actions/force-unlock"):
+			return ErrWorkspaceNotLocked
 		}
 	}
 
