@@ -2,6 +2,7 @@ package scalr
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"testing"
 
@@ -244,7 +245,11 @@ func TestAccessPoliciesDelete(t *testing.T) {
 
 		// Try loading the accessPolicy - it should fail.
 		_, err = client.AccessPolicies.Read(ctx, apTest.ID)
-		assert.Equal(t, ErrResourceNotFound, err)
+		assert.Equal(
+			t,
+			errors.New(fmt.Sprintf("IamAccessPolicy with ID '%v' not found or user unauthorized", apTest.ID)),
+			err,
+		)
 	})
 
 	t.Run("without a valid accessPolicy ID", func(t *testing.T) {

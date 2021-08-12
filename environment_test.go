@@ -2,6 +2,8 @@ package scalr
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -92,8 +94,13 @@ func TestEnvironmentsRead(t *testing.T) {
 	})
 
 	t.Run("when the env does not exist", func(t *testing.T) {
-		_, err := client.Environments.Read(ctx, "notexisting")
-		assert.Equal(t, err, ErrResourceNotFound)
+		var envId = "notexisting"
+		_, err := client.Environments.Read(ctx, envId)
+		assert.Equal(
+			t,
+			err,
+			errors.New(fmt.Sprintf("Environment with ID '%s' not found or user unauthorized", envId)),
+		)
 	})
 
 	t.Run("with invalid env ID", func(t *testing.T) {
@@ -160,11 +167,20 @@ func TestEnvironmentsDelete(t *testing.T) {
 
 		// Try fetching the env again - it should error.
 		_, err = client.Environments.Read(ctx, envTest.ID)
-		assert.Equal(t, err, ErrResourceNotFound)
+		assert.Equal(
+			t,
+			err,
+			errors.New(fmt.Sprintf("Environment with ID '%s' not found or user unauthorized", envTest.ID)),
+		)
 	})
 
 	t.Run("when the env does not exist", func(t *testing.T) {
-		err := client.Environments.Delete(ctx, randomString(t))
-		assert.Equal(t, err, ErrResourceNotFound)
+		var envId = randomString(t)
+		err := client.Environments.Delete(ctx, envId)
+		assert.Equal(
+			t,
+			err,
+			errors.New(fmt.Sprintf("Environment with ID '%s' not found or user unauthorized", envId)),
+		)
 	})
 }

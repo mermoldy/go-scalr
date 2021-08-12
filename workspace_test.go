@@ -2,6 +2,8 @@ package scalr
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -113,7 +115,11 @@ func TestWorkspacesCreate(t *testing.T) {
 			Name:        String("foo"),
 			Environment: &Environment{ID: badIdentifier},
 		})
-		assert.Equal(t, err, ErrResourceNotFound)
+		assert.Equal(
+			t,
+			err,
+			errors.New(fmt.Sprintf("Environment with ID '%s' not found or user unauthorized", badIdentifier)),
+		)
 	})
 
 	t.Run("when an error is returned from the api", func(t *testing.T) {
@@ -365,7 +371,11 @@ func TestWorkspacesDelete(t *testing.T) {
 
 		// Try loading the workspace - it should fail.
 		_, err = client.Workspaces.ReadByID(ctx, wTest.ID)
-		assert.Equal(t, ErrResourceNotFound, err)
+		assert.Equal(
+			t,
+			errors.New(fmt.Sprintf("Workspace with ID '%s' not found or user unauthorized", wTest.ID)),
+			err,
+		)
 	})
 
 	t.Run("without a valid workspace ID", func(t *testing.T) {

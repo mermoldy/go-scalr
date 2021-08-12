@@ -39,8 +39,6 @@ var (
 
 	// ErrUnauthorized is returned when a receiving a 401.
 	ErrUnauthorized = errors.New("unauthorized")
-	// ErrResourceNotFound is returned when a receiving a 404.
-	ErrResourceNotFound = errors.New("resource not found")
 )
 
 // RetryLogHook allows a function to run before each retry.
@@ -418,8 +416,6 @@ func checkResponseCode(r *http.Response) error {
 	switch r.StatusCode {
 	case 401:
 		return ErrUnauthorized
-	case 404:
-		return ErrResourceNotFound
 	case 409:
 		switch {
 		case strings.HasSuffix(r.Request.URL.Path, "actions/lock"):
