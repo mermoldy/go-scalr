@@ -464,7 +464,7 @@ func checkResponseCode(r *http.Response) error {
 
 	if r.StatusCode == 404 {
 		return &ErrResourceNotFound{
-			Message: fmt.Sprintf(strings.Join(errs, "\n")),
+			Message: fmt.Sprint(strings.Join(errs, "\n")),
 		}
 	}
 
