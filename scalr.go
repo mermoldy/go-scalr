@@ -48,7 +48,7 @@ type ErrResourceNotFound struct {
 
 func (e ErrResourceNotFound) Error() string {
 	if len(e.Message) == 0 {
-		return fmt.Sprintf("resource not found")
+		return "resource not found"
 	} else {
 		//return fmt.Sprintf("resource not found: %s", e.Message)
 		return fmt.Sprintf(e.Message)
