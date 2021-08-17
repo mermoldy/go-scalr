@@ -2,7 +2,6 @@ package scalr
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"testing"
 
@@ -62,10 +61,10 @@ func TestConfigurationVersionsRead(t *testing.T) {
 		assert.Nil(t, cv)
 		assert.Equal(
 			t,
-			err,
-			errors.New(
-				fmt.Sprintf("ConfigurationVersion with ID '%s' not found or user unauthorized", cvName),
-			),
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("ConfigurationVersion with ID '%s' not found or user unauthorized", cvName),
+			}.Error(),
+			err.Error(),
 		)
 	})
 

@@ -2,7 +2,6 @@ package scalr
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"testing"
 
@@ -98,8 +97,10 @@ func TestEnvironmentsRead(t *testing.T) {
 		_, err := client.Environments.Read(ctx, envId)
 		assert.Equal(
 			t,
-			err,
-			errors.New(fmt.Sprintf("Environment with ID '%s' not found or user unauthorized", envId)),
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("Environment with ID '%s' not found or user unauthorized", envId),
+			}.Error(),
+			err.Error(),
 		)
 	})
 
@@ -169,8 +170,10 @@ func TestEnvironmentsDelete(t *testing.T) {
 		_, err = client.Environments.Read(ctx, envTest.ID)
 		assert.Equal(
 			t,
-			err,
-			errors.New(fmt.Sprintf("Environment with ID '%s' not found or user unauthorized", envTest.ID)),
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("Environment with ID '%s' not found or user unauthorized", envTest.ID),
+			}.Error(),
+			err.Error(),
 		)
 	})
 
@@ -179,8 +182,10 @@ func TestEnvironmentsDelete(t *testing.T) {
 		err := client.Environments.Delete(ctx, envId)
 		assert.Equal(
 			t,
-			err,
-			errors.New(fmt.Sprintf("Environment with ID '%s' not found or user unauthorized", envId)),
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("Environment with ID '%s' not found or user unauthorized", envId),
+			}.Error(),
+			err.Error(),
 		)
 	})
 }

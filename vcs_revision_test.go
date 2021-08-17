@@ -2,7 +2,6 @@ package scalr
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"testing"
 
@@ -19,10 +18,10 @@ func TestVCSRevisionRead(t *testing.T) {
 		assert.Nil(t, cv)
 		assert.Equal(
 			t,
-			err,
-			errors.New(
-				fmt.Sprintf("VcsRevisionBinding with ID '%s' not found or user unauthorized", vcsId),
-			),
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("VcsRevisionBinding with ID '%s' not found or user unauthorized", vcsId),
+			}.Error(),
+			err.Error(),
 		)
 	})
 

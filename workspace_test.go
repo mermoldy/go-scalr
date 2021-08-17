@@ -2,7 +2,6 @@ package scalr
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"testing"
 
@@ -118,8 +117,10 @@ func TestWorkspacesCreate(t *testing.T) {
 		})
 		assert.Equal(
 			t,
-			err,
-			errors.New(fmt.Sprintf("Environment with ID '%s' not found or user unauthorized", badIdentifier)),
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("Environment with ID '%s' not found or user unauthorized", badIdentifier),
+			}.Error(),
+			err.Error(),
 		)
 	})
 
@@ -374,8 +375,10 @@ func TestWorkspacesDelete(t *testing.T) {
 		_, err = client.Workspaces.ReadByID(ctx, wTest.ID)
 		assert.Equal(
 			t,
-			errors.New(fmt.Sprintf("Workspace with ID '%s' not found or user unauthorized", wTest.ID)),
-			err,
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("Workspace with ID '%s' not found or user unauthorized", wTest.ID),
+			}.Error(),
+			err.Error(),
 		)
 	})
 

@@ -2,7 +2,6 @@ package scalr
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"testing"
 
@@ -139,8 +138,10 @@ func TestRolesCreate(t *testing.T) {
 		})
 		assert.Equal(
 			t,
-			err,
-			errors.New(fmt.Sprintf("Clients with ID '%s' not found or user unauthorized", accountId)),
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("Clients with ID '%s' not found or user unauthorized", accountId),
+			}.Error(),
+			err.Error(),
 		)
 	})
 
@@ -257,8 +258,10 @@ func TestRolesDelete(t *testing.T) {
 		_, err = client.Roles.Read(ctx, rTest.ID)
 		assert.Equal(
 			t,
-			errors.New(fmt.Sprintf("IamRole with ID '%s' not found or user unauthorized", rTest.ID)),
-			err,
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("IamRole with ID '%s' not found or user unauthorized", rTest.ID),
+			}.Error(),
+			err.Error(),
 		)
 	})
 

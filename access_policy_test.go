@@ -2,7 +2,6 @@ package scalr
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"testing"
 
@@ -247,8 +246,10 @@ func TestAccessPoliciesDelete(t *testing.T) {
 		_, err = client.AccessPolicies.Read(ctx, apTest.ID)
 		assert.Equal(
 			t,
-			errors.New(fmt.Sprintf("IamAccessPolicy with ID '%v' not found or user unauthorized", apTest.ID)),
-			err,
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("IamAccessPolicy with ID '%v' not found or user unauthorized", apTest.ID),
+			}.Error(),
+			err.Error(),
 		)
 	})
 

@@ -2,7 +2,6 @@ package scalr
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"testing"
 
@@ -169,8 +168,10 @@ func TestVariablesRead(t *testing.T) {
 		assert.Nil(t, v)
 		assert.Equal(
 			t,
-			errors.New(fmt.Sprintf("Variable with ID '%s' not found or user unauthorized", variableId)),
-			err,
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("Variable with ID '%s' not found or user unauthorized", variableId),
+			}.Error(),
+			err.Error(),
 		)
 	})
 
@@ -263,8 +264,10 @@ func TestVariablesDelete(t *testing.T) {
 		err := client.Variables.Delete(ctx, variableId)
 		assert.Equal(
 			t,
-			err,
-			errors.New(fmt.Sprintf("Variable with ID '%s' not found or user unauthorized", variableId)),
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("Variable with ID '%s' not found or user unauthorized", variableId),
+			}.Error(),
+			err.Error(),
 		)
 	})
 
