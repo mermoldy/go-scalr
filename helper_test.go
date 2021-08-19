@@ -169,10 +169,11 @@ func createVariable(t *testing.T, client *Client, ws *Workspace) (*Variable, fun
 
 	ctx := context.Background()
 	v, err := client.Variables.Create(ctx, VariableCreateOptions{
-		Key:       String(randomString(t)),
-		Value:     String(randomString(t)),
-		Category:  Category(CategoryTerraform),
-		Workspace: ws,
+		Key:         String(randomString(t)),
+		Value:       String(randomString(t)),
+		Category:    Category(CategoryTerraform),
+		Description: String("Create by go-scalr test helper."),
+		Workspace:   ws,
 	})
 	if err != nil {
 		t.Fatal(err)

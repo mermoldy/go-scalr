@@ -50,13 +50,14 @@ type VariableList struct {
 
 // Variable represents a Scalr variable.
 type Variable struct {
-	ID        string       `jsonapi:"primary,vars"`
-	Key       string       `jsonapi:"attr,key"`
-	Value     string       `jsonapi:"attr,value"`
-	Category  CategoryType `jsonapi:"attr,category"`
-	HCL       bool         `jsonapi:"attr,hcl"`
-	Sensitive bool         `jsonapi:"attr,sensitive"`
-	Final     bool         `jsonapi:"attr,final"`
+	ID          string       `jsonapi:"primary,vars"`
+	Key         string       `jsonapi:"attr,key"`
+	Value       string       `jsonapi:"attr,value"`
+	Category    CategoryType `jsonapi:"attr,category"`
+	Description string       `jsonapi:"attr,description"`
+	HCL         bool         `jsonapi:"attr,hcl"`
+	Sensitive   bool         `jsonapi:"attr,sensitive"`
+	Final       bool         `jsonapi:"attr,final"`
 
 	// Relations
 	Workspace   *Workspace   `jsonapi:"relation,workspace"`
@@ -81,6 +82,9 @@ type VariableCreateOptions struct {
 
 	// Whether this is a Terraform or environment variable.
 	Category *CategoryType `jsonapi:"attr,category"`
+
+	// Variable description.
+	Description *string `jsonapi:"attr,description"`
 
 	// Whether to evaluate the value of the variable as a string of HCL code.
 	HCL *bool `jsonapi:"attr,hcl,omitempty"`
@@ -176,6 +180,9 @@ type VariableUpdateOptions struct {
 
 	// The value of the variable.
 	Value *string `jsonapi:"attr,value,omitempty"`
+
+	// The description of the variable.
+	Description *string `jsonapi:"attr,description,omitempty"`
 
 	// Whether to evaluate the value of the variable as a string of HCL code.
 	HCL *bool `jsonapi:"attr,hcl,omitempty"`
