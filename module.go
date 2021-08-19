@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"time"
 )
 
 // Compile-time proof of interface implementation.
@@ -14,13 +15,12 @@ var _ Modules = (*modules)(nil)
 type Modules interface {
 	// List all the modules .
 	List(ctx context.Context, options ModuleListOptions) (*ModuleList, error)
-
 	// Create the module
 	Create(ctx context.Context, options ModuleCreateOptions) (*Module, error)
-
 	// Read a module by its ID.
 	Read(ctx context.Context, moduleID string) (*Module, error)
-
+	// ReadBySource a module by Source
+	ReadBySource(ctx context.Context, moduleSource string) (*Module, error)
 	// Delete a module by its ID.
 	Delete(ctx context.Context, moduleID string) error
 }
@@ -31,16 +31,20 @@ type modules struct {
 }
 
 type Module struct {
-	ID       string         `jsonapi:"primary,modules"`
-	Name     string         `jsonapi:"attr,name"`
-	Provider string         `jsonapi:"attr,provider"`
-	VCSRepo  *ModuleVCSRepo `jsonapi:"attr,vcs-repo"`
-	Status   ModuleStatus   `jsonapi:"attr,status"`
-	Source   string         `jsonapi:"attr,source"`
+	ID          string         `jsonapi:"primary,modules"`
+	CreatedAt   time.Time      `jsonapi:"attr,created-at,iso8601"`
+	Name        string         `jsonapi:"attr,name"`
+	Provider    string         `jsonapi:"attr,provider"`
+	Source      string         `jsonapi:"attr,source"`
+	Description *string        `jsonapi:"attr,description,omitempty"`
+	VCSRepo     *ModuleVCSRepo `jsonapi:"attr,vcs-repo"`
+	Status      ModuleStatus   `jsonapi:"attr,status"`
 	// Relation
-	VcsProvider *VcsProviderOptions `jsonapi:"relation,vcs-provider"`
-	Account     *Account            `jsonapi:"relation,account,omitempty"`
-	Environment *Environment        `jsonapi:"relation,environment,omitempty"`
+	VcsProvider         *VcsProviderOptions `jsonapi:"relation,vcs-provider"`
+	Account             *Account            `jsonapi:"relation,account,omitempty"`
+	Environment         *Environment        `jsonapi:"relation,environment,omitempty"`
+	CreatedBy           *User               `jsonapi:"relation,created-by,omitempty"`
+	LatestModuleVersion *ModuleVersion      `jsonapi:"relation,latest-module-version,omitempty"`
 }
 
 // ModuleStatus represents a module state.
@@ -72,10 +76,10 @@ type ModuleListOptions struct {
 	ListOptions
 	Name        *string       `url:"filter[name],omitempty"`
 	Status      *ModuleStatus `url:"filter[status],omitempty"`
+	Source      *string       `url:"filter[source],omitempty"`
 	Provider    *string       `url:"filter[provider],omitempty"`
 	Account     *string       `url:"filter[account],omitempty"`
 	Environment *string       `url:"filter[environment],omitempty"`
-	//Include     string  `url:"include,omitempty"`
 }
 
 // List all the modules
@@ -163,6 +167,29 @@ func (s *modules) Read(ctx context.Context, moduleID string) (*Module, error) {
 	}
 
 	return m, nil
+}
+
+func (s *modules) ReadBySource(ctx context.Context, moduleSource string) (*Module, error) {
+	ms := &moduleSource
+	if !validString(ms) {
+		return nil, errors.New("invalid value for module source")
+	}
+
+	req, err := s.client.newRequest("GET", "modules", &ModuleListOptions{Source: ms})
+	if err != nil {
+		return nil, err
+	}
+
+	ml := &ModuleList{}
+	err = s.client.do(ctx, req, ml)
+	if err != nil {
+		return nil, err
+	}
+	if len(ml.Items) != 1 {
+		return nil, ErrResourceNotFound
+	}
+
+	return ml.Items[0], nil
 }
 
 // Delete deletes a module by its ID.
