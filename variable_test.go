@@ -20,10 +20,11 @@ func TestVariablesCreate(t *testing.T) {
 
 	t.Run("when options has an empty string value", func(t *testing.T) {
 		options := VariableCreateOptions{
-			Key:       String(randomVariableKey(t)),
-			Value:     String(""),
-			Category:  Category(CategoryShell),
-			Workspace: wsTest,
+			Key:         String(randomVariableKey(t)),
+			Value:       String(""),
+			Category:    Category(CategoryShell),
+			Description: String("random variable test"),
+			Workspace:   wsTest,
 		}
 
 		v, err := client.Variables.Create(ctx, options)
@@ -33,6 +34,7 @@ func TestVariablesCreate(t *testing.T) {
 		assert.Equal(t, *options.Key, v.Key)
 		assert.Equal(t, *options.Value, v.Value)
 		assert.Equal(t, *options.Category, v.Category)
+		assert.Equal(t, *options.Description, v.Description)
 	})
 
 	t.Run("when options is missing value", func(t *testing.T) {
@@ -156,6 +158,7 @@ func TestVariablesRead(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, vTest.ID, v.ID)
 		assert.Equal(t, vTest.Category, v.Category)
+		assert.Equal(t, vTest.Description, v.Description)
 		assert.Equal(t, vTest.HCL, v.HCL)
 		assert.Equal(t, vTest.Key, v.Key)
 		assert.Equal(t, vTest.Sensitive, v.Sensitive)
@@ -191,9 +194,10 @@ func TestVariablesUpdate(t *testing.T) {
 
 	t.Run("with valid options", func(t *testing.T) {
 		options := VariableUpdateOptions{
-			Key:   String("newname"),
-			Value: String("newvalue"),
-			HCL:   Bool(true),
+			Key:         String("newname"),
+			Value:       String("newvalue"),
+			Description: String("newdescription"),
+			HCL:         Bool(true),
 		}
 
 		v, err := client.Variables.Update(ctx, vTest.ID, options)
@@ -202,6 +206,7 @@ func TestVariablesUpdate(t *testing.T) {
 		assert.Equal(t, *options.Key, v.Key)
 		assert.Equal(t, *options.HCL, v.HCL)
 		assert.Equal(t, *options.Value, v.Value)
+		assert.Equal(t, *options.Description, v.Description)
 	})
 
 	t.Run("when updating a subset of values", func(t *testing.T) {
