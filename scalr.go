@@ -444,7 +444,7 @@ func checkResponseCode(r *http.Response) error {
 	err := json.NewDecoder(r.Body).Decode(errPayload)
 	if err != nil || len(errPayload.Errors) == 0 {
 		if r.StatusCode == 404 {
-			return &ErrResourceNotFound{}
+			return ErrResourceNotFound{}
 		} else {
 			return fmt.Errorf(r.Status)
 		}
