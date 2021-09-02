@@ -248,16 +248,28 @@ func TestClient_retryHTTPCheck(t *testing.T) {
 	}
 }
 
-func TestClient_notFoundErrorWithoutMessage(t *testing.T) {
-	resp := &http.Response{
-		StatusCode: 404,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test boody")),
+func TestClient_errorWithoutMessage(t *testing.T) {
+	cases := map[string]struct {
+		resp *http.Response
+		err  error
+	}{
+		"404-not-found-error": {
+			resp: &http.Response{StatusCode: 404, Body: ioutil.NopCloser(bytes.NewBufferString("test body"))},
+			err:  ErrResourceNotFound{},
+		},
+		"500-server-error": {
+			resp: &http.Response{StatusCode: 500, Body: ioutil.NopCloser(bytes.NewBufferString("test body"))},
+			err:  errors.New(""),
+		},
 	}
-	err := checkResponseCode(resp)
 
-	if err != nil {
-		assert.Error(t, err)
-		assert.Equal(t, err, ErrResourceNotFound{})
+	for _, tc := range cases {
+		err := checkResponseCode(tc.resp)
+
+		if err != nil {
+			assert.Error(t, err)
+			assert.Equal(t, err, tc.err)
+		}
 	}
 }
 
