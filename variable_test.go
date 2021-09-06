@@ -2,6 +2,7 @@ package scalr
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -165,9 +166,16 @@ func TestVariablesRead(t *testing.T) {
 	})
 
 	t.Run("when the variable does not exist", func(t *testing.T) {
-		v, err := client.Variables.Read(ctx, "nonexisting")
+		var variableId = "nonexisting"
+		v, err := client.Variables.Read(ctx, variableId)
 		assert.Nil(t, v)
-		assert.Equal(t, ErrResourceNotFound, err)
+		assert.Equal(
+			t,
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("Variable with ID '%s' not found or user unauthorized", variableId),
+			}.Error(),
+			err.Error(),
+		)
 	})
 
 	t.Run("without a valid variable ID", func(t *testing.T) {
@@ -257,8 +265,15 @@ func TestVariablesDelete(t *testing.T) {
 	})
 
 	t.Run("with non existing variable ID", func(t *testing.T) {
-		err := client.Variables.Delete(ctx, "nonexisting")
-		assert.Equal(t, err, ErrResourceNotFound)
+		var variableId = "nonexisting"
+		err := client.Variables.Delete(ctx, variableId)
+		assert.Equal(
+			t,
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("Variable with ID '%s' not found or user unauthorized", variableId),
+			}.Error(),
+			err.Error(),
+		)
 	})
 
 	t.Run("with invalid variable ID", func(t *testing.T) {

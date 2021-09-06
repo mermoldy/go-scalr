@@ -2,6 +2,7 @@ package scalr
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -21,9 +22,16 @@ func TestRunsRead(t *testing.T) {
 	})
 
 	t.Run("when the run does not exist", func(t *testing.T) {
-		r, err := client.Runs.Read(ctx, "nonexisting")
+		var runId = "nonexisting"
+		r, err := client.Runs.Read(ctx, runId)
 		assert.Nil(t, r)
-		assert.Equal(t, err, ErrResourceNotFound)
+		assert.Equal(
+			t,
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("Run with ID '%s' not found or user unauthorized", runId),
+			}.Error(),
+			err.Error(),
+		)
 	})
 
 	t.Run("with invalid run ID", func(t *testing.T) {
