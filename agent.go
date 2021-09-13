@@ -1,5 +1,7 @@
 package scalr
 
 type Agent struct {
-	id string
+	ID   string `jsonapi:"primary,agents"`
+	Name string `jsonapi:"attr,name"`
+	OS   string `jsonapi:"attr,os"`
 }

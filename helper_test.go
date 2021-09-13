@@ -53,7 +53,7 @@ func createAgentPool(t *testing.T, client *Client) (*AgentPool, func()) {
 		if err := client.AgentPools.Delete(ctx, ap.ID); err != nil {
 			t.Errorf("Error destroying agent pool! WARNING: Dangling resources\n"+
 				"may exist! The full error is shown below.\n\n"+
-				"Role: %s\nError: %s", ap.ID, err)
+				"AgentPool: %s\nError: %s", ap.ID, err)
 		}
 	}
 }
