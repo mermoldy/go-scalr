@@ -19,7 +19,7 @@ type Modules interface {
 	Create(ctx context.Context, options ModuleCreateOptions) (*Module, error)
 	// Read a module by its ID.
 	Read(ctx context.Context, moduleID string) (*Module, error)
-	// ReadBySource a module by Source
+	// Read the module by its Source.
 	ReadBySource(ctx context.Context, moduleSource string) (*Module, error)
 	// Delete a module by its ID.
 	Delete(ctx context.Context, moduleID string) error
