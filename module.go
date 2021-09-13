@@ -19,7 +19,7 @@ type Modules interface {
 	Create(ctx context.Context, options ModuleCreateOptions) (*Module, error)
 	// Read a module by its ID.
 	Read(ctx context.Context, moduleID string) (*Module, error)
-	// Read the module by its Source.
+	// ReadBySource Read the module by its Source.
 	ReadBySource(ctx context.Context, moduleSource string) (*Module, error)
 	// Delete a module by its ID.
 	Delete(ctx context.Context, moduleID string) error
@@ -186,7 +186,7 @@ func (s *modules) ReadBySource(ctx context.Context, moduleSource string) (*Modul
 		return nil, err
 	}
 	if len(ml.Items) != 1 {
-		return nil, ErrResourceNotFound
+		return nil, ErrResourceNotFound{Message: fmt.Sprintf("Module with source '%s' not found.", *ms)}
 	}
 
 	return ml.Items[0], nil

@@ -2,6 +2,7 @@ package scalr
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -69,7 +70,9 @@ func TestModulesCreate(t *testing.T) {
 			VcsProvider: &VcsProviderOptions{ID: *String(badIdentifier)},
 		})
 		assert.Nil(t, w)
-		assert.EqualError(t, err, "resource not found")
+		assert.EqualError(t, err, ErrResourceNotFound{
+			Message: fmt.Sprintf("VcsProvider with ID '%s' not found or user unauthorized", badIdentifier),
+		}.Error())
 	})
 
 	t.Run("when an error is returned from the api", func(t *testing.T) {
@@ -120,9 +123,12 @@ func TestModulesReadBySource(t *testing.T) {
 	})
 
 	t.Run("Invalid source", func(t *testing.T) {
+		ms := "invalidSource"
 		_, err := client.Modules.ReadBySource(ctx, "invalidSource")
 		require.Error(t, err)
-		assert.Equal(t, err, ErrResourceNotFound)
+		assert.EqualError(t, err, ErrResourceNotFound{
+			Message: fmt.Sprintf("Module with source '%s' not found.", ms),
+		}.Error())
 	})
 }
 
