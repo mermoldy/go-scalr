@@ -39,9 +39,19 @@ var (
 
 	// ErrUnauthorized is returned when a receiving a 401.
 	ErrUnauthorized = errors.New("unauthorized")
-	// ErrResourceNotFound is returned when a receiving a 404.
-	ErrResourceNotFound = errors.New("resource not found")
 )
+
+type ErrResourceNotFound struct {
+	Message string
+}
+
+func (e ErrResourceNotFound) Error() string {
+	if len(e.Message) == 0 {
+		return "resource not found"
+	} else {
+		return fmt.Sprintf(e.Message)
+	}
+}
 
 // RetryLogHook allows a function to run before each retry.
 type RetryLogHook func(attemptNum int, resp *http.Response)
@@ -422,8 +432,6 @@ func checkResponseCode(r *http.Response) error {
 	switch r.StatusCode {
 	case 401:
 		return ErrUnauthorized
-	case 404:
-		return ErrResourceNotFound
 	case 409:
 		switch {
 		case strings.HasSuffix(r.Request.URL.Path, "actions/lock"):
@@ -439,7 +447,11 @@ func checkResponseCode(r *http.Response) error {
 	errPayload := &jsonapi.ErrorsPayload{}
 	err := json.NewDecoder(r.Body).Decode(errPayload)
 	if err != nil || len(errPayload.Errors) == 0 {
-		return fmt.Errorf(r.Status)
+		if r.StatusCode == 404 {
+			return ErrResourceNotFound{}
+		} else {
+			return fmt.Errorf(r.Status)
+		}
 	}
 
 	// Parse and format the errors.
@@ -449,6 +461,12 @@ func checkResponseCode(r *http.Response) error {
 			errs = append(errs, e.Title)
 		} else {
 			errs = append(errs, fmt.Sprintf("%s\n\n%s", e.Title, e.Detail))
+		}
+	}
+
+	if r.StatusCode == 404 {
+		return &ErrResourceNotFound{
+			Message: fmt.Sprint(strings.Join(errs, "\n")),
 		}
 	}
 

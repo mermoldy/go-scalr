@@ -2,6 +2,7 @@ package scalr
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -55,9 +56,16 @@ func TestConfigurationVersionsRead(t *testing.T) {
 	})
 
 	t.Run("when the configuration version does not exist", func(t *testing.T) {
-		cv, err := client.ConfigurationVersions.Read(ctx, "nonexisting")
+		var cvName = "nonexisting"
+		cv, err := client.ConfigurationVersions.Read(ctx, cvName)
 		assert.Nil(t, cv)
-		assert.Equal(t, err, ErrResourceNotFound)
+		assert.Equal(
+			t,
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("ConfigurationVersion with ID '%s' not found or user unauthorized", cvName),
+			}.Error(),
+			err.Error(),
+		)
 	})
 
 	t.Run("with invalid configuration version id", func(t *testing.T) {

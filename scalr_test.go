@@ -1,8 +1,11 @@
 package scalr
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"github.com/stretchr/testify/assert"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -241,6 +244,31 @@ func TestClient_retryHTTPCheck(t *testing.T) {
 		}
 		if checkErr != tc.checkErr {
 			t.Fatalf("test %s expected checkErr %v, got: %v", name, tc.checkErr, checkErr)
+		}
+	}
+}
+
+func TestClient_errorWithoutMessage(t *testing.T) {
+	cases := map[string]struct {
+		resp *http.Response
+		err  error
+	}{
+		"404-not-found-error": {
+			resp: &http.Response{StatusCode: 404, Body: ioutil.NopCloser(bytes.NewBufferString("test body"))},
+			err:  ErrResourceNotFound{},
+		},
+		"500-server-error": {
+			resp: &http.Response{StatusCode: 500, Body: ioutil.NopCloser(bytes.NewBufferString("test body"))},
+			err:  errors.New(""),
+		},
+	}
+
+	for _, tc := range cases {
+		err := checkResponseCode(tc.resp)
+
+		if err != nil {
+			assert.Error(t, err)
+			assert.Equal(t, err, tc.err)
 		}
 	}
 }

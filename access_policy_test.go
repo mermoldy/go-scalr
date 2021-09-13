@@ -244,7 +244,13 @@ func TestAccessPoliciesDelete(t *testing.T) {
 
 		// Try loading the accessPolicy - it should fail.
 		_, err = client.AccessPolicies.Read(ctx, apTest.ID)
-		assert.Equal(t, ErrResourceNotFound, err)
+		assert.Equal(
+			t,
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("IamAccessPolicy with ID '%v' not found or user unauthorized", apTest.ID),
+			}.Error(),
+			err.Error(),
+		)
 	})
 
 	t.Run("without a valid accessPolicy ID", func(t *testing.T) {

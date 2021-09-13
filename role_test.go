@@ -2,6 +2,7 @@ package scalr
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -128,13 +129,20 @@ func TestRolesCreate(t *testing.T) {
 	})
 
 	t.Run("when options has an invalid account", func(t *testing.T) {
+		var accountId = "acc-234"
 		_, err := client.Roles.Create(ctx, RoleCreateOptions{
 			Name:        String("foo" + randomString(t)),
 			Permissions: readPermissions,
 			Description: String("bar"),
-			Account:     &Account{ID: "acc-234"},
+			Account:     &Account{ID: accountId},
 		})
-		assert.Equal(t, err, ErrResourceNotFound)
+		assert.Equal(
+			t,
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("Clients with ID '%s' not found or user unauthorized", accountId),
+			}.Error(),
+			err.Error(),
+		)
 	})
 
 	t.Run("bad permissions", func(t *testing.T) {
@@ -248,7 +256,13 @@ func TestRolesDelete(t *testing.T) {
 
 		// Try loading the role - it should fail.
 		_, err = client.Roles.Read(ctx, rTest.ID)
-		assert.Equal(t, ErrResourceNotFound, err)
+		assert.Equal(
+			t,
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("IamRole with ID '%s' not found or user unauthorized", rTest.ID),
+			}.Error(),
+			err.Error(),
+		)
 	})
 
 	t.Run("without a valid role ID", func(t *testing.T) {
