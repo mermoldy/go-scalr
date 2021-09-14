@@ -45,7 +45,7 @@ const (
 	ModuleVersionNotUploaded   ModuleVersionStatus = "not_uploaded"
 	ModuleVersionPending       ModuleVersionStatus = "pending"
 	ModuleVersionOk            ModuleVersionStatus = "ok"
-	ModuleVersionErrored       ModuleVersionStatus = "reg_ingress_failed"
+	ModuleVersionErrored       ModuleVersionStatus = "errored"
 	ModuleVersionPendingDelete ModuleVersionStatus = "pending_delete"
 )
 
