@@ -163,7 +163,7 @@ type AgentPoolUpdateOptions struct {
 	Name *string `jsonapi:"attr,name,omitempty"`
 
 	// Workspaces this pool is connected to
-	Workspaces []*Workspace `jsonapi:"relation,workspaces,omitempty"`
+	Workspaces []*Workspace `jsonapi:"relation,workspaces"`
 }
 
 // Update settings of an existing agent pool.

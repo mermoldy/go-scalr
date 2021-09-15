@@ -13,7 +13,7 @@ var _ AgentPoolTokens = (*agentPoolTokens)(nil)
 // AgentPoolTokens describes all the access token related methods that the
 // Scalr IACP API supports.
 type AgentPoolTokens interface {
-	List(ctx context.Context, agentPoolID string) (*AgentPoolTokenList, error)
+	List(ctx context.Context, agentPoolID string, options AgentPoolTokenListOptions) (*AgentPoolTokenList, error)
 	Create(ctx context.Context, agentPoolID string, options AgentPoolTokenCreateOptions) (*AgentPoolToken, error)
 }
 
@@ -37,14 +37,19 @@ type AgentPoolToken struct {
 }
 
 // AgentPoolTokenCreateOptions represents the options for creating a new AgentPoolToken.
+type AgentPoolTokenListOptions struct {
+	ListOptions
+}
+
+// AgentPoolTokenCreateOptions represents the options for creating a new AgentPoolToken.
 type AgentPoolTokenCreateOptions struct {
 	ID          string  `jsonapi:"primary,access-tokens"`
 	Description *string `jsonapi:"attr,description,omitempty"`
 }
 
 // List all the agent pools.
-func (s *agentPoolTokens) List(ctx context.Context, agentPoolID string) (*AgentPoolTokenList, error) {
-	req, err := s.client.newRequest("GET", fmt.Sprintf("agent-pools/%s/access-tokens", url.QueryEscape(agentPoolID)), nil)
+func (s *agentPoolTokens) List(ctx context.Context, agentPoolID string, options AgentPoolTokenListOptions) (*AgentPoolTokenList, error) {
+	req, err := s.client.newRequest("GET", fmt.Sprintf("agent-pools/%s/access-tokens", url.QueryEscape(agentPoolID)), &options)
 	if err != nil {
 		return nil, err
 	}
