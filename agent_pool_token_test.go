@@ -20,13 +20,13 @@ func TestAgentPoolTokenList(t *testing.T) {
 	defer aptCleanup()
 
 	t.Run("with valid agent pool", func(t *testing.T) {
-		tList, err := client.AgentPoolTokens.List(ctx, ap.ID)
+		tList, err := client.AgentPoolTokens.List(ctx, ap.ID, AgentPoolTokenListOptions{})
 		require.NoError(t, err)
 		assert.Len(t, tList.Items, 1)
 		assert.Equal(t, tList.Items[0].ID, apt.ID)
 	})
 	t.Run("with nonexistent agent pool", func(t *testing.T) {
-		_, err := client.AgentPoolTokens.List(ctx, "ap-123")
+		_, err := client.AgentPoolTokens.List(ctx, "ap-123", AgentPoolTokenListOptions{})
 		assert.Equal(
 			t,
 			ErrResourceNotFound{
@@ -53,7 +53,7 @@ func TestAgentPoolTokenCreate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Get a refreshed view from the API.
-		aptList, err := client.AgentPoolTokens.List(ctx, ap.ID)
+		aptList, err := client.AgentPoolTokens.List(ctx, ap.ID, AgentPoolTokenListOptions{})
 		require.NoError(t, err)
 
 		refreshed := aptList.Items[0]
@@ -71,7 +71,7 @@ func TestAgentPoolTokenCreate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Get a refreshed view from the API.
-		aptList, err := client.AgentPoolTokens.List(ctx, ap.ID)
+		aptList, err := client.AgentPoolTokens.List(ctx, ap.ID, AgentPoolTokenListOptions{})
 		require.NoError(t, err)
 
 		refreshed := aptList.Items[0]
