@@ -25,7 +25,7 @@ type Modules interface {
 	Delete(ctx context.Context, moduleID string) error
 }
 
-// runs implements Runs.
+// modules implements Modules.
 type modules struct {
 	client *Client
 }
@@ -50,7 +50,7 @@ type Module struct {
 // ModuleStatus represents a module state.
 type ModuleStatus string
 
-//List all available run statuses.
+//List all available module statuses.
 const (
 	ModuleNoVersionTags ModuleStatus = "no_version_tag"
 	ModulePending       ModuleStatus = "pending"

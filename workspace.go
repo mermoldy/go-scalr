@@ -171,7 +171,7 @@ type WorkspaceCreateOptions struct {
 
 	// Specifies the Environment for workspace.
 	Environment *Environment `jsonapi:"relation,environment"`
-	// Specifies the Module based on create workspace
+	// Specifies the ModuleVersion based on create workspace
 	ModuleVersion *ModuleVersion `jsonapi:"relation,module-version,omitempty"`
 }
 
@@ -330,7 +330,7 @@ type WorkspaceUpdateOptions struct {
 
 	// Specifies the VcsProvider for workspace vcs-repo.
 	VcsProvider *VcsProviderOptions `jsonapi:"relation,vcs-provider,omitempty"`
-	// Specifies the Module based on create workspace
+	// Specifies the ModuleVersion based on create workspace
 	ModuleVersion *ModuleVersion `jsonapi:"relation,module-version"`
 }
 
