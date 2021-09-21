@@ -38,7 +38,7 @@ const (
 	GitlabEnterprise    VcsType = "gitlab_enterprise"
 	Bitbucket           VcsType = "bitbucket"
 	BitbucketEnterprise VcsType = "bitbucket_enterprise"
-	azureDevOpsServices VcsType = "azure_dev_ops_services"
+	AzureDevOpsServices VcsType = "azure_dev_ops_services"
 )
 
 // AuthType represents the authorization type used in VCS provider.
