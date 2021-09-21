@@ -31,8 +31,23 @@ type vcs_providers struct {
 // VcsType represents a type VCS provider.
 type VcsType string
 
+const (
+	Github              VcsType = "github"
+	GithubEnterprise    VcsType = "github_enterprise"
+	Gitlab              VcsType = "gitlab"
+	GitlabEnterprise    VcsType = "gitlab_enterprise"
+	Bitbucket           VcsType = "bitbucket"
+	BitbucketEnterprise VcsType = "bitbucket_enterprise"
+	azureDevOpsServices VcsType = "azure_dev_ops_services"
+)
+
 // AuthType represents the authorization type used in VCS provider.
 type AuthType string
+
+const (
+	Oauth2        AuthType = "oauth2"
+	PersonalToken AuthType = "personal_token"
+)
 
 // VcsProvidersList represents a list of VCS providers.
 type VcsProvidersList struct {
