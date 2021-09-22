@@ -2,6 +2,7 @@ package scalr
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"time"
@@ -53,7 +54,7 @@ func (s *accessTokens) Update(ctx context.Context, accessTokenID string, options
 	}
 
 	if !validString(options.Description) {
-		return nil, fmt.Errorf("invalid value for description: '%s'", *options.Description)
+		return nil, errors.New("value for description must be a valid string")
 	}
 
 	req, err := s.client.newRequest("PATCH", fmt.Sprintf("access-tokens/%s", url.QueryEscape(accessTokenID)), &options)
