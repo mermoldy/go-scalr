@@ -65,6 +65,7 @@ type OAuth struct {
 type VcsProvider struct {
 	ID       string   `jsonapi:"primary,vcs-providers"`
 	Name     string   `jsonapi:"attr,name"`
+	Url      string   `jsonapi:"attr,url"`
 	VcsType  VcsType  `jsonapi:"attr,vcs-type"`
 	AuthType AuthType `jsonapi:"attr,auth-type"`
 	OAuth    *OAuth   `jsonapi:"attr,oauth"`
