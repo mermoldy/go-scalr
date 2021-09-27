@@ -71,8 +71,8 @@ type VcsProvider struct {
 	OAuth    *OAuth   `jsonapi:"attr,oauth"`
 
 	// Relations
-	Environment *Environment `jsonapi:"relation,environment"`
-	Account     *Account     `jsonapi:"relation,account"`
+	Environments []*Environment `jsonapi:"relation,environments"`
+	Account      *Account       `jsonapi:"relation,account"`
 }
 
 // VcsProvidersListOptions represents the options for listing vcs providers.
@@ -120,8 +120,8 @@ type VcsProviderCreateOptions struct {
 	Url      *string  `jsonapi:"attr,url"`
 
 	// Relations
-	Environment *Environment `jsonapi:"relation,environment,omitempty"`
-	Account     *Account     `jsonapi:"relation,account,omitempty"`
+	Environments []*Environment `jsonapi:"relation,environments,omitempty"`
+	Account      *Account       `jsonapi:"relation,account,omitempty"`
 }
 
 func (o VcsProviderCreateOptions) valid() error {
@@ -178,11 +178,9 @@ func (s *vcs_providers) Read(ctx context.Context, vcsProviderID string) (*VcsPro
 // VcsProviderUpdateOptions represents the options for updating a vcs provider.
 type VcsProviderUpdateOptions struct {
 	// For internal use only!
-	Name     *string  `jsonapi:"attr,name"`
-	AuthType AuthType `jsonapi:"attr,auth-type"`
-	OAuth    *OAuth   `jsonapi:"attr,oauth"`
-	Token    string   `jsonapi:"attr,token"`
-	Url      *string  `jsonapi:"attr,url"`
+	Name  *string `jsonapi:"attr,name"`
+	Token *string `jsonapi:"attr,token"`
+	Url   *string `jsonapi:"attr,url"`
 }
 
 // Update settings of an existing vcs provider.

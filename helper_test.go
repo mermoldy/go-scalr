@@ -191,24 +191,18 @@ func createVariable(t *testing.T, client *Client, ws *Workspace) (*Variable, fun
 	}
 }
 
-func createVcsProvider(t *testing.T, client *Client, env *Environment) (*VcsProvider, func()) {
-	var envCleanup func()
-
-	if env == nil {
-		env, envCleanup = createEnvironment(t, client)
-	}
-
+func createVcsProvider(t *testing.T, client *Client, envs []*Environment) (*VcsProvider, func()) {
 	ctx := context.Background()
 	vcsProvider, err := client.VcsProviders.Create(
 		ctx,
 		VcsProviderCreateOptions{
 			Name:     String("tst-" + randomString(t)),
-			VcsType:  VcsType("github"),
-			AuthType: AuthType("personal_token"),
+			VcsType:  Github,
+			AuthType: PersonalToken,
 			Token:    "test_token",
 
-			Environment: env,
-			Account:     &Account{ID: defaultAccountID},
+			Environments: envs,
+			Account:      &Account{ID: defaultAccountID},
 		},
 	)
 	if err != nil {
@@ -220,10 +214,6 @@ func createVcsProvider(t *testing.T, client *Client, env *Environment) (*VcsProv
 			t.Errorf("Error deleting vcs provider! WARNING: Dangling resources\n"+
 				"may exist! The full error is shown below.\n\n"+
 				"VCS Providder: %s\nError: %s", vcsProvider.ID, err)
-		}
-
-		if envCleanup != nil {
-			envCleanup()
 		}
 	}
 }
