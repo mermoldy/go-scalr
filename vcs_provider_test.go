@@ -93,23 +93,6 @@ func TestVcsProvidersCreate(t *testing.T) {
 		}
 	})
 
-	t.Run("when options is missing name", func(t *testing.T) {
-		vcs, err := client.VcsProviders.Create(ctx, VcsProviderCreateOptions{Environments: []*Environment{envTest}})
-		assert.Nil(t, vcs)
-		assert.EqualError(t, err, "name is required")
-	})
-
-	t.Run("when options has an invalid name", func(t *testing.T) {
-		vcs, err := client.VcsProviders.Create(ctx, VcsProviderCreateOptions{
-			Name:         String(badIdentifier),
-			VcsType:      Gitlab,
-			AuthType:     PersonalToken,
-			Environments: []*Environment{envTest},
-		})
-		assert.Nil(t, vcs)
-		assert.EqualError(t, err, "invalid value for name")
-	})
-
 	t.Run("when options has an invalid environment", func(t *testing.T) {
 		_, err := client.VcsProviders.Create(ctx, VcsProviderCreateOptions{
 			Name:         String("test-vcs"),

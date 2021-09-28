@@ -55,7 +55,7 @@ type VcsProvidersList struct {
 	Items []*VcsProvider
 }
 
-// OAuth contains the custom hooks field.
+// OAuth contains the properties required for 'oauth2' authorization type.
 type OAuth struct {
 	ClientId     string `json:"client-id"`
 	ClientSecret string `json:"client-secret"`
@@ -125,22 +125,8 @@ type VcsProviderCreateOptions struct {
 	Account      *Account       `jsonapi:"relation,account,omitempty"`
 }
 
-func (o VcsProviderCreateOptions) valid() error {
-	if !validString(o.Name) {
-		return errors.New("name is required")
-	}
-	if !validStringID(o.Name) {
-		return errors.New("invalid value for name")
-	}
-	return nil
-}
-
 // Create is used to create a new vcs provider.
 func (s *vcsProviders) Create(ctx context.Context, options VcsProviderCreateOptions) (*VcsProvider, error) {
-	if err := options.valid(); err != nil {
-		return nil, err
-	}
-
 	// Make sure we don't send a user provided ID.
 	options.ID = ""
 
