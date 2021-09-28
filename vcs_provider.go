@@ -69,10 +69,11 @@ type VcsProvider struct {
 	VcsType  VcsType  `jsonapi:"attr,vcs-type"`
 	AuthType AuthType `jsonapi:"attr,auth-type"`
 	OAuth    *OAuth   `jsonapi:"attr,oauth"`
+	Token    string   `jsonapi:"attr,token"`
 
 	// Relations
-	Environment *Environment `jsonapi:"relation,environment"`
-	Account     *Account     `jsonapi:"relation,account"`
+	Environments []*Environment `jsonapi:"relation,environments"`
+	Account      *Account       `jsonapi:"relation,account"`
 }
 
 // VcsProvidersListOptions represents the options for listing vcs providers.
@@ -120,13 +121,16 @@ type VcsProviderCreateOptions struct {
 	Url      *string  `jsonapi:"attr,url"`
 
 	// Relations
-	Environment *Environment `jsonapi:"relation,environment,omitempty"`
-	Account     *Account     `jsonapi:"relation,account,omitempty"`
+	Environments []*Environment `jsonapi:"relation,environments,omitempty"`
+	Account      *Account       `jsonapi:"relation,account,omitempty"`
 }
 
 func (o VcsProviderCreateOptions) valid() error {
-	if o.Name == nil {
-		return errors.New("missing name")
+	if !validString(o.Name) {
+		return errors.New("name is required")
+	}
+	if !validStringID(o.Name) {
+		return errors.New("invalid value for name")
 	}
 	return nil
 }
@@ -178,11 +182,10 @@ func (s *vcs_providers) Read(ctx context.Context, vcsProviderID string) (*VcsPro
 // VcsProviderUpdateOptions represents the options for updating a vcs provider.
 type VcsProviderUpdateOptions struct {
 	// For internal use only!
-	Name     *string  `jsonapi:"attr,name"`
-	AuthType AuthType `jsonapi:"attr,auth-type"`
-	OAuth    *OAuth   `jsonapi:"attr,oauth"`
-	Token    string   `jsonapi:"attr,token"`
-	Url      *string  `jsonapi:"attr,url"`
+	ID    string  `jsonapi:"primary,vcs-providers"`
+	Name  *string `jsonapi:"attr,name,omitempty"`
+	Token *string `jsonapi:"attr,token,omitempty"`
+	Url   *string `jsonapi:"attr,url,omitempty"`
 }
 
 // Update settings of an existing vcs provider.
@@ -190,6 +193,8 @@ func (s *vcs_providers) Update(ctx context.Context, vcsProviderId string, option
 	if !validStringID(&vcsProviderId) {
 		return nil, errors.New("invalid value for vcs provider ID")
 	}
+	// Make sure we don't send a user provided ID.
+	options.ID = vcsProviderId
 
 	u := fmt.Sprintf("vcs-providers/%s", url.QueryEscape(vcsProviderId))
 	req, err := s.client.newRequest("PATCH", u, &options)
@@ -197,16 +202,16 @@ func (s *vcs_providers) Update(ctx context.Context, vcsProviderId string, option
 		return nil, err
 	}
 
-	w := &VcsProvider{}
-	err = s.client.do(ctx, req, w)
+	vcs := &VcsProvider{}
+	err = s.client.do(ctx, req, vcs)
 	if err != nil {
 		return nil, err
 	}
 
-	return w, nil
+	return vcs, nil
 }
 
-// Delete an vcs provider by its ID.
+// Delete a vcs provider by its ID.
 func (s *vcs_providers) Delete(ctx context.Context, vcsProviderId string) error {
 	if !validStringID(&vcsProviderId) {
 		return errors.New("invalid value for vcs provider ID")
