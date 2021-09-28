@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/stretchr/testify/require"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -68,7 +69,7 @@ func TestVcsProvidersCreate(t *testing.T) {
 			Name:     String("foo"),
 			VcsType:  Github,
 			AuthType: PersonalToken,
-			Token:    "test_token",
+			Token:    os.Getenv("GITHUB_TOKEN"),
 
 			Environments: []*Environment{envTest},
 			Account:      &Account{ID: defaultAccountID},
@@ -130,7 +131,7 @@ func TestVcsProvidersCreate(t *testing.T) {
 			Name:     String("foo"),
 			VcsType:  Github,
 			AuthType: PersonalToken,
-			Token:    "",
+			Token:    "invalid-token",
 
 			Environments: []*Environment{envTest},
 			Account:      &Account{ID: defaultAccountID},
@@ -177,13 +178,12 @@ func TestVcsProvidersUpdate(t *testing.T) {
 
 	t.Run("when updating a subset of values", func(t *testing.T) {
 		options := VcsProviderUpdateOptions{
-			Token: String(randomString(t)),
+			Name: String(randomString(t)),
 		}
 
 		vcsAfter, err := client.VcsProviders.Update(ctx, vcsTest.ID, options)
 		require.NoError(t, err)
 
-		assert.Equal(t, vcsTest.Name, vcsAfter.Name)
 		assert.Equal(t, vcsTest.AuthType, vcsAfter.AuthType)
 		assert.Equal(t, vcsTest.VcsType, vcsAfter.VcsType)
 	})

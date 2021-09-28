@@ -2,6 +2,7 @@ package scalr
 
 import (
 	"context"
+	"os"
 	"strings"
 	"testing"
 
@@ -200,7 +201,7 @@ func createVcsProvider(t *testing.T, client *Client, envs []*Environment) (*VcsP
 			Name:     String("tst-" + randomString(t)),
 			VcsType:  Github,
 			AuthType: PersonalToken,
-			Token:    "test_token",
+			Token:    os.Getenv("GITHUB_TOKEN"),
 
 			Environments: envs,
 			Account:      &Account{ID: defaultAccountID},
