@@ -63,11 +63,11 @@ type Workspace struct {
 	Hooks                *Hooks                `jsonapi:"attr,hooks"`
 
 	// Relations
-	CurrentRun    *Run                `jsonapi:"relation,current-run"`
-	Environment   *Environment        `jsonapi:"relation,environment"`
-	CreatedBy     *User               `jsonapi:"relation,created-by"`
-	VcsProvider   *VcsProvider `jsonapi:"relation,vcs-provider"`
-	ModuleVersion *ModuleVersion      `jsonapi:"relation,module-version,omitempty"`
+	CurrentRun    *Run           `jsonapi:"relation,current-run"`
+	Environment   *Environment   `jsonapi:"relation,environment"`
+	CreatedBy     *User          `jsonapi:"relation,created-by"`
+	VcsProvider   *VcsProvider   `jsonapi:"relation,vcs-provider"`
+	ModuleVersion *ModuleVersion `jsonapi:"relation,module-version,omitempty"`
 }
 
 // Hooks contains the custom hooks field.

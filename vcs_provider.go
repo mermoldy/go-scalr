@@ -8,7 +8,7 @@ import (
 )
 
 // Compile-time proof of interface implementation.
-var _ VcsProviders = (*vcs_providers)(nil)
+var _ VcsProviders = (*vcsProviders)(nil)
 
 // VcsProviders describes all the VcsProviders related methods that the Scalr
 // IACP API supports.
@@ -23,8 +23,8 @@ type VcsProviders interface {
 	Delete(ctx context.Context, vcsProvider string) error
 }
 
-// vcs_providers implements VcsProviders.
-type vcs_providers struct {
+// vcsProviders implements VcsProviders.
+type vcsProviders struct {
 	client *Client
 }
 
@@ -95,7 +95,7 @@ type VcsProvidersListOptions struct {
 }
 
 // List the vcs providers.
-func (s *vcs_providers) List(ctx context.Context, options VcsProvidersListOptions) (*VcsProvidersList, error) {
+func (s *vcsProviders) List(ctx context.Context, options VcsProvidersListOptions) (*VcsProvidersList, error) {
 	req, err := s.client.newRequest("GET", "vcs-providers", &options)
 	if err != nil {
 		return nil, err
@@ -136,7 +136,7 @@ func (o VcsProviderCreateOptions) valid() error {
 }
 
 // Create is used to create a new vcs provider.
-func (s *vcs_providers) Create(ctx context.Context, options VcsProviderCreateOptions) (*VcsProvider, error) {
+func (s *vcsProviders) Create(ctx context.Context, options VcsProviderCreateOptions) (*VcsProvider, error) {
 	if err := options.valid(); err != nil {
 		return nil, err
 	}
@@ -159,7 +159,7 @@ func (s *vcs_providers) Create(ctx context.Context, options VcsProviderCreateOpt
 }
 
 // Read a vcs provider by its ID.
-func (s *vcs_providers) Read(ctx context.Context, vcsProviderID string) (*VcsProvider, error) {
+func (s *vcsProviders) Read(ctx context.Context, vcsProviderID string) (*VcsProvider, error) {
 	if !validStringID(&vcsProviderID) {
 		return nil, errors.New("invalid value for vcs provider ID")
 	}
@@ -189,7 +189,7 @@ type VcsProviderUpdateOptions struct {
 }
 
 // Update settings of an existing vcs provider.
-func (s *vcs_providers) Update(ctx context.Context, vcsProviderId string, options VcsProviderUpdateOptions) (*VcsProvider, error) {
+func (s *vcsProviders) Update(ctx context.Context, vcsProviderId string, options VcsProviderUpdateOptions) (*VcsProvider, error) {
 	if !validStringID(&vcsProviderId) {
 		return nil, errors.New("invalid value for vcs provider ID")
 	}
@@ -212,7 +212,7 @@ func (s *vcs_providers) Update(ctx context.Context, vcsProviderId string, option
 }
 
 // Delete a vcs provider by its ID.
-func (s *vcs_providers) Delete(ctx context.Context, vcsProviderId string) error {
+func (s *vcsProviders) Delete(ctx context.Context, vcsProviderId string) error {
 	if !validStringID(&vcsProviderId) {
 		return errors.New("invalid value for vcs provider ID")
 	}

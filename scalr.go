@@ -198,10 +198,9 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.Webhooks = &webhooks{client: client}
 	client.ConfigurationVersions = &configurationVersions{client: client}
 	client.VcsRevisions = &vcsRevisions{client: client}
-	client.VcsProviders = &vcs_providers{client: client}
+	client.VcsProviders = &vcsProviders{client: client}
 	client.Modules = &modules{client: client}
 	client.ModuleVersions = &moduleVersions{client: client}
-
 
 	return client, nil
 }
