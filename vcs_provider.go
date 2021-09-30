@@ -80,6 +80,9 @@ type VcsProvider struct {
 type VcsProvidersListOptions struct {
 	ListOptions
 
+	// Filter by identifier.
+	ID *string `url:"filter[vcs-provider],omitempty"`
+
 	// Query string.
 	Query *string `url:"query,omitempty"`
 
