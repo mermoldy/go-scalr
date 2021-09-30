@@ -183,7 +183,7 @@ func (s *vcsProviders) Update(ctx context.Context, vcsProviderId string, options
 		return nil, errors.New("invalid value for vcs provider ID")
 	}
 	// Make sure we don't send a user provided ID.
-	options.ID = vcsProviderId
+	options.ID = ""
 
 	u := fmt.Sprintf("vcs-providers/%s", url.QueryEscape(vcsProviderId))
 	req, err := s.client.newRequest("PATCH", u, &options)
