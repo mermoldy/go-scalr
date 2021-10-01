@@ -179,6 +179,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	}
 
 	client.http = &retryablehttp.Client{
+		Backoff:      retryablehttp.DefaultBackoff,
 		CheckRetry:   client.retryHTTPCheck,
 		ErrorHandler: retryablehttp.PassthroughErrorHandler,
 		HTTPClient:   config.HTTPClient,
