@@ -120,6 +120,7 @@ type Client struct {
 	Environments          Environments
 	ConfigurationVersions ConfigurationVersions
 	VcsRevisions          VcsRevisions
+	VcsProviders          VcsProviders
 	Modules               Modules
 	ModuleVersions        ModuleVersions
 }
@@ -197,6 +198,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.Webhooks = &webhooks{client: client}
 	client.ConfigurationVersions = &configurationVersions{client: client}
 	client.VcsRevisions = &vcsRevisions{client: client}
+	client.VcsProviders = &vcsProviders{client: client}
 	client.Modules = &modules{client: client}
 	client.ModuleVersions = &moduleVersions{client: client}
 
