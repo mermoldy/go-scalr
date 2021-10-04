@@ -69,7 +69,7 @@ type VcsProvider struct {
 	VcsType  VcsType  `jsonapi:"attr,vcs-type"`
 	AuthType AuthType `jsonapi:"attr,auth-type"`
 	OAuth    *OAuth   `jsonapi:"attr,oauth"`
-	Token    string   `jsonapi:"attr,token"`
+	Token    *string  `jsonapi:"attr,token"`
 
 	// Relations
 	Environments []*Environment `jsonapi:"relation,environments"`
