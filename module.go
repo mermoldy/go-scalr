@@ -40,11 +40,11 @@ type Module struct {
 	VCSRepo     *ModuleVCSRepo `jsonapi:"attr,vcs-repo"`
 	Status      ModuleStatus   `jsonapi:"attr,status"`
 	// Relation
-	VcsProvider         *VcsProviderOptions `jsonapi:"relation,vcs-provider"`
-	Account             *Account            `jsonapi:"relation,account,omitempty"`
-	Environment         *Environment        `jsonapi:"relation,environment,omitempty"`
-	CreatedBy           *User               `jsonapi:"relation,created-by,omitempty"`
-	LatestModuleVersion *ModuleVersion      `jsonapi:"relation,latest-module-version,omitempty"`
+	VcsProvider         *VcsProvider   `jsonapi:"relation,vcs-provider"`
+	Account             *Account       `jsonapi:"relation,account,omitempty"`
+	Environment         *Environment   `jsonapi:"relation,environment,omitempty"`
+	CreatedBy           *User          `jsonapi:"relation,created-by,omitempty"`
+	LatestModuleVersion *ModuleVersion `jsonapi:"relation,latest-module-version,omitempty"`
 }
 
 // ModuleStatus represents a module state.
@@ -106,7 +106,7 @@ type ModuleCreateOptions struct {
 	VCSRepo *ModuleVCSRepo `jsonapi:"attr,vcs-repo"`
 
 	// Specifies the VcsProvider for module vcs-repo.
-	VcsProvider *VcsProviderOptions `jsonapi:"relation,vcs-provider"`
+	VcsProvider *VcsProvider `jsonapi:"relation,vcs-provider"`
 
 	// Specifies the Account for module
 	Account *Account `jsonapi:"relation,account,omitempty"`

@@ -111,17 +111,18 @@ type Client struct {
 	retryServerErrors bool
 
 	AccessPolicies        AccessPolicies
-	Runs                  Runs
-	Roles                 Roles
-	Variables             Variables
-	Workspaces            Workspaces
-	Endpoints             Endpoints
-	Webhooks              Webhooks
-	Environments          Environments
 	ConfigurationVersions ConfigurationVersions
-	VcsRevisions          VcsRevisions
-	Modules               Modules
+	Endpoints             Endpoints
+	Environments          Environments
 	ModuleVersions        ModuleVersions
+	Modules               Modules
+	PolicyGroups          PolicyGroups
+	Roles                 Roles
+	Runs                  Runs
+	Variables             Variables
+	VcsRevisions          VcsRevisions
+	Webhooks              Webhooks
+	Workspaces            Workspaces
 }
 
 // NewClient creates a new Scalr API client.
@@ -188,18 +189,19 @@ func NewClient(cfg *Config) (*Client, error) {
 	}
 
 	// Create the services.
-	client.Environments = &environments{client: client}
-	client.Roles = &roles{client: client}
 	client.AccessPolicies = &accessPolicies{client: client}
+	client.ConfigurationVersions = &configurationVersions{client: client}
+	client.Endpoints = &endpoints{client: client}
+	client.Environments = &environments{client: client}
+	client.ModuleVersions = &moduleVersions{client: client}
+	client.Modules = &modules{client: client}
+	client.PolicyGroups = &policyGroups{client: client}
+	client.Roles = &roles{client: client}
 	client.Runs = &runs{client: client}
 	client.Variables = &variables{client: client}
-	client.Workspaces = &workspaces{client: client}
-	client.Endpoints = &endpoints{client: client}
-	client.Webhooks = &webhooks{client: client}
-	client.ConfigurationVersions = &configurationVersions{client: client}
 	client.VcsRevisions = &vcsRevisions{client: client}
-	client.Modules = &modules{client: client}
-	client.ModuleVersions = &moduleVersions{client: client}
+	client.Webhooks = &webhooks{client: client}
+	client.Workspaces = &workspaces{client: client}
 
 	return client, nil
 }
