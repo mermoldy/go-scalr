@@ -2,6 +2,7 @@ package scalr
 
 import (
 	"context"
+	"os"
 	"strings"
 	"testing"
 
@@ -9,6 +10,7 @@ import (
 )
 
 const defaultAccountID = "acc-svrcncgh453bi8g"
+const defaultModuleID = "mod-svsmkkjo8sju4o0"
 const badIdentifier = "! / nope"
 
 func testClient(t *testing.T) *Client {
@@ -222,6 +224,33 @@ func createVariable(t *testing.T, client *Client, ws *Workspace) (*Variable, fun
 
 		if wsCleanup != nil {
 			wsCleanup()
+		}
+	}
+}
+
+func createVcsProvider(t *testing.T, client *Client, envs []*Environment) (*VcsProvider, func()) {
+	ctx := context.Background()
+	vcsProvider, err := client.VcsProviders.Create(
+		ctx,
+		VcsProviderCreateOptions{
+			Name:     String("tst-" + randomString(t)),
+			VcsType:  Github,
+			AuthType: PersonalToken,
+			Token:    os.Getenv("GITHUB_TOKEN"),
+
+			Environments: envs,
+			Account:      &Account{ID: defaultAccountID},
+		},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return vcsProvider, func() {
+		if err := client.VcsProviders.Delete(ctx, vcsProvider.ID); err != nil {
+			t.Errorf("Error deleting vcs provider! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"VCS Providder: %s\nError: %s", vcsProvider.ID, err)
 		}
 	}
 }

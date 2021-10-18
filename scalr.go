@@ -123,6 +123,9 @@ type Client struct {
 	Environments          Environments
 	ConfigurationVersions ConfigurationVersions
 	VcsRevisions          VcsRevisions
+	VcsProviders          VcsProviders
+	Modules               Modules
+	ModuleVersions        ModuleVersions
 }
 
 // NewClient creates a new Scalr API client.
@@ -179,6 +182,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	}
 
 	client.http = &retryablehttp.Client{
+		Backoff:      retryablehttp.DefaultBackoff,
 		CheckRetry:   client.retryHTTPCheck,
 		ErrorHandler: retryablehttp.PassthroughErrorHandler,
 		HTTPClient:   config.HTTPClient,
@@ -200,7 +204,10 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.Endpoints = &endpoints{client: client}
 	client.Webhooks = &webhooks{client: client}
 	client.ConfigurationVersions = &configurationVersions{client: client}
-	client.VcsRevisions = &vcs_revisions{client: client}
+	client.VcsRevisions = &vcsRevisions{client: client}
+	client.VcsProviders = &vcsProviders{client: client}
+	client.Modules = &modules{client: client}
+	client.ModuleVersions = &moduleVersions{client: client}
 
 	return client, nil
 }

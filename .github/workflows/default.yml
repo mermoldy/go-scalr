@@ -41,6 +41,7 @@ jobs:
       - name: Run tests
         env:
           SCALR_ADDRESS: https://${{ steps.create.outputs.hostname }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: make test
       - name: Install goveralls
         env:

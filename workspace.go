@@ -63,11 +63,12 @@ type Workspace struct {
 	Hooks                *Hooks                `jsonapi:"attr,hooks"`
 
 	// Relations
-	CurrentRun  *Run                `jsonapi:"relation,current-run"`
-	Environment *Environment        `jsonapi:"relation,environment"`
-	CreatedBy   *User               `jsonapi:"relation,created-by"`
-	VcsProvider *VcsProviderOptions `jsonapi:"relation,vcs-provider"`
-	AgentPool   *AgentPool          `jsonapi:"relation,agent-pool"`
+	CurrentRun    *Run           `jsonapi:"relation,current-run"`
+	Environment   *Environment   `jsonapi:"relation,environment"`
+	CreatedBy     *User          `jsonapi:"relation,created-by"`
+	VcsProvider   *VcsProvider   `jsonapi:"relation,vcs-provider"`
+	AgentPool     *AgentPool     `jsonapi:"relation,agent-pool"`
+	ModuleVersion *ModuleVersion `jsonapi:"relation,module-version,omitempty"`
 }
 
 // Hooks contains the custom hooks field.
@@ -168,13 +169,16 @@ type WorkspaceCreateOptions struct {
 	WorkingDirectory *string `jsonapi:"attr,working-directory,omitempty"`
 
 	// Specifies the VcsProvider for workspace vcs-repo. Required if vcs-repo attr passed
-	VcsProvider *VcsProviderOptions `jsonapi:"relation,vcs-provider,omitempty"`
+	VcsProvider *VcsProvider `jsonapi:"relation,vcs-provider,omitempty"`
 
 	// Specifies the Environment for workspace.
 	Environment *Environment `jsonapi:"relation,environment"`
 
 	// Specifies the AgentPool for workspace.
 	AgentPool *AgentPool `jsonapi:"relation,agent-pool,omitempty"`
+
+	// Specifies the ModuleVersion based on create workspace
+	ModuleVersion *ModuleVersion `jsonapi:"relation,module-version,omitempty"`
 }
 
 // VCSRepoOptions represents the configuration options of a VCS integration.
@@ -185,12 +189,6 @@ type VCSRepoOptions struct {
 	Path              *string   `json:"path,omitempty"`
 	TriggerPrefixes   *[]string `json:"trigger-prefixes,omitempty"`
 	DryRunsEnabled    *bool     `json:"dry-runs-enabled,omitempty"`
-}
-
-type VcsProviderOptions struct {
-	ID      string `jsonapi:"primary,vcs-providers"`
-	VcsType string `jsonapi:"attr,vcs-type"`
-	Url     string `jsonapi:"attr,url"`
 }
 
 // HooksOptions represents the WorkspaceHooks configuration.
@@ -331,10 +329,13 @@ type WorkspaceUpdateOptions struct {
 	WorkingDirectory *string `jsonapi:"attr,working-directory,omitempty"`
 
 	// Specifies the VcsProvider for workspace vcs-repo.
-	VcsProvider *VcsProviderOptions `jsonapi:"relation,vcs-provider,omitempty"`
+	VcsProvider *VcsProvider `jsonapi:"relation,vcs-provider,omitempty"`
 
 	// Specifies the AgentPool for workspace.
 	AgentPool *AgentPool `jsonapi:"relation,agent-pool"`
+
+	// Specifies the ModuleVersion based on create workspace
+	ModuleVersion *ModuleVersion `jsonapi:"relation,module-version"`
 }
 
 // Update settings of an existing workspace.
