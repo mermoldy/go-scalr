@@ -120,6 +120,7 @@ type Client struct {
 	Roles                 Roles
 	Runs                  Runs
 	Variables             Variables
+	VcsProviders          VcsProviders
 	VcsRevisions          VcsRevisions
 	Webhooks              Webhooks
 	Workspaces            Workspaces
@@ -199,6 +200,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.Roles = &roles{client: client}
 	client.Runs = &runs{client: client}
 	client.Variables = &variables{client: client}
+	client.VcsProviders = &vcsProviders{client: client}
 	client.VcsRevisions = &vcsRevisions{client: client}
 	client.Webhooks = &webhooks{client: client}
 	client.Workspaces = &workspaces{client: client}
