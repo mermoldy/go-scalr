@@ -10,7 +10,6 @@ import (
 
 const defaultAccountID = "acc-svrcncgh453bi8g"
 const defaultModuleID = "mod-svsmkkjo8sju4o0"
-const defaultVCSProviderID = "vcs-svsmeap82s0tsho"
 const badIdentifier = "! / nope"
 
 func testClient(t *testing.T) *Client {
@@ -189,30 +188,6 @@ func createVariable(t *testing.T, client *Client, ws *Workspace) (*Variable, fun
 
 		if wsCleanup != nil {
 			wsCleanup()
-		}
-	}
-}
-
-func createPolicyGroup(t *testing.T, client *Client) (*PolicyGroup, func()) {
-	ctx := context.Background()
-	policyGroup, err := client.PolicyGroups.Create(ctx, PolicyGroupCreateOptions{
-		Name:        String("tst-pgrp-" + randomString(t)),
-		Account:     &Account{ID: defaultAccountID},
-		VcsProvider: &VcsProvider{ID: defaultVCSProviderID},
-		VCSRepo: &PolicyGroupVCSRepoOptions{
-			Identifier: "Scalr/tf-revizor-fixtures",
-			Path:       String("policies/clouds"),
-		},
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return policyGroup, func() {
-		if err := client.PolicyGroups.Delete(ctx, policyGroup.ID); err != nil {
-			t.Errorf("Error destroying policy group! WARNING: Dangling resources\n"+
-				"may exist! The full error is shown below.\n\n"+
-				"Policy group: %s\nError: %s", policyGroup.ID, err)
 		}
 	}
 }

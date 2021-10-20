@@ -65,7 +65,7 @@ type PolicyGroupVCSRepo struct {
 
 // PolicyGroupVCSRepoOptions contains the configuration options of a VCS integration.
 type PolicyGroupVCSRepoOptions struct {
-	Identifier string  `json:"identifier"`
+	Identifier *string `json:"identifier"`
 	Branch     *string `json:"branch,omitempty"`
 	Path       *string `json:"path,omitempty"`
 }
@@ -217,6 +217,10 @@ func (s *policyGroups) Read(ctx context.Context, policyGroupID string) (*PolicyG
 
 // Update settings of existing policy group.
 func (s *policyGroups) Update(ctx context.Context, policyGroupID string, options PolicyGroupUpdateOptions) (*PolicyGroup, error) {
+	if !validStringID(&policyGroupID) {
+		return nil, errors.New("invalid value for policy group ID")
+	}
+
 	// Make sure we don't send a user provided ID.
 	options.ID = ""
 
