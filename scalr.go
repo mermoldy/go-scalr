@@ -111,6 +111,9 @@ type Client struct {
 	retryServerErrors bool
 
 	AccessPolicies        AccessPolicies
+	AccessTokens          AccessTokens
+	AgentPoolTokens       AgentPoolTokens
+	AgentPools            AgentPools
 	ConfigurationVersions ConfigurationVersions
 	Endpoints             Endpoints
 	Environments          Environments
@@ -191,6 +194,9 @@ func NewClient(cfg *Config) (*Client, error) {
 
 	// Create the services.
 	client.AccessPolicies = &accessPolicies{client: client}
+	client.AccessTokens = &accessTokens{client: client}
+	client.AgentPoolTokens = &agentPoolTokens{client: client}
+	client.AgentPools = &agentPools{client: client}
 	client.ConfigurationVersions = &configurationVersions{client: client}
 	client.Endpoints = &endpoints{client: client}
 	client.Environments = &environments{client: client}
