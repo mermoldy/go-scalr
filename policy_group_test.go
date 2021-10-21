@@ -9,15 +9,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const (
-	defaultPolicyGroupID1   = "pgrp-svsu2dqfvtk5qfg"
-	defaultPolicyGroupName1 = "Clouds"
-	defaultPolicyGroupID2   = "pgrp-svsu1tn68mhevuo"
-)
-
 func TestPolicyGroupsList(t *testing.T) {
+	// TODO: delete skip after SCALRCORE-19891
+	t.Skip("Works with personal token but does not work with github action token.")
+
 	client := testClient(t)
 	ctx := context.Background()
+
+	vcsProvider, vcsProviderCleanup := createVcsProvider(t, client, nil)
+	defer vcsProviderCleanup()
+
+	pg1, pg1Cleanup := createPolicyGroup(t, client, vcsProvider)
+	defer pg1Cleanup()
+
+	pg2, pg2Cleanup := createPolicyGroup(t, client, vcsProvider)
+	defer pg2Cleanup()
 
 	t.Run("without list options", func(t *testing.T) {
 		pgl, err := client.PolicyGroups.List(ctx, PolicyGroupListOptions{})
@@ -26,21 +32,21 @@ func TestPolicyGroupsList(t *testing.T) {
 		for _, pg := range pgl.Items {
 			pgIDs = append(pgIDs, pg.ID)
 		}
-		assert.Contains(t, pgIDs, defaultPolicyGroupID1)
-		assert.Contains(t, pgIDs, defaultPolicyGroupID2)
+		assert.Contains(t, pgIDs, pg1.ID)
+		assert.Contains(t, pgIDs, pg2.ID)
 		assert.Equal(t, 1, pgl.CurrentPage)
-		assert.Equal(t, 3, pgl.TotalCount)
+		assert.True(t, pgl.TotalCount >= 2)
 	})
 
 	t.Run("with name and account options", func(t *testing.T) {
 		pgl, err := client.PolicyGroups.List(ctx, PolicyGroupListOptions{
 			Account: defaultAccountID,
-			Name:    defaultPolicyGroupName1,
+			Name:    pg1.Name,
 		})
 		require.NoError(t, err)
 		assert.Equal(t, 1, pgl.CurrentPage)
 		assert.Equal(t, 1, pgl.TotalCount)
-		assert.Equal(t, defaultPolicyGroupID1, pgl.Items[0].ID)
+		assert.Equal(t, pg1.ID, pgl.Items[0].ID)
 	})
 
 	t.Run("with list options", func(t *testing.T) {
@@ -53,7 +59,7 @@ func TestPolicyGroupsList(t *testing.T) {
 		require.NoError(t, err)
 		assert.Empty(t, pgl.Items)
 		assert.Equal(t, 999, pgl.CurrentPage)
-		assert.Equal(t, 3, pgl.TotalCount)
+		assert.True(t, pgl.TotalCount >= 2)
 	})
 
 	t.Run("without a valid account", func(t *testing.T) {
@@ -64,8 +70,49 @@ func TestPolicyGroupsList(t *testing.T) {
 }
 
 func TestPolicyGroupsCreate(t *testing.T) {
+	// TODO: delete skip after SCALRCORE-19891
+	t.Skip("Works with personal token but does not work with github action token.")
+
 	client := testClient(t)
 	ctx := context.Background()
+
+	vcsProvider, vcsProviderCleanup := createVcsProvider(t, client, nil)
+	defer vcsProviderCleanup()
+
+	t.Run("with valid options", func(t *testing.T) {
+		options := PolicyGroupCreateOptions{
+			Name:        String("foo"),
+			Account:     &Account{ID: defaultAccountID},
+			VcsProvider: vcsProvider,
+			VCSRepo: &PolicyGroupVCSRepoOptions{
+				Identifier: String(policyGroupVcsRepoID),
+				Path:       String(policyGroupVcsRepoPath),
+			},
+		}
+
+		pg, err := client.PolicyGroups.Create(ctx, options)
+		defer func() { client.PolicyGroups.Delete(ctx, pg.ID) }()
+
+		require.NoError(t, err)
+
+		// Get a refreshed view from the API.
+		refreshed, err := client.PolicyGroups.Read(ctx, pg.ID)
+		require.NoError(t, err)
+
+		for _, item := range []*PolicyGroup{
+			pg,
+			refreshed,
+		} {
+			assert.NotEmpty(t, item.ID)
+			assert.Equal(t, *options.Name, item.Name)
+			assert.NotEmpty(t, item.OpaVersion)
+			assert.Equal(t, options.Account.ID, item.Account.ID)
+			assert.Equal(t, options.VcsProvider.ID, item.VcsProvider.ID)
+			assert.Equal(t, *options.VCSRepo.Identifier, item.VCSRepo.Identifier)
+			assert.Equal(t, *options.VCSRepo.Path, item.VCSRepo.Path)
+			assert.NotEmpty(t, item.VCSRepo.Branch)
+		}
+	})
 
 	t.Run("with empty options", func(t *testing.T) {
 		pg, err := client.PolicyGroups.Create(ctx, PolicyGroupCreateOptions{})
@@ -77,7 +124,7 @@ func TestPolicyGroupsCreate(t *testing.T) {
 		pg, err := client.PolicyGroups.Create(ctx, PolicyGroupCreateOptions{
 			Name:        String("foo"),
 			Account:     &Account{ID: defaultAccountID},
-			VcsProvider: &VcsProvider{ID: "vcs-123"},
+			VcsProvider: vcsProvider,
 		})
 		assert.Nil(t, pg)
 		assert.EqualError(t, err, "vcs repo is required")
@@ -88,9 +135,9 @@ func TestPolicyGroupsCreate(t *testing.T) {
 		pg, err := client.PolicyGroups.Create(ctx, PolicyGroupCreateOptions{
 			Name:        String("foo"),
 			Account:     &Account{ID: accID},
-			VcsProvider: &VcsProvider{ID: "vcs-123"},
+			VcsProvider: vcsProvider,
 			VCSRepo: &PolicyGroupVCSRepoOptions{
-				Identifier: String("foo/bar"),
+				Identifier: String(policyGroupVcsRepoID),
 			},
 		})
 		assert.Nil(t, pg)
@@ -110,7 +157,7 @@ func TestPolicyGroupsCreate(t *testing.T) {
 			Account:     &Account{ID: defaultAccountID},
 			VcsProvider: &VcsProvider{ID: vcsID},
 			VCSRepo: &PolicyGroupVCSRepoOptions{
-				Identifier: String("foo/bar"),
+				Identifier: String(policyGroupVcsRepoID),
 			},
 		})
 		assert.Nil(t, pg)
@@ -125,25 +172,28 @@ func TestPolicyGroupsCreate(t *testing.T) {
 }
 
 func TestPolicyGroupsRead(t *testing.T) {
+	// TODO: delete skip after SCALRCORE-19891
+	t.Skip("Works with personal token but does not work with github action token.")
+
 	client := testClient(t)
 	ctx := context.Background()
 
+	policyGroup, policyGroupCleanup := createPolicyGroup(t, client, nil)
+	defer policyGroupCleanup()
+
 	t.Run("when the policy group exists", func(t *testing.T) {
-		pg, err := client.PolicyGroups.Read(ctx, defaultPolicyGroupID1)
+		pg, err := client.PolicyGroups.Read(ctx, policyGroup.ID)
 		require.NoError(t, err)
-		assert.Equal(t, defaultPolicyGroupID1, pg.ID)
+		assert.Equal(t, policyGroup.ID, pg.ID)
 
 		t.Run("relationships are properly decoded", func(t *testing.T) {
 			assert.Equal(t, pg.Account.ID, defaultAccountID)
 		})
 
 		t.Run("vcs repo is properly decoded", func(t *testing.T) {
-			assert.NotEmpty(t, pg.VCSRepo.Identifier)
+			assert.Equal(t, policyGroupVcsRepoID, pg.VCSRepo.Identifier)
 			assert.NotEmpty(t, pg.VCSRepo.Branch)
-		})
-
-		t.Run("policies are properly decoded", func(t *testing.T) {
-			assert.NotEmpty(t, pg.Policies)
+			assert.Equal(t, policyGroupVcsRepoPath, pg.VCSRepo.Path)
 		})
 	})
 
@@ -161,55 +211,66 @@ func TestPolicyGroupsRead(t *testing.T) {
 }
 
 func TestPolicyGroupsUpdate(t *testing.T) {
+	// TODO: delete skip after SCALRCORE-19891
+	t.Skip("Works with personal token but does not work with github action token.")
+
 	client := testClient(t)
 	ctx := context.Background()
 
-	pgTest, err := client.PolicyGroups.Read(ctx, defaultPolicyGroupID1)
-	require.NoError(t, err)
+	policyGroup, policyGroupCleanup := createPolicyGroup(t, client, nil)
+	defer policyGroupCleanup()
 
 	t.Run("when updating a subset of values", func(t *testing.T) {
 		options := PolicyGroupUpdateOptions{
-			Name: String("pg-" + randomString(t)),
+			Name: String("tst-" + randomString(t)),
 		}
 
-		pgAfter, err := client.PolicyGroups.Update(ctx, pgTest.ID, options)
+		pgAfter, err := client.PolicyGroups.Update(ctx, policyGroup.ID, options)
 		require.NoError(t, err)
 
 		assert.Equal(t, *options.Name, pgAfter.Name)
-		assert.Equal(t, pgTest.OpaVersion, pgAfter.OpaVersion)
+		assert.Equal(t, policyGroup.OpaVersion, pgAfter.OpaVersion)
 	})
 
 	t.Run("when an error is returned from the api", func(t *testing.T) {
-		pg, err := client.PolicyGroups.Update(ctx, pgTest.ID, PolicyGroupUpdateOptions{
+		pg, err := client.PolicyGroups.Update(ctx, policyGroup.ID, PolicyGroupUpdateOptions{
 			OpaVersion: String("nonexisting"),
 		})
 		assert.Nil(t, pg)
 		assert.Error(t, err)
 	})
 
-	t.Run("when options has an invalid name", func(t *testing.T) {
+	t.Run("without a valid policy group ID", func(t *testing.T) {
 		pg, err := client.PolicyGroups.Update(ctx, badIdentifier, PolicyGroupUpdateOptions{})
 		assert.Nil(t, pg)
 		assert.EqualError(t, err, "invalid value for policy group ID")
 	})
-
-	// Restore updated policy group
-	_, err = client.PolicyGroups.Update(ctx, pgTest.ID, PolicyGroupUpdateOptions{
-		Name: String(pgTest.Name),
-	},
-	)
-	require.NoError(t, err)
 }
 
 func TestPolicyGroupsDelete(t *testing.T) {
+	// TODO: delete skip after SCALRCORE-19891
+	t.Skip("Works with personal token but does not work with github action token.")
+
 	client := testClient(t)
 	ctx := context.Background()
 
-	t.Run("when policy group is in use", func(t *testing.T) {
-		err := client.PolicyGroups.Delete(ctx, defaultPolicyGroupID1)
-		assert.EqualError(
-			t, err,
-			"Policy group can not be deleted\n\nPolicy group is in use and can not be removed",
+	vcsProvider, vcsProviderCleanup := createVcsProvider(t, client, nil)
+	defer vcsProviderCleanup()
+
+	policyGroup, _ := createPolicyGroup(t, client, vcsProvider)
+
+	t.Run("with valid options", func(t *testing.T) {
+		err := client.PolicyGroups.Delete(ctx, policyGroup.ID)
+		require.NoError(t, err)
+
+		// Try loading policy group - it should fail.
+		_, err = client.PolicyGroups.Read(ctx, policyGroup.ID)
+		assert.Equal(
+			t,
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("PolicyGroups with ID '%s' not found or user unauthorized", policyGroup.ID),
+			}.Error(),
+			err.Error(),
 		)
 	})
 
