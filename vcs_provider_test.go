@@ -103,7 +103,7 @@ func TestVcsProvidersCreate(t *testing.T) {
 		assert.Equal(
 			t,
 			ErrResourceNotFound{
-				Message: fmt.Sprintf("Environment with ID '%s' not found or user unauthorized", badIdentifier),
+				Message: fmt.Sprintf("Relationship 'environments' with ID '%s' not found or user unauthorized", badIdentifier),
 			}.Error(),
 			err.Error(),
 		)

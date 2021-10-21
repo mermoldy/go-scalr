@@ -67,6 +67,7 @@ type Workspace struct {
 	Environment   *Environment   `jsonapi:"relation,environment"`
 	CreatedBy     *User          `jsonapi:"relation,created-by"`
 	VcsProvider   *VcsProvider   `jsonapi:"relation,vcs-provider"`
+	AgentPool     *AgentPool     `jsonapi:"relation,agent-pool"`
 	ModuleVersion *ModuleVersion `jsonapi:"relation,module-version,omitempty"`
 }
 
@@ -112,6 +113,7 @@ type WorkspaceListOptions struct {
 	ListOptions
 
 	Environment *string `url:"filter[environment],omitempty"`
+	AgentPool   *string `url:"filter[agent-pool],omitempty"`
 	Name        *string `url:"filter[workspace][name],omitempty"`
 	Include     string  `url:"include,omitempty"`
 }
@@ -171,6 +173,10 @@ type WorkspaceCreateOptions struct {
 
 	// Specifies the Environment for workspace.
 	Environment *Environment `jsonapi:"relation,environment"`
+
+	// Specifies the AgentPool for workspace.
+	AgentPool *AgentPool `jsonapi:"relation,agent-pool,omitempty"`
+
 	// Specifies the ModuleVersion based on create workspace
 	ModuleVersion *ModuleVersion `jsonapi:"relation,module-version,omitempty"`
 }
@@ -324,6 +330,10 @@ type WorkspaceUpdateOptions struct {
 
 	// Specifies the VcsProvider for workspace vcs-repo.
 	VcsProvider *VcsProvider `jsonapi:"relation,vcs-provider,omitempty"`
+
+	// Specifies the AgentPool for workspace.
+	AgentPool *AgentPool `jsonapi:"relation,agent-pool"`
+
 	// Specifies the ModuleVersion based on create workspace
 	ModuleVersion *ModuleVersion `jsonapi:"relation,module-version"`
 }

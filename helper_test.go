@@ -41,6 +41,41 @@ func createEnvironment(t *testing.T, client *Client) (*Environment, func()) {
 	}
 }
 
+func createAgentPool(t *testing.T, client *Client) (*AgentPool, func()) {
+	ctx := context.Background()
+	ap, err := client.AgentPools.Create(ctx, AgentPoolCreateOptions{
+		Name:    String("provider-tst-pool-" + randomString(t)),
+		Account: &Account{ID: defaultAccountID},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return ap, func() {
+		if err := client.AgentPools.Delete(ctx, ap.ID); err != nil {
+			t.Errorf("Error destroying agent pool! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"AgentPool: %s\nError: %s", ap.ID, err)
+		}
+	}
+}
+
+func createAgentPoolToken(t *testing.T, client *Client, poolID string) (*AgentPoolToken, func()) {
+	ctx := context.Background()
+	apt, err := client.AgentPoolTokens.Create(ctx, poolID, AgentPoolTokenCreateOptions{Description: String("provider test token")})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return apt, func() {
+		if err := client.AccessTokens.Delete(ctx, apt.ID); err != nil {
+			t.Errorf("Error destroying agent pool token! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"Agent pool token: %s\nError: %s", apt.ID, err)
+		}
+	}
+}
+
 func createRole(t *testing.T, client *Client, permissions []*Permission) (*Role, func()) {
 	ctx := context.Background()
 	role, err := client.Roles.Create(ctx, RoleCreateOptions{
