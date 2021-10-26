@@ -22,7 +22,7 @@ type accountUsers struct {
 // AccountUserStatus represents a status of account user relation.
 type AccountUserStatus string
 
-// List of available policy group statuses.
+// List of available account user statuses.
 const (
 	AccountUserStatusActive   AccountUserStatus = "Active"
 	AccountUserStatusInactive AccountUserStatus = "Inactive"
