@@ -16,9 +16,6 @@ var _ Users = (*users)(nil)
 type Users interface {
 	List(ctx context.Context, options UserListOptions) (*UserList, error)
 	Read(ctx context.Context, userID string) (*User, error)
-	// Create(ctx context.Context, options UserCreateOptions) (*User, error)
-	// Update(ctx context.Context, userID string, options UserUpdateOptions) (*User, error)
-	// Delete(ctx context.Context, userID string) error
 }
 
 // policyGroups implements PolicyGroups.
@@ -62,10 +59,11 @@ type UserListOptions struct {
 	ListOptions
 
 	User             *string `url:"filter[user],omitempty"`
+	Email            *string `url:"filter[email],omitempty"`
 	IdentityProvider *string `url:"filter[identity-provider],omitempty"`
-	Query            string  `url:"query,omitempty"`
-	Sort             string  `url:"sort,omitempty"`
-	Include          string  `url:"include,omitempty"`
+	Query            *string `url:"query,omitempty"`
+	Sort             *string `url:"sort,omitempty"`
+	Include          *string `url:"include,omitempty"`
 }
 
 // List all the users.

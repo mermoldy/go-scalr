@@ -8,8 +8,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const defaultUserID = "user-suh84u6vuvidtbg"
-const defaultUserLdapID = "user-suh84u72qsmbuvg"
+const (
+	defaultUserID        = "user-suh84u6vuvidtbg"
+	defaultUserLdapID    = "user-suh84u72qsmbuvg"
+	defaultUserLdapEmail = "produser1@scalr.local"
+)
 
 func TestUsersList(t *testing.T) {
 	client := testClient(t)
@@ -46,6 +49,16 @@ func TestUsersList(t *testing.T) {
 		assert.Equal(t, 1, ul.CurrentPage)
 		assert.Equal(t, 1, ul.TotalCount)
 		assert.Equal(t, defaultUserID, ul.Items[0].ID)
+	})
+
+	t.Run("with email filter", func(t *testing.T) {
+		ul, err := client.Users.List(ctx, UserListOptions{
+			Email: String(defaultUserLdapEmail),
+		})
+		require.NoError(t, err)
+		assert.Equal(t, 1, ul.CurrentPage)
+		assert.Equal(t, 1, ul.TotalCount)
+		assert.Equal(t, defaultUserLdapID, ul.Items[0].ID)
 	})
 
 	t.Run("with identity provider filter", func(t *testing.T) {
