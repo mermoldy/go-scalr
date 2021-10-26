@@ -89,3 +89,31 @@ func TestUsersList(t *testing.T) {
 		assert.Len(t, ul.Items, 0)
 	})
 }
+
+func TestUsersRead(t *testing.T) {
+	client := testClient(t)
+	ctx := context.Background()
+
+	t.Run("when the user exists", func(t *testing.T) {
+		u, err := client.Users.Read(ctx, defaultUserLdapID)
+		require.NoError(t, err)
+		assert.Equal(t, defaultUserLdapID, u.ID)
+
+		t.Run("relationships are properly decoded", func(t *testing.T) {
+			assert.Equal(t, u.Teams[0].ID, defaultTeamLdapID)
+			assert.Equal(t, u.IdentityProviders[0].ID, defaultIdentityProviderLdapID)
+		})
+	})
+
+	t.Run("when the user does not exist", func(t *testing.T) {
+		u, err := client.Users.Read(ctx, "user-nonexisting")
+		assert.Nil(t, u)
+		assert.Error(t, err)
+	})
+
+	t.Run("without a valid user ID", func(t *testing.T) {
+		u, err := client.Users.Read(ctx, badIdentifier)
+		assert.Nil(t, u)
+		assert.EqualError(t, err, "invalid value for user ID")
+	})
+}

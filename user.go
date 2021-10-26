@@ -2,6 +2,9 @@ package scalr
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"net/url"
 	"time"
 )
 
@@ -12,7 +15,7 @@ var _ Users = (*users)(nil)
 // Scalr API supports.
 type Users interface {
 	List(ctx context.Context, options UserListOptions) (*UserList, error)
-	// Read(ctx context.Context, userID string) (*User, error)
+	Read(ctx context.Context, userID string) (*User, error)
 	// Create(ctx context.Context, options UserCreateOptions) (*User, error)
 	// Update(ctx context.Context, userID string, options UserUpdateOptions) (*User, error)
 	// Delete(ctx context.Context, userID string) error
@@ -79,4 +82,25 @@ func (s *users) List(ctx context.Context, options UserListOptions) (*UserList, e
 	}
 
 	return ul, nil
+}
+
+// Read user by its ID.
+func (s *users) Read(ctx context.Context, userID string) (*User, error) {
+	if !validStringID(&userID) {
+		return nil, errors.New("invalid value for user ID")
+	}
+
+	u := fmt.Sprintf("users/%s", url.QueryEscape(userID))
+	req, err := s.client.newRequest("GET", u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	usr := &User{}
+	err = s.client.do(ctx, req, usr)
+	if err != nil {
+		return nil, err
+	}
+
+	return usr, nil
 }
