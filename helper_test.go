@@ -255,6 +255,29 @@ func createVcsProvider(t *testing.T, client *Client, envs []*Environment) (*VcsP
 	}
 }
 
+func createTeam(t *testing.T, client *Client, users []*User) (*Team, func()) {
+	ctx := context.Background()
+	team, err := client.Teams.Create(
+		ctx,
+		TeamCreateOptions{
+			Name:    String("tst-" + randomString(t)),
+			Account: &Account{ID: defaultAccountID},
+			Users:   users,
+		},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return team, func() {
+		if err := client.Teams.Delete(ctx, team.ID); err != nil {
+			t.Errorf("Error deleting team! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"VCS Providder: %s\nError: %s", team.ID, err)
+		}
+	}
+}
+
 func randomString(t *testing.T) string {
 	v, err := uuid.GenerateUUID()
 	if err != nil {

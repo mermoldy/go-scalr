@@ -33,7 +33,7 @@ func TestUsersList(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		uIDs := make([]string, len(ul.Items))
+		var uIDs []string
 		for _, u := range ul.Items {
 			uIDs = append(uIDs, u.ID)
 		}
@@ -67,7 +67,7 @@ func TestUsersList(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		uIDs := make([]string, len(ul.Items))
+		var uIDs []string
 		// Set of IDP IDs
 		idpIDs := make(map[string]bool)
 		for _, u := range ul.Items {

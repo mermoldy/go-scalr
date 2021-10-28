@@ -30,7 +30,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if len(aul.Items) == 0 {
+	if aul.TotalCount == 0 {
 		log.Printf("No users found in account %s", accID)
 	} else {
 		var active []string
@@ -55,7 +55,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if len(aul.Items) == 0 {
+	if aul.TotalCount == 0 {
 		log.Printf("No accounts found for user %s", userID)
 	} else {
 		var active []string

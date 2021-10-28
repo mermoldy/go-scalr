@@ -1,6 +1,9 @@
 package scalr
 
-const defaultIdentityProviderLdapID = "idp-sojhv9e8mc2k808"
+const (
+	defaultIdentityProviderScalrID = "idp-sohkb0o1phrdmr8"
+	defaultIdentityProviderLdapID  = "idp-sojhv9e8mc2k808"
+)
 
 // IdentityProvider represents a Scalr identity provider.
 type IdentityProvider struct {

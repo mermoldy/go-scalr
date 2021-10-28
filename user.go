@@ -18,7 +18,7 @@ type Users interface {
 	Read(ctx context.Context, userID string) (*User, error)
 }
 
-// policyGroups implements PolicyGroups.
+// users implements Users.
 type users struct {
 	client *Client
 }
