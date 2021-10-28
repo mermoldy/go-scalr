@@ -9,9 +9,11 @@ import (
 )
 
 const (
-	defaultUserID        = "user-suh84u6vuvidtbg"
-	defaultUserLdapID    = "user-suh84u72qsmbuvg"
-	defaultUserLdapEmail = "produser1@scalr.local"
+	defaultUserID                  = "user-suh84u6vuvidtbg"
+	defaultUserLdapID              = "user-suh84u72qsmbuvg"
+	defaultUserLdapEmail           = "produser1@scalr.local"
+	defaultIdentityProviderScalrID = "idp-sohkb0o1phrdmr8"
+	defaultIdentityProviderLdapID  = "idp-sojhv9e8mc2k808"
 )
 
 func TestUsersList(t *testing.T) {
