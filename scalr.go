@@ -112,6 +112,7 @@ type Client struct {
 
 	AccessPolicies        AccessPolicies
 	AccessTokens          AccessTokens
+	AccountUsers          AccountUsers
 	AgentPoolTokens       AgentPoolTokens
 	AgentPools            AgentPools
 	ConfigurationVersions ConfigurationVersions
@@ -122,6 +123,8 @@ type Client struct {
 	PolicyGroups          PolicyGroups
 	Roles                 Roles
 	Runs                  Runs
+	Teams                 Teams
+	Users                 Users
 	Variables             Variables
 	VcsProviders          VcsProviders
 	VcsRevisions          VcsRevisions
@@ -195,6 +198,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	// Create the services.
 	client.AccessPolicies = &accessPolicies{client: client}
 	client.AccessTokens = &accessTokens{client: client}
+	client.AccountUsers = &accountUsers{client: client}
 	client.AgentPoolTokens = &agentPoolTokens{client: client}
 	client.AgentPools = &agentPools{client: client}
 	client.ConfigurationVersions = &configurationVersions{client: client}
@@ -205,6 +209,8 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.PolicyGroups = &policyGroups{client: client}
 	client.Roles = &roles{client: client}
 	client.Runs = &runs{client: client}
+	client.Teams = &teams{client: client}
+	client.Users = &users{client: client}
 	client.Variables = &variables{client: client}
 	client.VcsProviders = &vcsProviders{client: client}
 	client.VcsRevisions = &vcsRevisions{client: client}
