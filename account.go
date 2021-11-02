@@ -2,5 +2,6 @@ package scalr
 
 // Account represents a Scalr IACP account.
 type Account struct {
-	ID string `jsonapi:"primary,accounts"`
+	ID   string `jsonapi:"primary,accounts"`
+	Name string `jsonapi:"attr,name"`
 }

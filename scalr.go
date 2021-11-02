@@ -111,21 +111,24 @@ type Client struct {
 	retryServerErrors bool
 
 	AccessPolicies        AccessPolicies
-	AgentPools            AgentPools
 	AccessTokens          AccessTokens
+	AccountUsers          AccountUsers
 	AgentPoolTokens       AgentPoolTokens
-	Runs                  Runs
-	Roles                 Roles
-	Variables             Variables
-	Workspaces            Workspaces
-	Endpoints             Endpoints
-	Webhooks              Webhooks
-	Environments          Environments
+	AgentPools            AgentPools
 	ConfigurationVersions ConfigurationVersions
-	VcsRevisions          VcsRevisions
-	VcsProviders          VcsProviders
-	Modules               Modules
+	Endpoints             Endpoints
+	Environments          Environments
 	ModuleVersions        ModuleVersions
+	Modules               Modules
+	Roles                 Roles
+	Runs                  Runs
+	Teams                 Teams
+	Users                 Users
+	Variables             Variables
+	VcsProviders          VcsProviders
+	VcsRevisions          VcsRevisions
+	Webhooks              Webhooks
+	Workspaces            Workspaces
 }
 
 // NewClient creates a new Scalr API client.
@@ -192,22 +195,25 @@ func NewClient(cfg *Config) (*Client, error) {
 	}
 
 	// Create the services.
-	client.Environments = &environments{client: client}
-	client.Roles = &roles{client: client}
-	client.AgentPools = &agentPools{client: client}
-	client.AgentPoolTokens = &agentPoolTokens{client: client}
-	client.AccessTokens = &accessTokens{client: client}
 	client.AccessPolicies = &accessPolicies{client: client}
-	client.Runs = &runs{client: client}
-	client.Variables = &variables{client: client}
-	client.Workspaces = &workspaces{client: client}
-	client.Endpoints = &endpoints{client: client}
-	client.Webhooks = &webhooks{client: client}
+	client.AccessTokens = &accessTokens{client: client}
+	client.AccountUsers = &accountUsers{client: client}
+	client.AgentPoolTokens = &agentPoolTokens{client: client}
+	client.AgentPools = &agentPools{client: client}
 	client.ConfigurationVersions = &configurationVersions{client: client}
-	client.VcsRevisions = &vcsRevisions{client: client}
-	client.VcsProviders = &vcsProviders{client: client}
-	client.Modules = &modules{client: client}
+	client.Endpoints = &endpoints{client: client}
+	client.Environments = &environments{client: client}
 	client.ModuleVersions = &moduleVersions{client: client}
+	client.Modules = &modules{client: client}
+	client.Roles = &roles{client: client}
+	client.Runs = &runs{client: client}
+	client.Teams = &teams{client: client}
+	client.Users = &users{client: client}
+	client.Variables = &variables{client: client}
+	client.VcsProviders = &vcsProviders{client: client}
+	client.VcsRevisions = &vcsRevisions{client: client}
+	client.Webhooks = &webhooks{client: client}
+	client.Workspaces = &workspaces{client: client}
 
 	return client, nil
 }
