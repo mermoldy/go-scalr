@@ -3,11 +3,11 @@ package scalr
 import (
 	"context"
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestVCSProvidersList(t *testing.T) {
@@ -103,7 +103,10 @@ func TestVcsProvidersCreate(t *testing.T) {
 		assert.Equal(
 			t,
 			ErrResourceNotFound{
-				Message: fmt.Sprintf("Relationship 'environments' with ID '%s' not found or user unauthorized", badIdentifier),
+				Message: fmt.Sprintf(
+					"Relationship 'environments' with ID '%s' not found or user unauthorized",
+					badIdentifier,
+				),
 			}.Error(),
 			err.Error(),
 		)

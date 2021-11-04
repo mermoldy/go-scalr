@@ -12,6 +12,8 @@ import (
 const defaultAccountID = "acc-svrcncgh453bi8g"
 const defaultModuleID = "mod-svsmkkjo8sju4o0"
 const badIdentifier = "! / nope"
+const policyGroupVcsRepoID = "Scalr/tf-revizor-fixtures"
+const policyGroupVcsRepoPath = "policies/clouds"
 
 func testClient(t *testing.T) *Client {
 	client, err := NewClient(nil)
@@ -274,6 +276,40 @@ func createTeam(t *testing.T, client *Client, users []*User) (*Team, func()) {
 			t.Errorf("Error deleting team! WARNING: Dangling resources\n"+
 				"may exist! The full error is shown below.\n\n"+
 				"VCS Providder: %s\nError: %s", team.ID, err)
+		}
+	}
+}
+
+func createPolicyGroup(t *testing.T, client *Client, vcsProvider *VcsProvider) (*PolicyGroup, func()) {
+	var vcsCleanup func()
+
+	if vcsProvider == nil {
+		vcsProvider, vcsCleanup = createVcsProvider(t, client, nil)
+	}
+
+	ctx := context.Background()
+	pg, err := client.PolicyGroups.Create(ctx, PolicyGroupCreateOptions{
+		Name:        String("tst-" + randomString(t)),
+		Account:     &Account{ID: defaultAccountID},
+		VcsProvider: vcsProvider,
+		VCSRepo: &PolicyGroupVCSRepoOptions{
+			Identifier: String(policyGroupVcsRepoID),
+			Path:       String(policyGroupVcsRepoPath),
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return pg, func() {
+		if err := client.PolicyGroups.Delete(ctx, pg.ID); err != nil {
+			t.Errorf("Error destroying policy group! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"Policy group: %s\nError: %s", pg.ID, err)
+		}
+
+		if vcsCleanup != nil {
+			vcsCleanup()
 		}
 	}
 }

@@ -57,7 +57,7 @@ type Workspace struct {
 	Operations           bool                  `jsonapi:"attr,operations"`
 	Permissions          *WorkspacePermissions `jsonapi:"attr,permissions"`
 	TerraformVersion     string                `jsonapi:"attr,terraform-version"`
-	VCSRepo              *VCSRepo              `jsonapi:"attr,vcs-repo"`
+	VCSRepo              *WorkspaceVCSRepo     `jsonapi:"attr,vcs-repo"`
 	WorkingDirectory     string                `jsonapi:"attr,working-directory"`
 	HasResources         bool                  `jsonapi:"attr,has-resources"`
 	Hooks                *Hooks                `jsonapi:"attr,hooks"`
@@ -79,8 +79,8 @@ type Hooks struct {
 	PostApply string `json:"post-apply"`
 }
 
-// VCSRepo contains the configuration of a VCS integration.
-type VCSRepo struct {
+// WorkspaceVCSRepo contains the configuration of a VCS integration.
+type WorkspaceVCSRepo struct {
 	Branch            string   `json:"branch"`
 	Identifier        string   `json:"identifier"`
 	IngressSubmodules bool     `json:"ingress-submodules"`
@@ -157,7 +157,7 @@ type WorkspaceCreateOptions struct {
 	// Settings for the workspace's VCS repository. If omitted, the workspace is
 	// created without a VCS repo. If included, you must specify at least the
 	// oauth-token-id and identifier keys below.
-	VCSRepo *VCSRepoOptions `jsonapi:"attr,vcs-repo,omitempty"`
+	VCSRepo *WorkspaceVCSRepoOptions `jsonapi:"attr,vcs-repo,omitempty"`
 
 	// Contains configuration for custom hooks,
 	// which can be triggered before or after plan or apply phases
@@ -181,8 +181,8 @@ type WorkspaceCreateOptions struct {
 	ModuleVersion *ModuleVersion `jsonapi:"relation,module-version,omitempty"`
 }
 
-// VCSRepoOptions represents the configuration options of a VCS integration.
-type VCSRepoOptions struct {
+// WorkspaceVCSRepoOptions represents the configuration options of a VCS integration.
+type WorkspaceVCSRepoOptions struct {
 	Branch            *string   `json:"branch,omitempty"`
 	Identifier        *string   `json:"identifier,omitempty"`
 	IngressSubmodules *bool     `json:"ingress-submodules,omitempty"`
@@ -316,7 +316,7 @@ type WorkspaceUpdateOptions struct {
 	// the keys below you wish to modify. To add a new VCS repo to a workspace
 	// that didn't previously have one, include at least the oauth-token-id and
 	// identifier keys.
-	VCSRepo *VCSRepoOptions `jsonapi:"attr,vcs-repo,omitempty"`
+	VCSRepo *WorkspaceVCSRepoOptions `jsonapi:"attr,vcs-repo,omitempty"`
 
 	// Contains configuration for custom hooks,
 	// which can be triggered before or after plan or apply phases

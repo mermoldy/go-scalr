@@ -40,11 +40,6 @@ type CloudCredential struct {
 	ID string `jsonapi:"primary,cloud-credentials"`
 }
 
-// PolicyGroup relationship
-type PolicyGroup struct {
-	ID string `jsonapi:"primary,policy-groups"`
-}
-
 // EnvironmentList represents a list of environments.
 type EnvironmentList struct {
 	*Pagination

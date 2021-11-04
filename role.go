@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net/url"
 	"strings"
 )
@@ -66,7 +65,6 @@ func (o RoleCreateOptions) valid() error {
 		return errors.New("account is required")
 	}
 	if !validStringID(&o.Account.ID) {
-		log.Printf(o.Account.ID)
 		return errors.New("invalid value for account ID")
 	}
 	if o.Name == nil {

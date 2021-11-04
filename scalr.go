@@ -120,6 +120,7 @@ type Client struct {
 	Environments          Environments
 	ModuleVersions        ModuleVersions
 	Modules               Modules
+	PolicyGroups          PolicyGroups
 	Roles                 Roles
 	Runs                  Runs
 	Teams                 Teams
@@ -205,6 +206,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.Environments = &environments{client: client}
 	client.ModuleVersions = &moduleVersions{client: client}
 	client.Modules = &modules{client: client}
+	client.PolicyGroups = &policyGroups{client: client}
 	client.Roles = &roles{client: client}
 	client.Runs = &runs{client: client}
 	client.Teams = &teams{client: client}
