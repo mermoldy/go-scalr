@@ -94,7 +94,7 @@ type AgentPoolListOptions struct {
 
 	Account     *string `url:"filter[account],omitempty"`
 	Environment *string `url:"filter[environment],omitempty"`
-	Name        string  `url:"filter[agent-pool][name],omitempty"`
+	Name        string  `url:"filter[name],omitempty"`
 	AgentPool   string  `url:"filter[agent-pool],omitempty"`
 	Include     string  `url:"include,omitempty"`
 }
