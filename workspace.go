@@ -114,7 +114,7 @@ type WorkspaceListOptions struct {
 
 	Environment *string `url:"filter[environment],omitempty"`
 	AgentPool   *string `url:"filter[agent-pool],omitempty"`
-	Name        *string `url:"filter[workspace][name],omitempty"`
+	Name        *string `url:"filter[name],omitempty"`
 	Include     string  `url:"include,omitempty"`
 }
 
