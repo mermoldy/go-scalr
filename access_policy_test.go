@@ -9,9 +9,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const defaultUserID = "user-suh84u6vuvidtbg"
-const defaultTeamID = "team-t67mjto75maj8p0"
-
 func TestAccessPoliciesList(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()

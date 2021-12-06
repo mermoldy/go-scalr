@@ -68,7 +68,7 @@ type WebhookListOptions struct {
 	Include *string `url:"include,omitempty"`
 
 	// Filter by enabled
-	Enabled *bool `url:"filter[webhook][enabled],omitempty"`
+	Enabled *bool `url:"filter[enabled],omitempty"`
 
 	// Event filter
 	Event *string `url:"filter[event],omitempty"`

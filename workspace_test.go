@@ -64,10 +64,13 @@ func TestWorkspacesCreate(t *testing.T) {
 	envTest, envTestCleanup := createEnvironment(t, client)
 	defer envTestCleanup()
 
+	pool, poolCleanup := createAgentPool(t, client)
+	defer poolCleanup()
+
 	t.Run("with valid options", func(t *testing.T) {
 		options := WorkspaceCreateOptions{
 			Environment:      envTest,
-			Name:             String("foo"),
+			Name:             String(randomString(t)),
 			AutoApply:        Bool(true),
 			Operations:       Bool(true),
 			TerraformVersion: String("0.12.25"),
@@ -93,6 +96,33 @@ func TestWorkspacesCreate(t *testing.T) {
 			assert.Equal(t, *options.TerraformVersion, item.TerraformVersion)
 			assert.Equal(t, *options.WorkingDirectory, item.WorkingDirectory)
 		}
+	})
+
+	t.Run("with agent pool", func(t *testing.T) {
+		options := WorkspaceCreateOptions{
+			Environment:      envTest,
+			AgentPool:        pool,
+			Name:             String(randomString(t)),
+			AutoApply:        Bool(true),
+			Operations:       Bool(true),
+			TerraformVersion: String("0.12.25"),
+			WorkingDirectory: String("bar/"),
+		}
+
+		ws, err := client.Workspaces.Create(ctx, options)
+		require.NoError(t, err)
+
+		// Get a refreshed view from the API.
+		refreshed, err := client.Workspaces.ReadByID(ctx, ws.ID)
+		require.NoError(t, err)
+
+		assert.NotEmpty(t, ws.ID)
+		assert.NotEmpty(t, ws.AgentPool)
+		if refreshed.AgentPool != nil {
+			assert.Equal(t, pool.ID, refreshed.AgentPool.ID)
+		}
+		assert.Equal(t, pool.ID, ws.AgentPool.ID)
+		defer client.Workspaces.Delete(ctx, ws.ID)
 	})
 
 	t.Run("when options is missing name", func(t *testing.T) {
@@ -226,6 +256,9 @@ func TestWorkspacesUpdate(t *testing.T) {
 	envTest, envTestCleanup := createEnvironment(t, client)
 	defer envTestCleanup()
 
+	pool, poolCleanup := createAgentPool(t, client)
+	defer poolCleanup()
+
 	wsTest, _ := createWorkspace(t, client, envTest)
 
 	t.Run("when updating a subset of values", func(t *testing.T) {
@@ -243,6 +276,27 @@ func TestWorkspacesUpdate(t *testing.T) {
 		assert.NotEqual(t, wsTest.AutoApply, wsAfter.AutoApply)
 		assert.NotEqual(t, wsTest.TerraformVersion, wsAfter.TerraformVersion)
 		assert.Equal(t, wsTest.WorkingDirectory, wsAfter.WorkingDirectory)
+	})
+
+	t.Run("when attaching/detaching an agent pool", func(t *testing.T) {
+
+		options := WorkspaceUpdateOptions{
+			AgentPool: pool,
+		}
+
+		wsAfter, err := client.Workspaces.Update(ctx, wsTest.ID, options)
+		require.NoError(t, err)
+
+		assert.Equal(t, pool.ID, wsAfter.AgentPool.ID)
+
+		options = WorkspaceUpdateOptions{
+			AgentPool: nil,
+		}
+
+		wsAfter, err = client.Workspaces.Update(ctx, wsTest.ID, options)
+		require.NoError(t, err)
+
+		assert.Nil(t, wsAfter.AgentPool)
 	})
 
 	t.Run("with valid options", func(t *testing.T) {

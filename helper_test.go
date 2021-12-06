@@ -2,6 +2,7 @@ package scalr
 
 import (
 	"context"
+	"os"
 	"strings"
 	"testing"
 
@@ -9,7 +10,10 @@ import (
 )
 
 const defaultAccountID = "acc-svrcncgh453bi8g"
+const defaultModuleID = "mod-svsmkkjo8sju4o0"
 const badIdentifier = "! / nope"
+const policyGroupVcsRepoID = "Scalr/tf-revizor-fixtures"
+const policyGroupVcsRepoPath = "policies/clouds"
 
 func testClient(t *testing.T) *Client {
 	client, err := NewClient(nil)
@@ -35,6 +39,41 @@ func createEnvironment(t *testing.T, client *Client) (*Environment, func()) {
 			t.Errorf("Error destroying environment! WARNING: Dangling resources\n"+
 				"may exist! The full error is shown below.\n\n"+
 				"Environment: %s\nError: %s", env.ID, err)
+		}
+	}
+}
+
+func createAgentPool(t *testing.T, client *Client) (*AgentPool, func()) {
+	ctx := context.Background()
+	ap, err := client.AgentPools.Create(ctx, AgentPoolCreateOptions{
+		Name:    String("provider-tst-pool-" + randomString(t)),
+		Account: &Account{ID: defaultAccountID},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return ap, func() {
+		if err := client.AgentPools.Delete(ctx, ap.ID); err != nil {
+			t.Errorf("Error destroying agent pool! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"AgentPool: %s\nError: %s", ap.ID, err)
+		}
+	}
+}
+
+func createAgentPoolToken(t *testing.T, client *Client, poolID string) (*AgentPoolToken, func()) {
+	ctx := context.Background()
+	apt, err := client.AgentPoolTokens.Create(ctx, poolID, AgentPoolTokenCreateOptions{Description: String("provider test token")})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return apt, func() {
+		if err := client.AccessTokens.Delete(ctx, apt.ID); err != nil {
+			t.Errorf("Error destroying agent pool token! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"Agent pool token: %s\nError: %s", apt.ID, err)
 		}
 	}
 }
@@ -187,6 +226,90 @@ func createVariable(t *testing.T, client *Client, ws *Workspace) (*Variable, fun
 
 		if wsCleanup != nil {
 			wsCleanup()
+		}
+	}
+}
+
+func createVcsProvider(t *testing.T, client *Client, envs []*Environment) (*VcsProvider, func()) {
+	ctx := context.Background()
+	vcsProvider, err := client.VcsProviders.Create(
+		ctx,
+		VcsProviderCreateOptions{
+			Name:     String("tst-" + randomString(t)),
+			VcsType:  Github,
+			AuthType: PersonalToken,
+			Token:    os.Getenv("GITHUB_TOKEN"),
+
+			Environments: envs,
+			Account:      &Account{ID: defaultAccountID},
+		},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return vcsProvider, func() {
+		if err := client.VcsProviders.Delete(ctx, vcsProvider.ID); err != nil {
+			t.Errorf("Error deleting vcs provider! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"VCS Providder: %s\nError: %s", vcsProvider.ID, err)
+		}
+	}
+}
+
+func createTeam(t *testing.T, client *Client, users []*User) (*Team, func()) {
+	ctx := context.Background()
+	team, err := client.Teams.Create(
+		ctx,
+		TeamCreateOptions{
+			Name:    String("tst-" + randomString(t)),
+			Account: &Account{ID: defaultAccountID},
+			Users:   users,
+		},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return team, func() {
+		if err := client.Teams.Delete(ctx, team.ID); err != nil {
+			t.Errorf("Error deleting team! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"VCS Providder: %s\nError: %s", team.ID, err)
+		}
+	}
+}
+
+func createPolicyGroup(t *testing.T, client *Client, vcsProvider *VcsProvider) (*PolicyGroup, func()) {
+	var vcsCleanup func()
+
+	if vcsProvider == nil {
+		vcsProvider, vcsCleanup = createVcsProvider(t, client, nil)
+	}
+
+	ctx := context.Background()
+	pg, err := client.PolicyGroups.Create(ctx, PolicyGroupCreateOptions{
+		Name:        String("tst-" + randomString(t)),
+		Account:     &Account{ID: defaultAccountID},
+		VcsProvider: vcsProvider,
+		VCSRepo: &PolicyGroupVCSRepoOptions{
+			Identifier: String(policyGroupVcsRepoID),
+			Path:       String(policyGroupVcsRepoPath),
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return pg, func() {
+		if err := client.PolicyGroups.Delete(ctx, pg.ID); err != nil {
+			t.Errorf("Error destroying policy group! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"Policy group: %s\nError: %s", pg.ID, err)
+		}
+
+		if vcsCleanup != nil {
+			vcsCleanup()
 		}
 	}
 }
