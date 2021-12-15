@@ -12,8 +12,9 @@ import (
 func TestEnvironmentsList(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
+	emptyOptions := EnvironmentListOptions{}
 
-	envl, err := client.Environments.List(ctx)
+	envl, err := client.Environments.List(ctx, emptyOptions)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -22,7 +23,7 @@ func TestEnvironmentsList(t *testing.T) {
 	defer envTest1Cleanup()
 
 	t.Run("with no list options", func(t *testing.T) {
-		envl, err := client.Environments.List(ctx)
+		envl, err := client.Environments.List(ctx, emptyOptions)
 		envlIDs := make([]string, len(envl.Items))
 		for _, env := range envl.Items {
 			envlIDs = append(envlIDs, env.ID)
@@ -32,6 +33,40 @@ func TestEnvironmentsList(t *testing.T) {
 
 		assert.Equal(t, 1, envl.CurrentPage)
 		assert.Equal(t, 1+totalCount, envl.TotalCount)
+	})
+
+	includeOptions := EnvironmentListOptions{
+		Include: String("created-by"),
+	}
+	t.Run("with include option", func(t *testing.T) {
+		envl, err := client.Environments.List(ctx, includeOptions)
+		require.NoError(t, err)
+
+		for _, env := range envl.Items {
+			assert.NotEqual(t, env.CreatedBy, nil)
+		}
+	})
+
+	filterByNameOptions := EnvironmentListOptions{
+		Name: &envTest1.Name,
+	}
+	t.Run("with filter by name option", func(t *testing.T) {
+		envl, err := client.Environments.List(ctx, filterByNameOptions)
+		require.NoError(t, err)
+		assert.Equal(t, 1, len(envl.Items))
+		env := envl.Items[0]
+		assert.Equal(t, env.ID, envTest1.ID)
+	})
+
+	filterByIdOptions := EnvironmentListOptions{
+		Id: &envTest1.ID,
+	}
+	t.Run("with filter by ID option", func(t *testing.T) {
+		envl, err := client.Environments.List(ctx, filterByIdOptions)
+		require.NoError(t, err)
+		assert.Equal(t, 1, len(envl.Items))
+		env := envl.Items[0]
+		assert.Equal(t, env.ID, envTest1.ID)
 	})
 
 }

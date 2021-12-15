@@ -14,7 +14,7 @@ var _ Environments = (*environments)(nil)
 // Environments describes all the environment related methods that the
 // Scalr IACP API supports.
 type Environments interface {
-	List(ctx context.Context) (*EnvironmentList, error)
+	List(ctx context.Context, options EnvironmentListOptions) (*EnvironmentList, error)
 	Read(ctx context.Context, environmentID string) (*Environment, error)
 	Create(ctx context.Context, options EnvironmentCreateOptions) (*Environment, error)
 	Update(ctx context.Context, environmentID string, options EnvironmentUpdateOptions) (*Environment, error)
@@ -99,9 +99,17 @@ func (o EnvironmentCreateOptions) valid() error {
 	return nil
 }
 
+type EnvironmentListOptions struct {
+	ListOptions
+
+	Include *string `url:"include,omitempty"`
+	Name    *string `url:"query,omitempty"`
+	Id      *string `url:"query,omitempty"`
+}
+
 // List all the environmens.
-func (s *environments) List(ctx context.Context) (*EnvironmentList, error) {
-	req, err := s.client.newRequest("GET", "environments", nil)
+func (s *environments) List(ctx context.Context, options EnvironmentListOptions) (*EnvironmentList, error) {
+	req, err := s.client.newRequest("GET", "environments", &options)
 	if err != nil {
 		return nil, err
 	}
