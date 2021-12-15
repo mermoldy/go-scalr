@@ -69,6 +69,18 @@ func TestEnvironmentsList(t *testing.T) {
 		assert.Equal(t, env.ID, envTest1.ID)
 	})
 
+	filterByAccountIdOptions := EnvironmentListOptions{
+		Account: String(defaultAccountID),
+	}
+	t.Run("with filter by account option", func(t *testing.T) {
+		envl, err := client.Environments.List(ctx, filterByAccountIdOptions)
+
+		require.NoError(t, err)
+		for _, env := range envl.Items {
+			assert.Equal(t, defaultAccountID, env.Account.ID)
+		}
+	})
+
 }
 
 func TestEnvironmentsCreate(t *testing.T) {

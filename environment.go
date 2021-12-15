@@ -105,6 +105,7 @@ type EnvironmentListOptions struct {
 	Include *string `url:"include,omitempty"`
 	Name    *string `url:"query,omitempty"`
 	Id      *string `url:"query,omitempty"`
+	Account *string `url:"filter[account],omitempty"`
 }
 
 // List all the environmens.
