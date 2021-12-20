@@ -2,6 +2,7 @@ package scalr
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -67,6 +68,86 @@ func TestRunTriggersCreate(t *testing.T) {
 		assert.NotEmpty(t, trigger.CreatedAt)
 		assert.Equal(t, wsEnv1Test1.ID, trigger.Downstream.ID)
 		assert.Equal(t, wsEnv1Test2.ID, trigger.Upstream.ID)
+	})
+
+}
+
+func TestRunTriggersRead(t *testing.T) {
+	client := testClient(t)
+	ctx := context.Background()
+
+	envTest, envTestCleanup := createEnvironment(t, client)
+	defer envTestCleanup()
+
+	wsTest1, wsEnv1Test1Cleanup := createWorkspace(t, client, envTest)
+	defer wsEnv1Test1Cleanup()
+	wsTest2, wsTest2Cleanup := createWorkspace(t, client, envTest)
+	defer wsTest2Cleanup()
+
+	options := RunTriggerCreateOptions{
+		Downstream: &Downstream{ID: wsTest1.ID},
+		Upstream:   &Upstream{ID: wsTest2.ID},
+	}
+	created_trigger, err := client.RunTriggers.Create(ctx, options)
+	require.NoError(t, err)
+	assert.NotEmpty(t, created_trigger.ID)
+
+	t.Run("get run trigger by id", func(t *testing.T) {
+		trigger, err := client.RunTriggers.Read(ctx, created_trigger.ID)
+		require.NoError(t, err)
+		assert.Equal(t, created_trigger, trigger)
+	})
+
+	t.Run("try to get run trigger with not valid ID", func(t *testing.T) {
+		_, err := client.RunTriggers.Read(ctx, badIdentifier)
+		require.Error(t, err)
+		assert.EqualError(t, err, "invalid value for RunTrigger ID")
+	})
+
+}
+
+func TestRunTriggersDelete(t *testing.T) {
+	client := testClient(t)
+	ctx := context.Background()
+
+	envTest, envTestCleanup := createEnvironment(t, client)
+	defer envTestCleanup()
+
+	wsTest1, wsEnv1Test1Cleanup := createWorkspace(t, client, envTest)
+	defer wsEnv1Test1Cleanup()
+	wsTest2, wsTest2Cleanup := createWorkspace(t, client, envTest)
+	defer wsTest2Cleanup()
+
+	options := RunTriggerCreateOptions{
+		Downstream: &Downstream{ID: wsTest1.ID},
+		Upstream:   &Upstream{ID: wsTest2.ID},
+	}
+	createdTrigger, err := client.RunTriggers.Create(ctx, options)
+	require.NoError(t, err)
+	assert.NotEmpty(t, createdTrigger.ID)
+
+	t.Run("delete run trigger by id", func(t *testing.T) {
+		err := client.RunTriggers.Delete(ctx, createdTrigger.ID)
+		require.NoError(t, err)
+
+		// read RunTrigger by ID should fail
+		trigger, err := client.RunTriggers.Read(ctx, createdTrigger.ID)
+		require.Error(t, err)
+		assert.Equal(
+			t,
+			ErrResourceNotFound{
+				Message: fmt.Sprintf("RunTrigger with ID '%s' not found or user unauthorized", createdTrigger.ID),
+			}.Error(),
+			err.Error(),
+		)
+		assert.Nil(t, trigger)
+
+	})
+
+	t.Run("try to delete run trigger with not valid ID", func(t *testing.T) {
+		err := client.RunTriggers.Delete(ctx, badIdentifier)
+		require.Error(t, err)
+		assert.EqualError(t, err, "invalid value for RunTrigger ID")
 	})
 
 }

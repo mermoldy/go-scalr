@@ -3,6 +3,8 @@ package scalr
 import (
 	"context"
 	"errors"
+	"fmt"
+	"net/url"
 	"time"
 )
 
@@ -10,8 +12,14 @@ import (
 var _ RunTriggers = (*runTriggers)(nil)
 
 type RunTriggers interface {
-	// Create is used to create a new run triggers.
+	// Create is used to create a new run trigger.
 	Create(ctx context.Context, options RunTriggerCreateOptions) (*RunTrigger, error)
+
+	// Read RunTrigger by it's ID
+	Read(ctx context.Context, runTriggerID string) (*RunTrigger, error)
+
+	// Delete RunTrigger by it's ID
+	Delete(ctx context.Context, runTriggerID string) error
 }
 
 // runTriggers implements RunTriggers.
@@ -87,4 +95,40 @@ func (o RunTriggerCreateOptions) valid() error {
 		return errors.New("invalid value for Upstream ID")
 	}
 	return nil
+}
+
+func (s *runTriggers) Read(ctx context.Context, runTriggerID string) (*RunTrigger, error) {
+	if !validStringID(&runTriggerID) {
+		return nil, errors.New("invalid value for RunTrigger ID")
+	}
+	u := fmt.Sprintf("run-triggers/%s", url.QueryEscape(runTriggerID))
+	fmt.Println(u)
+	req, err := s.client.newRequest("GET", u, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	runTrigger := &RunTrigger{}
+	err = s.client.do(ctx, req, runTrigger)
+	if err != nil {
+		return nil, err
+	}
+
+	return runTrigger, nil
+}
+
+func (s *runTriggers) Delete(ctx context.Context, runTriggerID string) error {
+	if !validStringID(&runTriggerID) {
+		return errors.New("invalid value for RunTrigger ID")
+	}
+	u := fmt.Sprintf("run-triggers/%s", url.QueryEscape(runTriggerID))
+	fmt.Println(u)
+	req, err := s.client.newRequest("DELETE", u, nil)
+
+	if err != nil {
+		return err
+	}
+
+	return s.client.do(ctx, req, nil)
 }
