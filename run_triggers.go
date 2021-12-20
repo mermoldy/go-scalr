@@ -102,7 +102,6 @@ func (s *runTriggers) Read(ctx context.Context, runTriggerID string) (*RunTrigge
 		return nil, errors.New("invalid value for RunTrigger ID")
 	}
 	u := fmt.Sprintf("run-triggers/%s", url.QueryEscape(runTriggerID))
-	fmt.Println(u)
 	req, err := s.client.newRequest("GET", u, nil)
 
 	if err != nil {
@@ -123,7 +122,6 @@ func (s *runTriggers) Delete(ctx context.Context, runTriggerID string) error {
 		return errors.New("invalid value for RunTrigger ID")
 	}
 	u := fmt.Sprintf("run-triggers/%s", url.QueryEscape(runTriggerID))
-	fmt.Println(u)
 	req, err := s.client.newRequest("DELETE", u, nil)
 
 	if err != nil {
