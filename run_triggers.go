@@ -22,7 +22,7 @@ type RunTriggers interface {
 	Delete(ctx context.Context, runTriggerID string) error
 }
 
-// runTriggers implements RunTriggers.
+// runTriggers implements RunTriggers
 type runTriggers struct {
 	client *Client
 }
