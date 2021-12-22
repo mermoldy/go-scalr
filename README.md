@@ -93,7 +93,7 @@ func main() {
 You will need to set up the environment variables for your Scalr installation. For example:
 
 ```
-export SCALR_ADDRESS=https://abcdef.scalr.com/
+export SCALR_ADDRESS=https://abcdef.scalr.com
 export SCALR_TOKEN=
 ```
 You can run the acceptance tests like this:
