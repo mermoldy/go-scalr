@@ -29,6 +29,13 @@ const (
 	DefaultBasePath = "/api/iacp/v3/"
 )
 
+type ContentType int64
+
+const (
+	JSONAPI ContentType = iota
+	JSON
+)
+
 var (
 	// ErrWorkspaceLocked is returned when trying to lock a
 	// locked workspace.
@@ -110,6 +117,7 @@ type Client struct {
 	retryLogHook      RetryLogHook
 	retryServerErrors bool
 
+	AccountIPAllowLists   AccountIPAllowlists
 	AccessPolicies        AccessPolicies
 	AccessTokens          AccessTokens
 	AccountUsers          AccountUsers
@@ -197,6 +205,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	}
 
 	// Create the services.
+	client.AccountIPAllowLists = &accountIPAllowlists{client: client}
 	client.AccessPolicies = &accessPolicies{client: client}
 	client.AccessTokens = &accessTokens{client: client}
 	client.AccountUsers = &accountUsers{client: client}
@@ -274,12 +283,20 @@ func (c *Client) newRequest(method, path string, v interface{}) (*retryablehttp.
 		}
 	case "DELETE", "PATCH", "POST":
 		reqHeaders.Set("Accept", "application/vnd.api+json")
-		reqHeaders.Set("Content-Type", "application/vnd.api+json")
 
 		if v != nil {
-			buf := bytes.NewBuffer(nil)
-			if err := jsonapi.MarshalPayloadWithoutIncluded(buf, v); err != nil {
-				return nil, err
+			var buf []byte
+			if strings.Contains(path, "/actions/") {
+				reqHeaders.Set("Content-Type", "application/json")
+				if buf, err = json.Marshal(v); err != nil {
+					return nil, err
+				}
+			} else {
+				buf := bytes.NewBuffer(nil)
+				reqHeaders.Set("Content-Type", "application/vnd.api+json")
+				if err := jsonapi.MarshalPayloadWithoutIncluded(buf, v); err != nil {
+					return nil, err
+				}
 			}
 			body = buf
 		}
