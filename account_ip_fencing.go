@@ -10,14 +10,14 @@ import (
 // Compile-time proof of interface implementation.
 var _ AccountIPAllowlists = (*accountIPAllowlists)(nil)
 
-// AccessTokens describes all the access token related methods that the
+// AccountIPAllowlists describes methods for updating and reading ip fencing rules that the
 // Scalr IACP API supports.
 type AccountIPAllowlists interface {
 	Read(ctx context.Context, account string) (*AccountIPAllowlist, error)
 	Update(ctx context.Context, account string, options AccountIPAllowlistUpdateOptions) (*AccountIPAllowlist, error)
 }
 
-// accounts implements Accounts.
+// accountIPAllowlists implements AccountIPAllowlists.
 type accountIPAllowlists struct {
 	client *Client
 }

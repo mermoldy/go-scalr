@@ -29,13 +29,6 @@ const (
 	DefaultBasePath = "/api/iacp/v3/"
 )
 
-type ContentType int64
-
-const (
-	JSONAPI ContentType = iota
-	JSON
-)
-
 var (
 	// ErrWorkspaceLocked is returned when trying to lock a
 	// locked workspace.
@@ -283,22 +276,23 @@ func (c *Client) newRequest(method, path string, v interface{}) (*retryablehttp.
 		}
 	case "DELETE", "PATCH", "POST":
 		reqHeaders.Set("Accept", "application/vnd.api+json")
+		reqHeaders.Set("Content-Type", "application/vnd.api+json")
 
 		if v != nil {
-			var buf []byte
 			if strings.Contains(path, "/actions/") {
+				var buf []byte
 				reqHeaders.Set("Content-Type", "application/json")
 				if buf, err = json.Marshal(v); err != nil {
 					return nil, err
 				}
+				body = buf
 			} else {
 				buf := bytes.NewBuffer(nil)
-				reqHeaders.Set("Content-Type", "application/vnd.api+json")
 				if err := jsonapi.MarshalPayloadWithoutIncluded(buf, v); err != nil {
 					return nil, err
 				}
+				body = buf
 			}
-			body = buf
 		}
 	case "PUT":
 		reqHeaders.Set("Accept", "application/json")
