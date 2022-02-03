@@ -110,7 +110,7 @@ type Client struct {
 	retryLogHook      RetryLogHook
 	retryServerErrors bool
 
-	AccountIPAllowLists   AccountIPAllowlists
+	Accounts              Accounts
 	AccessPolicies        AccessPolicies
 	AccessTokens          AccessTokens
 	AccountUsers          AccountUsers
@@ -198,7 +198,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	}
 
 	// Create the services.
-	client.AccountIPAllowLists = &accountIPAllowlists{client: client}
+	client.Accounts = &accounts{client: client}
 	client.AccessPolicies = &accessPolicies{client: client}
 	client.AccessTokens = &accessTokens{client: client}
 	client.AccountUsers = &accountUsers{client: client}
@@ -279,20 +279,11 @@ func (c *Client) newRequest(method, path string, v interface{}) (*retryablehttp.
 		reqHeaders.Set("Content-Type", "application/vnd.api+json")
 
 		if v != nil {
-			if strings.Contains(path, "/actions/") {
-				var buf []byte
-				reqHeaders.Set("Content-Type", "application/json")
-				if buf, err = json.Marshal(v); err != nil {
-					return nil, err
-				}
-				body = buf
-			} else {
-				buf := bytes.NewBuffer(nil)
-				if err := jsonapi.MarshalPayloadWithoutIncluded(buf, v); err != nil {
-					return nil, err
-				}
-				body = buf
+			buf := bytes.NewBuffer(nil)
+			if err := jsonapi.MarshalPayloadWithoutIncluded(buf, v); err != nil {
+				return nil, err
 			}
+			body = buf
 		}
 	case "PUT":
 		reqHeaders.Set("Accept", "application/json")
