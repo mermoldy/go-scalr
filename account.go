@@ -62,7 +62,7 @@ func (s *accounts) Update(ctx context.Context, accountID string, options Account
 
 	for _, network := range *options.AllowedIPs {
 		if !validIPv4Network(&network) {
-			return nil, fmt.Errorf("invalid value for ip allowlist entry: %s", network)
+			return nil, fmt.Errorf("invalid value for allowed ips entry: %s", network)
 		}
 	}
 
