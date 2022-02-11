@@ -80,7 +80,7 @@ func TestAccountUpdate(t *testing.T) {
 		}
 		account, err := client.Accounts.Update(ctx, defaultAccountID, options)
 		assert.Nil(t, account)
-		assert.EqualError(t, err, "invalid value for ip allowlist entry: 127.0.00")
+		assert.EqualError(t, err, "invalid value for allowed ips entry: 127.0.00")
 	})
 
 	t.Run("invalid allowed ips ipv6", func(t *testing.T) {
@@ -89,7 +89,7 @@ func TestAccountUpdate(t *testing.T) {
 		}
 		account, err := client.Accounts.Update(ctx, defaultAccountID, options)
 		assert.Nil(t, account)
-		assert.EqualError(t, err, "invalid value for ip allowlist entry: FE80:CD00:0000:0CDE:1257:0000:211E:729C")
+		assert.EqualError(t, err, "invalid value for allowed ips entry: FE80:CD00:0000:0CDE:1257:0000:211E:729C")
 	})
 
 	t.Run("reset allowed ips", func(t *testing.T) {
