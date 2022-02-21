@@ -17,10 +17,10 @@ func TestAccountRead(t *testing.T) {
 		account, err := client.Accounts.Read(ctx, defaultAccountID)
 		require.NoError(t, err)
 
-		assert.Equal(t, account.ID, defaultAccountID)
-		assert.Equal(t, account.Name, make([]string, 0))
+		assert.Equal(t, defaultAccountID, account.ID)
+		assert.Equal(t, defaultAccountName, account.Name)
 
-		assert.Equal(t, account.AllowedIPs, nil)
+		assert.Equal(t, []string{}, account.AllowedIPs)
 	})
 
 	t.Run("account does not exist", func(t *testing.T) {
@@ -64,13 +64,13 @@ func TestAccountUpdate(t *testing.T) {
 		account, err := client.Accounts.Update(ctx, defaultAccountID, options)
 		require.NoError(t, err)
 		for i, ip := range account.AllowedIPs {
-			assert.Equal(t, ip, (*options.AllowedIPs)[i])
+			assert.Equal(t, (*options.AllowedIPs)[i], ip)
 		}
 
 		account, err = client.Accounts.Read(ctx, defaultAccountID)
 		require.NoError(t, err)
 		for i, ip := range account.AllowedIPs {
-			assert.Equal(t, ip, (*options.AllowedIPs)[i])
+			assert.Equal(t, (*options.AllowedIPs)[i], ip)
 		}
 	})
 
@@ -80,7 +80,7 @@ func TestAccountUpdate(t *testing.T) {
 		}
 		account, err := client.Accounts.Update(ctx, defaultAccountID, options)
 		assert.Nil(t, account)
-		assert.EqualError(t, err, "invalid value for allowed ips entry: 127.0.00")
+		assert.EqualError(t, err, "Invalid Attribute\n\nvalue is not a valid IPv4 network")
 	})
 
 	t.Run("invalid allowed ips ipv6", func(t *testing.T) {
@@ -89,7 +89,7 @@ func TestAccountUpdate(t *testing.T) {
 		}
 		account, err := client.Accounts.Update(ctx, defaultAccountID, options)
 		assert.Nil(t, account)
-		assert.EqualError(t, err, "invalid value for allowed ips entry: FE80:CD00:0000:0CDE:1257:0000:211E:729C")
+		assert.EqualError(t, err, "Invalid Attribute\n\nvalue is not a valid IPv4 network")
 	})
 
 	t.Run("reset allowed ips", func(t *testing.T) {
@@ -98,6 +98,6 @@ func TestAccountUpdate(t *testing.T) {
 		}
 		account, err := client.Accounts.Update(ctx, defaultAccountID, options)
 		require.NoError(t, err)
-		assert.Equal(t, nil, account.AllowedIPs)
+		assert.Equal(t, []string{}, account.AllowedIPs)
 	})
 }

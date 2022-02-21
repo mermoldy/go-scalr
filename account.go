@@ -10,14 +10,14 @@ import (
 // Compile-time proof of interface implementation.
 var _ Accounts = (*accounts)(nil)
 
-// AccountIPAllowlists describes methods for updating and reading ip fencing rules that the
+// Accounts describes methods for updating and reading account that the
 // Scalr IACP API supports.
 type Accounts interface {
 	Read(ctx context.Context, account string) (*Account, error)
 	Update(ctx context.Context, account string, options AccountUpdateOptions) (*Account, error)
 }
 
-// accountIPAllowlists implements AccountIPAllowlists.
+// accounts implements Accounts.
 type accounts struct {
 	client *Client
 }
@@ -58,12 +58,6 @@ type AccountUpdateOptions struct {
 func (s *accounts) Update(ctx context.Context, accountID string, options AccountUpdateOptions) (*Account, error) {
 	if !validStringID(&accountID) {
 		return nil, errors.New("invalid value for account ID")
-	}
-
-	for _, network := range *options.AllowedIPs {
-		if !validIPv4Network(&network) {
-			return nil, fmt.Errorf("invalid value for allowed ips entry: %s", network)
-		}
 	}
 
 	// Make sure we don't send a user provided ID.
