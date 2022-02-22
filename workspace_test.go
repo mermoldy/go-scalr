@@ -75,7 +75,7 @@ func TestWorkspacesCreate(t *testing.T) {
 			Operations:           Bool(true),
 			TerraformVersion:     String("0.12.25"),
 			WorkingDirectory:     String("bar/"),
-			RunOperationsTimeout: UInt16(15),
+			RunOperationsTimeout: Int(15),
 		}
 
 		ws, err := client.Workspaces.Create(ctx, options)
@@ -96,7 +96,7 @@ func TestWorkspacesCreate(t *testing.T) {
 			assert.Equal(t, *options.Operations, item.Operations)
 			assert.Equal(t, *options.TerraformVersion, item.TerraformVersion)
 			assert.Equal(t, *options.WorkingDirectory, item.WorkingDirectory)
-			assert.Equal(t, *options.RunOperationsTimeout, item.RunOperationsTimeout)
+			assert.Equal(t, options.RunOperationsTimeout, item.RunOperationsTimeout)
 		}
 	})
 
@@ -269,7 +269,7 @@ func TestWorkspacesUpdate(t *testing.T) {
 			AutoApply:            Bool(true),
 			Operations:           Bool(true),
 			TerraformVersion:     String("0.12.25"),
-			RunOperationsTimeout: UInt16(20),
+			RunOperationsTimeout: Int(20),
 		}
 
 		wsAfter, err := client.Workspaces.Update(ctx, wsTest.ID, options)
@@ -279,7 +279,7 @@ func TestWorkspacesUpdate(t *testing.T) {
 		assert.NotEqual(t, wsTest.AutoApply, wsAfter.AutoApply)
 		assert.NotEqual(t, wsTest.TerraformVersion, wsAfter.TerraformVersion)
 		assert.Equal(t, wsTest.WorkingDirectory, wsAfter.WorkingDirectory)
-		assert.Equal(t, uint16(20), wsAfter.RunOperationsTimeout)
+		assert.Equal(t, int(20), *wsAfter.RunOperationsTimeout)
 	})
 
 	t.Run("when attaching/detaching an agent pool", func(t *testing.T) {

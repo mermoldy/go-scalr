@@ -20,11 +20,6 @@ func Int64(v int64) *int64 {
 	return &v
 }
 
-// UInt16 returns a pointer to the given uint16.
-func UInt16(v uint16) *uint16 {
-	return &v
-}
-
 // String returns a pointer to the given string.
 func String(v string) *string {
 	return &v
