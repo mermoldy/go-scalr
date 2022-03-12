@@ -186,7 +186,7 @@ func (s *modules) ReadBySource(ctx context.Context, moduleSource string) (*Modul
 		return nil, err
 	}
 	if len(ml.Items) != 1 {
-		return nil, ErrResourceNotFound{Message: fmt.Sprintf("Module with source '%s' not found.", *ms)}
+		return nil, ResourceNotFoundError{Message: fmt.Sprintf("Module with source '%s' not found.", *ms)}
 	}
 
 	return ml.Items[0], nil

@@ -171,7 +171,7 @@ func TestVariablesRead(t *testing.T) {
 		assert.Nil(t, v)
 		assert.Equal(
 			t,
-			ErrResourceNotFound{
+			ResourceNotFoundError{
 				Message: fmt.Sprintf("Variable with ID '%s' not found or user unauthorized", variableId),
 			}.Error(),
 			err.Error(),
@@ -269,7 +269,7 @@ func TestVariablesDelete(t *testing.T) {
 		err := client.Variables.Delete(ctx, variableId)
 		assert.Equal(
 			t,
-			ErrResourceNotFound{
+			ResourceNotFoundError{
 				Message: fmt.Sprintf("Variable with ID '%s' not found or user unauthorized", variableId),
 			}.Error(),
 			err.Error(),

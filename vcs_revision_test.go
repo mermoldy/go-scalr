@@ -18,7 +18,7 @@ func TestVCSRevisionRead(t *testing.T) {
 		assert.Nil(t, cv)
 		assert.Equal(
 			t,
-			ErrResourceNotFound{
+			ResourceNotFoundError{
 				Message: fmt.Sprintf("VcsRevisionBinding with ID '%s' not found or user unauthorized", vcsId),
 			}.Error(),
 			err.Error(),
