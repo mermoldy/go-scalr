@@ -61,7 +61,7 @@ type Workspace struct {
 	WorkingDirectory     string                `jsonapi:"attr,working-directory"`
 	HasResources         bool                  `jsonapi:"attr,has-resources"`
 	Hooks                *Hooks                `jsonapi:"attr,hooks"`
-	RunOperationsTimeout *int                  `jsonapi:"attr,run-operations-timeout"`
+	RunOperationTimeout  *int                  `jsonapi:"attr,run-operation-timeout"`
 
 	// Relations
 	CurrentRun    *Run           `jsonapi:"relation,current-run"`
@@ -182,7 +182,7 @@ type WorkspaceCreateOptions struct {
 	ModuleVersion *ModuleVersion `jsonapi:"relation,module-version,omitempty"`
 
 	// Specifies the number of minutes run operation can be executed before termination.
-	RunOperationsTimeout *int `jsonapi:"attr,run-operations-timeout"`
+	RunOperationTimeout *int `jsonapi:"attr,run-operation-timeout"`
 }
 
 // WorkspaceVCSRepoOptions represents the configuration options of a VCS integration.
@@ -342,7 +342,7 @@ type WorkspaceUpdateOptions struct {
 	ModuleVersion *ModuleVersion `jsonapi:"relation,module-version"`
 
 	// Specifies the number of minutes run operation can be executed before termination.
-	RunOperationsTimeout *int `jsonapi:"attr,run-operations-timeout"`
+	RunOperationTimeout *int `jsonapi:"attr,run-operation-timeout"`
 }
 
 // Update settings of an existing workspace.

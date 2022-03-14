@@ -69,13 +69,13 @@ func TestWorkspacesCreate(t *testing.T) {
 
 	t.Run("with valid options", func(t *testing.T) {
 		options := WorkspaceCreateOptions{
-			Environment:          envTest,
-			Name:                 String(randomString(t)),
-			AutoApply:            Bool(true),
-			Operations:           Bool(true),
-			TerraformVersion:     String("0.12.25"),
-			WorkingDirectory:     String("bar/"),
-			RunOperationsTimeout: Int(15),
+			Environment:         envTest,
+			Name:                String(randomString(t)),
+			AutoApply:           Bool(true),
+			Operations:          Bool(true),
+			TerraformVersion:    String("0.12.25"),
+			WorkingDirectory:    String("bar/"),
+			RunOperationTimeout: Int(15),
 		}
 
 		ws, err := client.Workspaces.Create(ctx, options)
@@ -96,7 +96,7 @@ func TestWorkspacesCreate(t *testing.T) {
 			assert.Equal(t, *options.Operations, item.Operations)
 			assert.Equal(t, *options.TerraformVersion, item.TerraformVersion)
 			assert.Equal(t, *options.WorkingDirectory, item.WorkingDirectory)
-			assert.Equal(t, options.RunOperationsTimeout, item.RunOperationsTimeout)
+			assert.Equal(t, options.RunOperationTimeout, item.RunOperationTimeout)
 		}
 	})
 
@@ -265,11 +265,11 @@ func TestWorkspacesUpdate(t *testing.T) {
 
 	t.Run("when updating a subset of values", func(t *testing.T) {
 		options := WorkspaceUpdateOptions{
-			Name:                 String(wsTest.Name),
-			AutoApply:            Bool(true),
-			Operations:           Bool(true),
-			TerraformVersion:     String("0.12.25"),
-			RunOperationsTimeout: Int(20),
+			Name:                String(wsTest.Name),
+			AutoApply:           Bool(true),
+			Operations:          Bool(true),
+			TerraformVersion:    String("0.12.25"),
+			RunOperationTimeout: Int(20),
 		}
 
 		wsAfter, err := client.Workspaces.Update(ctx, wsTest.ID, options)
@@ -279,7 +279,7 @@ func TestWorkspacesUpdate(t *testing.T) {
 		assert.NotEqual(t, wsTest.AutoApply, wsAfter.AutoApply)
 		assert.NotEqual(t, wsTest.TerraformVersion, wsAfter.TerraformVersion)
 		assert.Equal(t, wsTest.WorkingDirectory, wsAfter.WorkingDirectory)
-		assert.Equal(t, int(20), *wsAfter.RunOperationsTimeout)
+		assert.Equal(t, int(20), *wsAfter.RunOperationTimeout)
 	})
 
 	t.Run("when attaching/detaching an agent pool", func(t *testing.T) {
