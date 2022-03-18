@@ -27,7 +27,7 @@ func TestRunsRead(t *testing.T) {
 		assert.Nil(t, r)
 		assert.Equal(
 			t,
-			ErrResourceNotFound{
+			ResourceNotFoundError{
 				Message: fmt.Sprintf("Run with ID '%s' not found or user unauthorized", runId),
 			}.Error(),
 			err.Error(),
