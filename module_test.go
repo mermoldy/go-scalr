@@ -70,7 +70,7 @@ func TestModulesCreate(t *testing.T) {
 			VcsProvider: &VcsProvider{ID: *String(badIdentifier)},
 		})
 		assert.Nil(t, w)
-		assert.EqualError(t, err, ErrResourceNotFound{
+		assert.EqualError(t, err, ResourceNotFoundError{
 			Message: fmt.Sprintf("VcsProvider with ID '%s' not found or user unauthorized", badIdentifier),
 		}.Error())
 	})
@@ -126,7 +126,7 @@ func TestModulesReadBySource(t *testing.T) {
 		ms := "invalidSource"
 		_, err := client.Modules.ReadBySource(ctx, "invalidSource")
 		require.Error(t, err)
-		assert.EqualError(t, err, ErrResourceNotFound{
+		assert.EqualError(t, err, ResourceNotFoundError{
 			Message: fmt.Sprintf("Module with source '%s' not found.", ms),
 		}.Error())
 	})
