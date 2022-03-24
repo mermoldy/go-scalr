@@ -290,7 +290,7 @@ func TestTeamsDelete(t *testing.T) {
 		_, err = client.Teams.Read(ctx, testTeam.ID)
 		assert.Equal(
 			t,
-			ErrResourceNotFound{
+			ResourceNotFoundError{
 				Message: fmt.Sprintf("Team with ID '%s' not found or user unauthorized", testTeam.ID),
 			}.Error(),
 			err.Error(),
