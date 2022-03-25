@@ -172,7 +172,7 @@ func TestAgentPoolsCreate(t *testing.T) {
 		})
 		assert.Equal(
 			t,
-			ErrResourceNotFound{
+			ResourceNotFoundError{
 				Message: fmt.Sprintf("Clients with ID '%s' not found or user unauthorized", accountId),
 			}.Error(),
 			err.Error(),
@@ -188,7 +188,7 @@ func TestAgentPoolsCreate(t *testing.T) {
 		})
 		assert.Equal(
 			t,
-			ErrResourceNotFound{
+			ResourceNotFoundError{
 				Message: fmt.Sprintf("Environment with ID '%s' not found or user unauthorized", envID),
 			}.Error(),
 			err.Error(),
@@ -229,7 +229,7 @@ func TestAgentPoolsCreate(t *testing.T) {
 		assert.Nil(t, ap)
 		assert.Equal(
 			t,
-			ErrResourceNotFound{
+			ResourceNotFoundError{
 				Message: fmt.Sprintf("Relationship 'workspaces' with ID '%s' not found or user unauthorized", wsID),
 			}.Error(),
 			err.Error(),
@@ -260,7 +260,7 @@ func TestAgentPoolsRead(t *testing.T) {
 		assert.Nil(t, agentPool)
 		assert.Equal(
 			t,
-			ErrResourceNotFound{
+			ResourceNotFoundError{
 				Message: fmt.Sprintf("AgentPool with ID '%s' not found or user unauthorized", apID),
 			}.Error(),
 			err.Error(),
@@ -347,7 +347,7 @@ func TestAgentPoolsDelete(t *testing.T) {
 		_, err = client.AgentPools.Read(ctx, pool.ID)
 		assert.Equal(
 			t,
-			ErrResourceNotFound{
+			ResourceNotFoundError{
 				Message: fmt.Sprintf("AgentPool with ID '%s' not found or user unauthorized", pool.ID),
 			}.Error(),
 			err.Error(),

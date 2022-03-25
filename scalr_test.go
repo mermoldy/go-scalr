@@ -255,7 +255,7 @@ func TestClient_errorWithoutMessage(t *testing.T) {
 	}{
 		"404-not-found-error": {
 			resp: &http.Response{StatusCode: 404, Body: ioutil.NopCloser(bytes.NewBufferString("test body"))},
-			err:  ErrResourceNotFound{},
+			err:  ResourceNotFoundError{},
 		},
 		"500-server-error": {
 			resp: &http.Response{StatusCode: 500, Body: ioutil.NopCloser(bytes.NewBufferString("test body"))},

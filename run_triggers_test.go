@@ -135,7 +135,7 @@ func TestRunTriggersDelete(t *testing.T) {
 		require.Error(t, err)
 		assert.Equal(
 			t,
-			ErrResourceNotFound{
+			ResourceNotFoundError{
 				Message: fmt.Sprintf("RunTrigger with ID '%s' not found or user unauthorized", createdTrigger.ID),
 			}.Error(),
 			err.Error(),

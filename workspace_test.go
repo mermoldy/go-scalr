@@ -149,7 +149,7 @@ func TestWorkspacesCreate(t *testing.T) {
 		})
 		assert.Equal(
 			t,
-			ErrResourceNotFound{
+			ResourceNotFoundError{
 				Message: fmt.Sprintf("Environment with ID '%s' not found or user unauthorized", badIdentifier),
 			}.Error(),
 			err.Error(),
@@ -433,7 +433,7 @@ func TestWorkspacesDelete(t *testing.T) {
 		_, err = client.Workspaces.ReadByID(ctx, wTest.ID)
 		assert.Equal(
 			t,
-			ErrResourceNotFound{
+			ResourceNotFoundError{
 				Message: fmt.Sprintf("Workspace with ID '%s' not found or user unauthorized", wTest.ID),
 			}.Error(),
 			err.Error(),

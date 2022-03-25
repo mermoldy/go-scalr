@@ -138,7 +138,7 @@ func TestRolesCreate(t *testing.T) {
 		})
 		assert.Equal(
 			t,
-			ErrResourceNotFound{
+			ResourceNotFoundError{
 				Message: fmt.Sprintf("Clients with ID '%s' not found or user unauthorized", accountId),
 			}.Error(),
 			err.Error(),
@@ -258,7 +258,7 @@ func TestRolesDelete(t *testing.T) {
 		_, err = client.Roles.Read(ctx, rTest.ID)
 		assert.Equal(
 			t,
-			ErrResourceNotFound{
+			ResourceNotFoundError{
 				Message: fmt.Sprintf("IamRole with ID '%s' not found or user unauthorized", rTest.ID),
 			}.Error(),
 			err.Error(),
