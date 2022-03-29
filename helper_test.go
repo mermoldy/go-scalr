@@ -314,6 +314,36 @@ func createPolicyGroup(t *testing.T, client *Client, vcsProvider *VcsProvider) (
 	}
 }
 
+func linkPolicyGroupToEnvironment(t *testing.T, client *Client, policyGroup *PolicyGroup, environment *Environment) func() {
+	ctx := context.Background()
+	options := PolicyGroupEnvironmentsCreateOptions{
+		PolicyGroupID:           policyGroup.ID,
+		PolicyGroupEnvironments: []*PolicyGroupEnvironment{{ID: environment.ID}},
+	}
+
+	err := client.PolicyGroupEnvironments.Create(ctx, options)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return func() {
+		err := client.PolicyGroupEnvironments.Delete(
+			ctx,
+			PolicyGroupEnvironmentDeleteOptions{
+				PolicyGroupID: policyGroup.ID,
+				EnvironmentID: environment.ID,
+			},
+		)
+
+		if err != nil {
+			t.Errorf("Error destroying policy group environment linkage! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"Policy group: %s\nError: %s", policyGroup.ID, err)
+		}
+	}
+}
+
 func randomString(t *testing.T) string {
 	v, err := uuid.GenerateUUID()
 	if err != nil {
