@@ -9,6 +9,8 @@ import (
 )
 
 func TestPolicyGroupEnvironmentsCreate(t *testing.T) {
+	// TODO: delete skip after SCALRCORE-19891
+	t.Skip("Works with personal token but does not work with github action token.")
 
 	client := testClient(t)
 	ctx := context.Background()
@@ -67,6 +69,8 @@ func TestPolicyGroupEnvironmentsCreate(t *testing.T) {
 }
 
 func TestPolicyGroupEnvironmentDelete(t *testing.T) {
+	// TODO: delete skip after SCALRCORE-19891
+	t.Skip("Works with personal token but does not work with github action token.")
 
 	client := testClient(t)
 	ctx := context.Background()
