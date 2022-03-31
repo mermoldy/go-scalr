@@ -116,6 +116,7 @@ type Client struct {
 	retryLogHook      RetryLogHook
 	retryServerErrors bool
 
+	Accounts              Accounts
 	AccessPolicies        AccessPolicies
 	AccessTokens          AccessTokens
 	AccountUsers          AccountUsers
@@ -203,6 +204,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	}
 
 	// Create the services.
+	client.Accounts = &accounts{client: client}
 	client.AccessPolicies = &accessPolicies{client: client}
 	client.AccessTokens = &accessTokens{client: client}
 	client.AccountUsers = &accountUsers{client: client}
