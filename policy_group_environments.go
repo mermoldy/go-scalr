@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+
+	"github.com/svanharmelen/jsonapi"
 )
 
 // Compile-time proof of interface implementation.
@@ -65,13 +67,11 @@ func (s *policyGroupEnvironment) Create(ctx context.Context, options PolicyGroup
 	if err := options.valid(); err != nil {
 		return err
 	}
-
-	type PolicyGroupEnvironmentsPayload struct {
-		Data []*PolicyGroupEnvironment `json:"data"`
-	}
-
 	u := fmt.Sprintf("policy-groups/%s/relationships/environments", url.QueryEscape(options.PolicyGroupID))
-	payload := PolicyGroupEnvironmentsPayload{Data: options.PolicyGroupEnvironments}
+	payload, err := jsonapi.Marshal(options.PolicyGroupEnvironments)
+	if err != nil {
+		return err
+	}
 	req, err := s.client.newJsonRequest("POST", u, payload)
 	if err != nil {
 		return err
