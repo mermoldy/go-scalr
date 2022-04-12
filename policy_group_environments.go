@@ -66,8 +66,13 @@ func (s *policyGroupEnvironment) Create(ctx context.Context, options PolicyGroup
 		return err
 	}
 
+	type PolicyGroupEnvironmentsPayload struct {
+		Data []*PolicyGroupEnvironment `json:"data"`
+	}
+
 	u := fmt.Sprintf("policy-groups/%s/relationships/environments", url.QueryEscape(options.PolicyGroupID))
-	req, err := s.client.newRequest("POST", u, options.PolicyGroupEnvironments)
+	payload := PolicyGroupEnvironmentsPayload{Data: options.PolicyGroupEnvironments}
+	req, err := s.client.newJsonRequest("POST", u, payload)
 	if err != nil {
 		return err
 	}
