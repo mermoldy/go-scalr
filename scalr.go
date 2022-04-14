@@ -116,27 +116,30 @@ type Client struct {
 	retryLogHook      RetryLogHook
 	retryServerErrors bool
 
-	AccessPolicies        AccessPolicies
-	AccessTokens          AccessTokens
-	AccountUsers          AccountUsers
-	AgentPoolTokens       AgentPoolTokens
-	AgentPools            AgentPools
-	ConfigurationVersions ConfigurationVersions
-	Endpoints             Endpoints
-	Environments          Environments
-	ModuleVersions        ModuleVersions
-	Modules               Modules
-	PolicyGroups          PolicyGroups
-	Roles                 Roles
-	Runs                  Runs
-	Teams                 Teams
-	Users                 Users
-	Variables             Variables
-	VcsProviders          VcsProviders
-	VcsRevisions          VcsRevisions
-	Webhooks              Webhooks
-	Workspaces            Workspaces
-	RunTriggers           RunTriggers
+	AccessPolicies                  AccessPolicies
+	AccessTokens                    AccessTokens
+	AccountUsers                    AccountUsers
+	AgentPoolTokens                 AgentPoolTokens
+	AgentPools                      AgentPools
+	ConfigurationVersions           ConfigurationVersions
+	Endpoints                       Endpoints
+	Environments                    Environments
+	ModuleVersions                  ModuleVersions
+	Modules                         Modules
+	PolicyGroups                    PolicyGroups
+	Roles                           Roles
+	Runs                            Runs
+	Teams                           Teams
+	Users                           Users
+	Variables                       Variables
+	VcsProviders                    VcsProviders
+	VcsRevisions                    VcsRevisions
+	Webhooks                        Webhooks
+	Workspaces                      Workspaces
+	RunTriggers                     RunTriggers
+	ProviderConfigurations          ProviderConfigurations
+	ProviderConfigurationParameters ProviderConfigurationParameters
+	ProviderConfigurationLinks      ProviderConfigurationLinks
 }
 
 // NewClient creates a new Scalr API client.
@@ -224,7 +227,9 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.Webhooks = &webhooks{client: client}
 	client.Workspaces = &workspaces{client: client}
 	client.RunTriggers = &runTriggers{client: client}
-
+	client.ProviderConfigurations = &providerConfigurations{client: client}
+	client.ProviderConfigurationParameters = &providerConfigurationParameters{client: client}
+	client.ProviderConfigurationLinks = &providerConfigurationLinks{client: client}
 	return client, nil
 }
 

@@ -123,7 +123,7 @@ func TestEnvironmentsCreate(t *testing.T) {
 		defer client.Environments.Delete(ctx, env.ID)
 
 		assert.Equal(t, *options.Name, env.Name)
-		assert.Equal(t, *&options.Account.ID, env.Account.ID)
+		assert.Equal(t, options.Account.ID, env.Account.ID)
 	})
 
 }
