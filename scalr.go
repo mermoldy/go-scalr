@@ -116,6 +116,7 @@ type Client struct {
 	retryLogHook      RetryLogHook
 	retryServerErrors bool
 
+	Accounts                        Accounts
 	AccessPolicies                  AccessPolicies
 	AccessTokens                    AccessTokens
 	AccountUsers                    AccountUsers
@@ -127,6 +128,9 @@ type Client struct {
 	ModuleVersions                  ModuleVersions
 	Modules                         Modules
 	PolicyGroups                    PolicyGroups
+	ProviderConfigurationLinks      ProviderConfigurationLinks
+	ProviderConfigurationParameters ProviderConfigurationParameters
+	ProviderConfigurations          ProviderConfigurations
 	Roles                           Roles
 	Runs                            Runs
 	Teams                           Teams
@@ -137,9 +141,6 @@ type Client struct {
 	Webhooks                        Webhooks
 	Workspaces                      Workspaces
 	RunTriggers                     RunTriggers
-	ProviderConfigurations          ProviderConfigurations
-	ProviderConfigurationParameters ProviderConfigurationParameters
-	ProviderConfigurationLinks      ProviderConfigurationLinks
 }
 
 // NewClient creates a new Scalr API client.
@@ -206,6 +207,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	}
 
 	// Create the services.
+	client.Accounts = &accounts{client: client}
 	client.AccessPolicies = &accessPolicies{client: client}
 	client.AccessTokens = &accessTokens{client: client}
 	client.AccountUsers = &accountUsers{client: client}

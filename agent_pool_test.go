@@ -173,7 +173,7 @@ func TestAgentPoolsCreate(t *testing.T) {
 		assert.Equal(
 			t,
 			ResourceNotFoundError{
-				Message: fmt.Sprintf("Clients with ID '%s' not found or user unauthorized", accountId),
+				Message: fmt.Sprintf("Invalid Relationship\n\nAccount with ID '%s' not found or user unauthorized", accountId),
 			}.Error(),
 			err.Error(),
 		)
@@ -189,7 +189,7 @@ func TestAgentPoolsCreate(t *testing.T) {
 		assert.Equal(
 			t,
 			ResourceNotFoundError{
-				Message: fmt.Sprintf("Environment with ID '%s' not found or user unauthorized", envID),
+				Message: fmt.Sprintf("Invalid Relationship\n\nEnvironment with ID '%s' not found or user unauthorized", envID),
 			}.Error(),
 			err.Error(),
 		)
