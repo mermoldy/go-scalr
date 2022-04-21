@@ -46,7 +46,7 @@ type ProviderConfiguration struct {
 	GoogleCredentials     string `jsonapi:"attr,google-credentials"`
 
 	Account    *Account                          `jsonapi:"relation,account"`
-	Parameters []*ProviderConfigurationParameter `jsonapi:"relation,provider-configuration-parameters"`
+	Parameters []*ProviderConfigurationParameter `jsonapi:"relation,parameters"`
 }
 
 // ProviderConfigurationsListOptions represents the options for listing provider configurations.

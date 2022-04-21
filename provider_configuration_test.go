@@ -94,6 +94,58 @@ func TestProviderConfigurationCreate(t *testing.T) {
 	})
 }
 
+func TestProviderConfigurationRead(t *testing.T) {
+	client := testClient(t)
+	client.headers.Set("Prefer", "profile=internal")
+	ctx := context.Background()
+
+	t.Run("with parameters", func(t *testing.T) {
+		configuration, removeConfiguration := createProviderConfiguration(
+			t, client, "kubernetes", "kubernetes_dev",
+		)
+		defer removeConfiguration()
+
+		optionsList := []ProviderConfigurationParameterCreateOptions{
+			{
+				Key:         String("config_path"),
+				Sensitive:   Bool(false),
+				Value:       String("~/.kube/config"),
+				Description: String("A path to a kube config file."),
+			},
+			{
+				Key:       String("client_certificate"),
+				Sensitive: Bool(true),
+				Value:     String("-----BEGIN CERTIFICATE-----\nMIIB9TCCAWACAQAwgbgxGTAXB"),
+			},
+			{
+				Key:   String("host"),
+				Value: String("my-host"),
+			},
+		}
+		expectedParameters, err := client.ProviderConfigurationParameters.CreateMany(
+			ctx, configuration.ID, optionsList,
+		)
+		require.NoError(t, err)
+
+		configuration, err = client.ProviderConfigurations.Read(ctx, configuration.ID)
+		require.NoError(t, err)
+		assert.Equal(t, len(expectedParameters), len(configuration.Parameters))
+
+		includedParameters := make(map[string]ProviderConfigurationParameter)
+		for _, p := range configuration.Parameters {
+			includedParameters[p.ID] = *p
+		}
+
+		for _, parameter := range expectedParameters {
+			includedParameter := includedParameters[parameter.ID]
+			assert.Equal(t, parameter.Key, includedParameter.Key)
+			assert.Equal(t, parameter.Description, includedParameter.Description)
+			assert.Equal(t, parameter.Sensitive, includedParameter.Sensitive)
+		}
+
+	})
+}
+
 func TestProviderConfigurationList(t *testing.T) {
 	client := testClient(t)
 	client.headers.Set("Prefer", "profile=internal")
