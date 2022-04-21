@@ -32,18 +32,18 @@ type ProviderConfigurationsList struct {
 
 // ProviderConfiguration represents a Scalr provider configuration.
 type ProviderConfiguration struct {
-	ID                   string `jsonapi:"primary,provider-configurations"`
-	Name                 string `jsonapi:"attr,name"`
-	ProviderType         string `jsonapi:"attr,provider-type"`
-	ExportShellVariables bool   `jsonapi:"attr,export-shell-variables"`
-	AwsAccessKey         string `jsonapi:"attr,aws-access-key"`
-	AwsSecretKey         string `jsonapi:"attr,aws-secret-key"`
-	AzureClientId        string `jsonapi:"attr,azure-client-id"`
-	AzureClientSecret    string `jsonapi:"attr,azure-client-secret"`
-	AzureSubscriptionId  string `jsonapi:"attr,azure-subscription-id"`
-	AzureTenantId        string `jsonapi:"attr,azure-tenant-id"`
-	GoogleProject        string `jsonapi:"attr,google-project"`
-	GoogleCredentials    string `jsonapi:"attr,google-credentials"`
+	ID                    string `jsonapi:"primary,provider-configurations"`
+	Name                  string `jsonapi:"attr,name"`
+	ProviderType          string `jsonapi:"attr,provider-type"`
+	ExportShellVariables  bool   `jsonapi:"attr,export-shell-variables"`
+	AwsAccessKey          string `jsonapi:"attr,aws-access-key"`
+	AwsSecretKey          string `jsonapi:"attr,aws-secret-key"`
+	AzurermClientId       string `jsonapi:"attr,azurerm-client-id"`
+	AzurermClientSecret   string `jsonapi:"attr,azurerm-client-secret"`
+	AzurermSubscriptionId string `jsonapi:"attr,azurerm-subscription-id"`
+	AzurermTenantId       string `jsonapi:"attr,azurerm-tenant-id"`
+	GoogleProject         string `jsonapi:"attr,google-project"`
+	GoogleCredentials     string `jsonapi:"attr,google-credentials"`
 
 	Account    *Account                          `jsonapi:"relation,account"`
 	Parameters []*ProviderConfigurationParameter `jsonapi:"relation,provider-configuration-parameters"`
@@ -62,6 +62,7 @@ type ProviderConfigurationsListOptions struct {
 type ProviderConfigurationFilter struct {
 	ProviderType string `url:"provider-type,omitempty"`
 	Name         string `url:"name,omitempty"`
+	AccountID    string `url:"account,omitempty"`
 }
 
 // List all the provider configurations within a scalr account.
@@ -82,18 +83,18 @@ func (s *providerConfigurations) List(ctx context.Context, options ProviderConfi
 
 // ProviderConfigurationCreateOptions represents the options for creating a new provider configuration.
 type ProviderConfigurationCreateOptions struct {
-	ID                   string  `jsonapi:"primary,provider-configurations"`
-	Name                 *string `jsonapi:"attr,name"`
-	ProviderType         *string `jsonapi:"attr,provider-type"`
-	ExportShellVariables *bool   `jsonapi:"attr,export-shell-variables,omitempty"`
-	AwsAccessKey         *string `jsonapi:"attr,aws-access-key,omitempty"`
-	AwsSecretKey         *string `jsonapi:"attr,aws-secret-key,omitempty"`
-	AzureClientId        *string `jsonapi:"attr,azure-client-id,omitempty"`
-	AzureClientSecret    *string `jsonapi:"attr,azure-client-secret,omitempty"`
-	AzureSubscriptionId  *string `jsonapi:"attr,azure-subscription-id,omitempty"`
-	AzureTenantId        *string `jsonapi:"attr,azure-tenant-id,omitempty"`
-	GoogleProject        *string `jsonapi:"attr,google-project,omitempty"`
-	GoogleCredentials    *string `jsonapi:"attr,google-credentials,omitempty"`
+	ID                    string  `jsonapi:"primary,provider-configurations"`
+	Name                  *string `jsonapi:"attr,name"`
+	ProviderType          *string `jsonapi:"attr,provider-type"`
+	ExportShellVariables  *bool   `jsonapi:"attr,export-shell-variables,omitempty"`
+	AwsAccessKey          *string `jsonapi:"attr,aws-access-key,omitempty"`
+	AwsSecretKey          *string `jsonapi:"attr,aws-secret-key,omitempty"`
+	AzurermClientId       *string `jsonapi:"attr,azurerm-client-id,omitempty"`
+	AzurermClientSecret   *string `jsonapi:"attr,azurerm-client-secret,omitempty"`
+	AzurermSubscriptionId *string `jsonapi:"attr,azurerm-subscription-id,omitempty"`
+	AzurermTenantId       *string `jsonapi:"attr,azurerm-tenant-id,omitempty"`
+	GoogleProject         *string `jsonapi:"attr,google-project,omitempty"`
+	GoogleCredentials     *string `jsonapi:"attr,google-credentials,omitempty"`
 
 	Account *Account `jsonapi:"relation,account,omitempty"`
 }
@@ -146,16 +147,16 @@ func (s *providerConfigurations) Read(ctx context.Context, configurationID strin
 type ProviderConfigurationUpdateOptions struct {
 	ID string `jsonapi:"primary,provider-configurations"`
 
-	Name                 *string `jsonapi:"attr,name"`
-	ExportShellVariables *bool   `jsonapi:"attr,export-shell-variables,omitempty"`
-	AwsAccessKey         *string `jsonapi:"attr,aws-access-key,omitempty"`
-	AwsSecretKey         *string `jsonapi:"attr,aws-secret-key,omitempty"`
-	AzureClientId        *string `jsonapi:"attr,azure-client-id,omitempty"`
-	AzureClientSecret    *string `jsonapi:"attr,azure-client-secret,omitempty"`
-	AzureSubscriptionId  *string `jsonapi:"attr,azure-subscription-id,omitempty"`
-	AzureTenantId        *string `jsonapi:"attr,azure-tenant-id,omitempty"`
-	GoogleProject        *string `jsonapi:"attr,google-project,omitempty"`
-	GoogleCredentials    *string `jsonapi:"attr,google-credentials,omitempty"`
+	Name                  *string `jsonapi:"attr,name"`
+	ExportShellVariables  *bool   `jsonapi:"attr,export-shell-variables,omitempty"`
+	AwsAccessKey          *string `jsonapi:"attr,aws-access-key,omitempty"`
+	AwsSecretKey          *string `jsonapi:"attr,aws-secret-key,omitempty"`
+	AzurermClientId       *string `jsonapi:"attr,azurerm-client-id,omitempty"`
+	AzurermClientSecret   *string `jsonapi:"attr,azurerm-client-secret,omitempty"`
+	AzurermSubscriptionId *string `jsonapi:"attr,azurerm-subscription-id,omitempty"`
+	AzurermTenantId       *string `jsonapi:"attr,azurerm-tenant-id,omitempty"`
+	GoogleProject         *string `jsonapi:"attr,google-project,omitempty"`
+	GoogleCredentials     *string `jsonapi:"attr,google-credentials,omitempty"`
 }
 
 // Update an existing provider configuration.

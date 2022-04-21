@@ -40,14 +40,14 @@ func TestProviderConfigurationCreate(t *testing.T) {
 	})
 	t.Run("success azurerm", func(t *testing.T) {
 		options := ProviderConfigurationCreateOptions{
-			Account:              &Account{ID: defaultAccountID},
-			Name:                 String("azure dev"),
-			ProviderType:         String("azure"),
-			ExportShellVariables: Bool(false),
-			AzureClientId:        String("my-client-id"),
-			AzureClientSecret:    String("my-client-secret"),
-			AzureSubscriptionId:  String("my-subscription-id"),
-			AzureTenantId:        String("my-azure-tenant-id"),
+			Account:               &Account{ID: defaultAccountID},
+			Name:                  String("azurerm dev"),
+			ProviderType:          String("azurerm"),
+			ExportShellVariables:  Bool(false),
+			AzurermClientId:       String("my-client-id"),
+			AzurermClientSecret:   String("my-client-secret"),
+			AzurermSubscriptionId: String("my-subscription-id"),
+			AzurermTenantId:       String("my-azurerm-tenant-id"),
 		}
 		pcfg, err := client.ProviderConfigurations.Create(ctx, options)
 		if err != nil {
@@ -62,10 +62,10 @@ func TestProviderConfigurationCreate(t *testing.T) {
 		assert.Equal(t, *options.Name, pcfg.Name)
 		assert.Equal(t, *options.ProviderType, pcfg.ProviderType)
 		assert.Equal(t, *options.ExportShellVariables, pcfg.ExportShellVariables)
-		assert.Equal(t, *options.AzureClientId, pcfg.AzureClientId)
-		assert.Equal(t, "", pcfg.AzureClientSecret)
-		assert.Equal(t, *options.AzureSubscriptionId, pcfg.AzureSubscriptionId)
-		assert.Equal(t, *options.AzureTenantId, pcfg.AzureTenantId)
+		assert.Equal(t, *options.AzurermClientId, pcfg.AzurermClientId)
+		assert.Equal(t, "", pcfg.AzurermClientSecret)
+		assert.Equal(t, *options.AzurermSubscriptionId, pcfg.AzurermSubscriptionId)
+		assert.Equal(t, *options.AzurermTenantId, pcfg.AzurermTenantId)
 	})
 	t.Run("success google", func(t *testing.T) {
 		options := ProviderConfigurationCreateOptions{
@@ -130,7 +130,7 @@ func TestProviderConfigurationList(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, 2, len(configurationsList.Items))
 
-		resultNames := make([]string, 2)
+		var resultNames []string
 		for _, configuration := range configurationsList.Items {
 			resultNames = append(resultNames, configuration.Name)
 		}
@@ -171,12 +171,12 @@ func TestProviderConfigurationUpdate(t *testing.T) {
 		defer removeConfiguration()
 
 		options := ProviderConfigurationUpdateOptions{
-			Name:                 String("azure_dev2"),
-			ExportShellVariables: Bool(true),
-			AzureClientId:        String("my-client-id"),
-			AzureClientSecret:    String("my-client-secret-"),
-			AzureSubscriptionId:  String("my-subscription-id"),
-			AzureTenantId:        String("my-tenant-id"),
+			Name:                  String("azure_dev2"),
+			ExportShellVariables:  Bool(true),
+			AzurermClientId:       String("my-client-id"),
+			AzurermClientSecret:   String("my-client-secret-"),
+			AzurermSubscriptionId: String("my-subscription-id"),
+			AzurermTenantId:       String("my-tenant-id"),
 		}
 		updatedConfiguration, err := client.ProviderConfigurations.Update(
 			ctx, configuration.ID, options,
@@ -184,10 +184,10 @@ func TestProviderConfigurationUpdate(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, *options.Name, updatedConfiguration.Name)
 		assert.Equal(t, *options.ExportShellVariables, updatedConfiguration.ExportShellVariables)
-		assert.Equal(t, *options.AzureClientId, updatedConfiguration.AzureClientId)
-		assert.Equal(t, "", updatedConfiguration.AzureClientSecret)
-		assert.Equal(t, *options.AzureSubscriptionId, updatedConfiguration.AzureSubscriptionId)
-		assert.Equal(t, *options.AzureTenantId, updatedConfiguration.AzureTenantId)
+		assert.Equal(t, *options.AzurermClientId, updatedConfiguration.AzurermClientId)
+		assert.Equal(t, "", updatedConfiguration.AzurermClientSecret)
+		assert.Equal(t, *options.AzurermSubscriptionId, updatedConfiguration.AzurermSubscriptionId)
+		assert.Equal(t, *options.AzurermTenantId, updatedConfiguration.AzurermTenantId)
 	})
 	t.Run("success google", func(t *testing.T) {
 		configuration, removeConfiguration := createProviderConfiguration(
@@ -196,7 +196,7 @@ func TestProviderConfigurationUpdate(t *testing.T) {
 		defer removeConfiguration()
 
 		options := ProviderConfigurationUpdateOptions{
-			Name:                 String("azure_dev2"),
+			Name:                 String("azurerm_dev2"),
 			ExportShellVariables: Bool(true),
 			GoogleProject:        String("my-project"),
 			GoogleCredentials:    String("my-credentials"),
