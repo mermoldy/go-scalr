@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"sync"
 )
 
 const NUM_PARALLEL = 10
@@ -17,7 +16,6 @@ var _ ProviderConfigurationParameters = (*providerConfigurationParameters)(nil)
 type ProviderConfigurationParameters interface {
 	List(ctx context.Context, configurationID string, options ProviderConfigurationParametersListOptions) (*ProviderConfigurationParametersList, error)
 	Create(ctx context.Context, configurationID string, options ProviderConfigurationParameterCreateOptions) (*ProviderConfigurationParameter, error)
-	CreateMany(ctx context.Context, configurationID string, optionsList []ProviderConfigurationParameterCreateOptions) ([]*ProviderConfigurationParameter, error)
 	Read(ctx context.Context, parameterID string) (*ProviderConfigurationParameter, error)
 	Delete(ctx context.Context, parameterID string) error
 	Update(ctx context.Context, parameterID string, options ProviderConfigurationParameterUpdateOptions) (*ProviderConfigurationParameter, error)
@@ -101,60 +99,6 @@ func (s *providerConfigurationParameters) Create(ctx context.Context, configurat
 	return parameter, nil
 }
 
-// CreateMany is used to create multiple parameters for provider configuratio.
-func (s *providerConfigurationParameters) CreateMany(ctx context.Context, configurationID string, optionsList []ProviderConfigurationParameterCreateOptions) ([]*ProviderConfigurationParameter, error) {
-	done := make(chan struct{})
-	defer close(done)
-
-	type result struct {
-		parameter *ProviderConfigurationParameter
-		err       error
-	}
-
-	inputCh := make(chan ProviderConfigurationParameterCreateOptions)
-	go func() {
-		defer close(inputCh)
-		for _, input := range optionsList {
-			select {
-			case inputCh <- input:
-			case <-done:
-				return
-			}
-		}
-	}()
-
-	var wg sync.WaitGroup
-	wg.Add(NUM_PARALLEL)
-
-	resultCh := make(chan result)
-
-	for i := 0; i < NUM_PARALLEL; i++ {
-		go func() {
-			for createOptions := range inputCh {
-				parameter, err := s.client.ProviderConfigurationParameters.Create(ctx, configurationID, createOptions)
-				resultCh <- result{parameter, err}
-			}
-			wg.Done()
-		}()
-	}
-
-	go func() {
-		wg.Wait()
-		close(resultCh)
-	}()
-
-	var parameters []*ProviderConfigurationParameter
-
-	for result := range resultCh {
-		if result.err != nil {
-			return nil, result.err
-		}
-		parameters = append(parameters, result.parameter)
-	}
-
-	return parameters, nil
-}
-
 // Read a provider configuration parameter by parameter ID.
 func (s *providerConfigurationParameters) Read(ctx context.Context, parameterID string) (*ProviderConfigurationParameter, error) {
 	if !validStringID(&parameterID) {
@@ -180,14 +124,16 @@ func (s *providerConfigurationParameters) Read(ctx context.Context, parameterID 
 // ProviderConfigurationParameterUpdateOptions represents the options for updating a provider configuration.
 type ProviderConfigurationParameterUpdateOptions struct {
 	ID          string  `jsonapi:"primary,provider-configuration-parameters"`
-	Key         *string `jsonapi:"attr,key"`
-	Sensitive   *bool   `jsonapi:"attr,sensitive"`
-	Value       *string `jsonapi:"attr,value"`
-	Description *string `jsonapi:"attr,description"`
+	Key         *string `jsonapi:"attr,key,omitempty"`
+	Sensitive   *bool   `jsonapi:"attr,sensitive,omitempty"`
+	Value       *string `jsonapi:"attr,value,omitempty"`
+	Description *string `jsonapi:"attr,description,omitempty"`
 }
 
 // Update an existing provider configuration parameter.
 func (s *providerConfigurationParameters) Update(ctx context.Context, parameterID string, options ProviderConfigurationParameterUpdateOptions) (*ProviderConfigurationParameter, error) {
+	options.ID = ""
+
 	if !validStringID(&parameterID) {
 		return nil, errors.New("invalid value for provider configuration parameter ID")
 	}
