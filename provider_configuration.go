@@ -122,7 +122,6 @@ type ProviderConfigurationCreateOptions struct {
 
 // Create is used to create a new provider configuration.
 func (s *providerConfigurations) Create(ctx context.Context, options ProviderConfigurationCreateOptions) (*ProviderConfiguration, error) {
-	// TODO: validate options
 	options.ID = ""
 
 	req, err := s.client.newRequest("POST", "provider-configurations", &options)
@@ -168,16 +167,16 @@ func (s *providerConfigurations) Read(ctx context.Context, configurationID strin
 type ProviderConfigurationUpdateOptions struct {
 	ID string `jsonapi:"primary,provider-configurations"`
 
-	Name                  *string `jsonapi:"attr,name,omitempty"`
-	ExportShellVariables  *bool   `jsonapi:"attr,export-shell-variables,omitempty"`
-	AwsAccessKey          *string `jsonapi:"attr,aws-access-key,omitempty"`
-	AwsSecretKey          *string `jsonapi:"attr,aws-secret-key,omitempty"`
-	AzurermClientId       *string `jsonapi:"attr,azurerm-client-id,omitempty"`
-	AzurermClientSecret   *string `jsonapi:"attr,azurerm-client-secret,omitempty"`
-	AzurermSubscriptionId *string `jsonapi:"attr,azurerm-subscription-id,omitempty"`
-	AzurermTenantId       *string `jsonapi:"attr,azurerm-tenant-id,omitempty"`
-	GoogleProject         *string `jsonapi:"attr,google-project,omitempty"`
-	GoogleCredentials     *string `jsonapi:"attr,google-credentials,omitempty"`
+	Name                  *string `jsonapi:"attr,name"`
+	ExportShellVariables  *bool   `jsonapi:"attr,export-shell-variables"`
+	AwsAccessKey          *string `jsonapi:"attr,aws-access-key"`
+	AwsSecretKey          *string `jsonapi:"attr,aws-secret-key"`
+	AzurermClientId       *string `jsonapi:"attr,azurerm-client-id"`
+	AzurermClientSecret   *string `jsonapi:"attr,azurerm-client-secret"`
+	AzurermSubscriptionId *string `jsonapi:"attr,azurerm-subscription-id"`
+	AzurermTenantId       *string `jsonapi:"attr,azurerm-tenant-id"`
+	GoogleProject         *string `jsonapi:"attr,google-project"`
+	GoogleCredentials     *string `jsonapi:"attr,google-credentials"`
 }
 
 // Update an existing provider configuration.
@@ -219,7 +218,7 @@ func (s *providerConfigurations) Delete(ctx context.Context, configurationID str
 	return s.client.do(ctx, req, nil)
 }
 
-// CreateParameters is used to create parameters for provider configuratio.
+// ChangeParameters is used to change parameters for provider configuratio.
 func (s *providerConfigurations) ChangeParameters(
 	ctx context.Context,
 	configurationID string,
@@ -326,6 +325,7 @@ func (s *providerConfigurations) ChangeParameters(
 	return
 }
 
+// CreateParameters is used to create parameters for provider configuratio.
 func (s *providerConfigurations) CreateParameters(
 	ctx context.Context,
 	configurationID string,

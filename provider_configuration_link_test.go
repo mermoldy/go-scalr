@@ -11,7 +11,6 @@ import (
 
 func TestProviderConfigurationLinkCreate(t *testing.T) {
 	client := testClient(t)
-	client.headers.Set("Prefer", "profile=internal")
 	ctx := context.Background()
 
 	t.Run("workspace link", func(t *testing.T) {
@@ -58,7 +57,6 @@ func TestProviderConfigurationLinkCreate(t *testing.T) {
 
 func TestProviderConfigurationLinkUpdate(t *testing.T) {
 	client := testClient(t)
-	client.headers.Set("Prefer", "profile=internal")
 	ctx := context.Background()
 
 	environment, removeEnvironment := createEnvironment(t, client)
@@ -119,7 +117,6 @@ func TestProviderConfigurationLinkUpdate(t *testing.T) {
 
 func TestProviderConfigurationLinkDelete(t *testing.T) {
 	client := testClient(t)
-	client.headers.Set("Prefer", "profile=internal")
 	ctx := context.Background()
 
 	environment, removeEnvironment := createEnvironment(t, client)

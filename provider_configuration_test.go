@@ -11,7 +11,6 @@ import (
 
 func TestProviderConfigurationCreate(t *testing.T) {
 	client := testClient(t)
-	client.headers.Set("Prefer", "profile=internal")
 	ctx := context.Background()
 	t.Run("success aws", func(t *testing.T) {
 		options := ProviderConfigurationCreateOptions{
@@ -96,7 +95,6 @@ func TestProviderConfigurationCreate(t *testing.T) {
 
 func TestProviderConfigurationRead(t *testing.T) {
 	client := testClient(t)
-	client.headers.Set("Prefer", "profile=internal")
 	ctx := context.Background()
 
 	t.Run("with parameters", func(t *testing.T) {
@@ -148,7 +146,6 @@ func TestProviderConfigurationRead(t *testing.T) {
 
 func TestProviderConfigurationCreateParameters(t *testing.T) {
 	client := testClient(t)
-	client.headers.Set("Prefer", "profile=internal")
 	ctx := context.Background()
 
 	t.Run("success", func(t *testing.T) {
@@ -267,7 +264,6 @@ func TestProviderConfigurationCreateParameters(t *testing.T) {
 
 func TestProviderConfigurationChangeParameters(t *testing.T) {
 	client := testClient(t)
-	client.headers.Set("Prefer", "profile=internal")
 	ctx := context.Background()
 
 	t.Run("success", func(t *testing.T) {
@@ -362,7 +358,6 @@ func TestProviderConfigurationChangeParameters(t *testing.T) {
 
 func TestProviderConfigurationList(t *testing.T) {
 	client := testClient(t)
-	client.headers.Set("Prefer", "profile=internal")
 	ctx := context.Background()
 
 	t.Run("filtering", func(t *testing.T) {
@@ -407,7 +402,6 @@ func TestProviderConfigurationList(t *testing.T) {
 
 func TestProviderConfigurationUpdate(t *testing.T) {
 	client := testClient(t)
-	client.headers.Set("Prefer", "profile=internal")
 	ctx := context.Background()
 
 	t.Run("success aws", func(t *testing.T) {
@@ -432,7 +426,7 @@ func TestProviderConfigurationUpdate(t *testing.T) {
 	})
 	t.Run("success azurerm", func(t *testing.T) {
 		configuration, removeConfiguration := createProviderConfiguration(
-			t, client, "azure", "azurerm_dev",
+			t, client, "azurerm", "azurerm_dev",
 		)
 		defer removeConfiguration()
 
@@ -480,7 +474,6 @@ func TestProviderConfigurationUpdate(t *testing.T) {
 
 func TestProviderConfigurationDelete(t *testing.T) {
 	client := testClient(t)
-	client.headers.Set("Prefer", "profile=internal")
 	ctx := context.Background()
 
 	configuration, _ := createProviderConfiguration(t, client, "aws", "aws_dev_us_east_1")

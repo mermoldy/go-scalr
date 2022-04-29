@@ -11,7 +11,6 @@ import (
 
 func TestProviderConfigurationParameterCreate(t *testing.T) {
 	client := testClient(t)
-	client.headers.Set("Prefer", "profile=internal")
 	ctx := context.Background()
 
 	configuration, deleteConfiguration := createProviderConfiguration(
@@ -62,7 +61,6 @@ func TestProviderConfigurationParameterCreate(t *testing.T) {
 
 func TestProviderConfigurationParametersList(t *testing.T) {
 	client := testClient(t)
-	client.headers.Set("Prefer", "profile=internal")
 	ctx := context.Background()
 
 	t.Run("success", func(t *testing.T) {
@@ -113,7 +111,6 @@ func TestProviderConfigurationParametersList(t *testing.T) {
 
 func TestProviderConfigurationParameterUpdate(t *testing.T) {
 	client := testClient(t)
-	client.headers.Set("Prefer", "profile=internal")
 	ctx := context.Background()
 
 	t.Run("success all attributes", func(t *testing.T) {
@@ -151,7 +148,7 @@ func TestProviderConfigurationParameterUpdate(t *testing.T) {
 
 func TestProviderConfigurationParameterDelete(t *testing.T) {
 	client := testClient(t)
-	client.headers.Set("Prefer", "profile=internal")
+
 	ctx := context.Background()
 
 	configuration, removeConfiguration := createProviderConfiguration(t, client, "kubernetes", "kubernetes dev")
