@@ -328,14 +328,14 @@ func randomVariableKey(t *testing.T) string {
 	return "_" + strings.ReplaceAll(randomString(t), "-", "")
 }
 
-func createProviderConfiguration(t *testing.T, client *Client, providerType string, configurationName string) (*ProviderConfiguration, func()) {
+func createProviderConfiguration(t *testing.T, client *Client, providerName string, configurationName string) (*ProviderConfiguration, func()) {
 	ctx := context.Background()
 	config, err := client.ProviderConfigurations.Create(
 		ctx,
 		ProviderConfigurationCreateOptions{
 			Account:      &Account{ID: defaultAccountID},
 			Name:         String(configurationName),
-			ProviderType: String(providerType),
+			ProviderName: String(providerName),
 		},
 	)
 	if err != nil {

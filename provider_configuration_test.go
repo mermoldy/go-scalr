@@ -16,7 +16,7 @@ func TestProviderConfigurationCreate(t *testing.T) {
 		options := ProviderConfigurationCreateOptions{
 			Account:              &Account{ID: defaultAccountID},
 			Name:                 String("AWS dev account us-east-1"),
-			ProviderType:         String("aws"),
+			ProviderName:         String("aws"),
 			ExportShellVariables: Bool(false),
 			AwsAccessKey:         String("my-access-key"),
 			AwsSecretKey:         String("my-secret-key"),
@@ -32,7 +32,7 @@ func TestProviderConfigurationCreate(t *testing.T) {
 
 		assert.Equal(t, options.Account.ID, pcfg.Account.ID)
 		assert.Equal(t, *options.Name, pcfg.Name)
-		assert.Equal(t, *options.ProviderType, pcfg.ProviderType)
+		assert.Equal(t, *options.ProviderName, pcfg.ProviderName)
 		assert.Equal(t, *options.ExportShellVariables, pcfg.ExportShellVariables)
 		assert.Equal(t, *options.AwsAccessKey, pcfg.AwsAccessKey)
 		assert.Equal(t, "", pcfg.AwsSecretKey)
@@ -41,7 +41,7 @@ func TestProviderConfigurationCreate(t *testing.T) {
 		options := ProviderConfigurationCreateOptions{
 			Account:               &Account{ID: defaultAccountID},
 			Name:                  String("azurerm dev"),
-			ProviderType:          String("azurerm"),
+			ProviderName:          String("azurerm"),
 			ExportShellVariables:  Bool(false),
 			AzurermClientId:       String("my-client-id"),
 			AzurermClientSecret:   String("my-client-secret"),
@@ -59,7 +59,7 @@ func TestProviderConfigurationCreate(t *testing.T) {
 
 		assert.Equal(t, options.Account.ID, pcfg.Account.ID)
 		assert.Equal(t, *options.Name, pcfg.Name)
-		assert.Equal(t, *options.ProviderType, pcfg.ProviderType)
+		assert.Equal(t, *options.ProviderName, pcfg.ProviderName)
 		assert.Equal(t, *options.ExportShellVariables, pcfg.ExportShellVariables)
 		assert.Equal(t, *options.AzurermClientId, pcfg.AzurermClientId)
 		assert.Equal(t, "", pcfg.AzurermClientSecret)
@@ -70,7 +70,7 @@ func TestProviderConfigurationCreate(t *testing.T) {
 		options := ProviderConfigurationCreateOptions{
 			Account:              &Account{ID: defaultAccountID},
 			Name:                 String("AWS dev account us-east-1"),
-			ProviderType:         String("google"),
+			ProviderName:         String("google"),
 			ExportShellVariables: Bool(false),
 			GoogleProject:        String("my-google-project"),
 			GoogleCredentials:    String("my-google-credentials"),
@@ -86,7 +86,7 @@ func TestProviderConfigurationCreate(t *testing.T) {
 
 		assert.Equal(t, options.Account.ID, pcfg.Account.ID)
 		assert.Equal(t, *options.Name, pcfg.Name)
-		assert.Equal(t, *options.ProviderType, pcfg.ProviderType)
+		assert.Equal(t, *options.ProviderName, pcfg.ProviderName)
 		assert.Equal(t, *options.ExportShellVariables, pcfg.ExportShellVariables)
 		assert.Equal(t, *options.GoogleProject, pcfg.GoogleProject)
 		assert.Equal(t, "", pcfg.GoogleCredentials)
@@ -363,18 +363,18 @@ func TestProviderConfigurationList(t *testing.T) {
 	t.Run("filtering", func(t *testing.T) {
 		type providerTestingData struct {
 			Name         string
-			ProviderType string
+			ProviderName string
 		}
 		providerTestingDataSet := []providerTestingData{
-			{Name: "aws_prod_us_east_1", ProviderType: "aws"},
-			{Name: "aws_prod_us_east_2", ProviderType: "aws"},
-			{Name: "aws_dev_us_east1", ProviderType: "aws"},
-			{Name: "gc_prod_us_west1_b", ProviderType: "google"},
+			{Name: "aws_prod_us_east_1", ProviderName: "aws"},
+			{Name: "aws_prod_us_east_2", ProviderName: "aws"},
+			{Name: "aws_dev_us_east1", ProviderName: "aws"},
+			{Name: "gc_prod_us_west1_b", ProviderName: "google"},
 		}
 
 		for _, providerData := range providerTestingDataSet {
 			_, removeConfiguration := createProviderConfiguration(
-				t, client, providerData.ProviderType, providerData.Name,
+				t, client, providerData.ProviderName, providerData.Name,
 			)
 
 			defer removeConfiguration()
@@ -382,7 +382,7 @@ func TestProviderConfigurationList(t *testing.T) {
 
 		requestOptions := ProviderConfigurationsListOptions{
 			Filter: &ProviderConfigurationFilter{
-				ProviderType: "aws",
+				ProviderName: "aws",
 				Name:         "like:_prod_",
 			},
 		}

@@ -55,7 +55,7 @@ type ProviderConfigurationsList struct {
 type ProviderConfiguration struct {
 	ID                    string `jsonapi:"primary,provider-configurations"`
 	Name                  string `jsonapi:"attr,name"`
-	ProviderType          string `jsonapi:"attr,provider-type"`
+	ProviderName          string `jsonapi:"attr,provider-name"`
 	ExportShellVariables  bool   `jsonapi:"attr,export-shell-variables"`
 	AwsAccessKey          string `jsonapi:"attr,aws-access-key"`
 	AwsSecretKey          string `jsonapi:"attr,aws-secret-key"`
@@ -81,7 +81,7 @@ type ProviderConfigurationsListOptions struct {
 
 // ProviderConfigurationFilter represents the options for filtering provider configurations.
 type ProviderConfigurationFilter struct {
-	ProviderType string `url:"provider-type,omitempty"`
+	ProviderName string `url:"provider-name,omitempty"`
 	Name         string `url:"name,omitempty"`
 	AccountID    string `url:"account,omitempty"`
 }
@@ -106,7 +106,7 @@ func (s *providerConfigurations) List(ctx context.Context, options ProviderConfi
 type ProviderConfigurationCreateOptions struct {
 	ID                    string  `jsonapi:"primary,provider-configurations"`
 	Name                  *string `jsonapi:"attr,name"`
-	ProviderType          *string `jsonapi:"attr,provider-type"`
+	ProviderName          *string `jsonapi:"attr,provider-name"`
 	ExportShellVariables  *bool   `jsonapi:"attr,export-shell-variables,omitempty"`
 	AwsAccessKey          *string `jsonapi:"attr,aws-access-key,omitempty"`
 	AwsSecretKey          *string `jsonapi:"attr,aws-secret-key,omitempty"`
