@@ -198,7 +198,7 @@ func (s *policyGroups) Read(ctx context.Context, policyGroupID string) (*PolicyG
 	options := struct {
 		Include string `url:"include"`
 	}{
-		Include: "policies,environments,workspaces",
+		Include: "policies",
 	}
 	u := fmt.Sprintf("policy-groups/%s", url.QueryEscape(policyGroupID))
 	req, err := s.client.newRequest("GET", u, options)

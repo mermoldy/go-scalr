@@ -10,6 +10,7 @@ import (
 )
 
 const defaultAccountID = "acc-svrcncgh453bi8g"
+const defaultAccountName = "mainiacp"
 const defaultModuleID = "mod-svsmkkjo8sju4o0"
 const badIdentifier = "! / nope"
 const policyGroupVcsRepoID = "Scalr/tf-revizor-fixtures"
