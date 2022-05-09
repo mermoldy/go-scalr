@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"sync"
 )
 
 // Compile-time proof of interface implementation.
@@ -18,26 +17,6 @@ type ProviderConfigurations interface {
 	Read(ctx context.Context, configurationID string) (*ProviderConfiguration, error)
 	Delete(ctx context.Context, configurationID string) error
 	Update(ctx context.Context, configurationID string, options ProviderConfigurationUpdateOptions) (*ProviderConfiguration, error)
-	ChangeParameters(
-		ctx context.Context,
-		configurationID string,
-		toCreate *[]ProviderConfigurationParameterCreateOptions,
-		toUpdate *[]ProviderConfigurationParameterUpdateOptions,
-		toDelete *[]string,
-	) (
-		created []ProviderConfigurationParameter,
-		updated []ProviderConfigurationParameter,
-		deleted []string,
-		err error,
-	)
-	CreateParameters(
-		ctx context.Context,
-		configurationID string,
-		optionsList *[]ProviderConfigurationParameterCreateOptions,
-	) (
-		created []ProviderConfigurationParameter,
-		err error,
-	)
 }
 
 // providerConfigurations implements ProviderConfigurations.
@@ -216,126 +195,4 @@ func (s *providerConfigurations) Delete(ctx context.Context, configurationID str
 	}
 
 	return s.client.do(ctx, req, nil)
-}
-
-// ChangeParameters is used to change parameters for provider configuratio.
-func (s *providerConfigurations) ChangeParameters(
-	ctx context.Context,
-	configurationID string,
-	toCreate *[]ProviderConfigurationParameterCreateOptions,
-	toUpdate *[]ProviderConfigurationParameterUpdateOptions,
-	toDelete *[]string,
-) (
-	created []ProviderConfigurationParameter,
-	updated []ProviderConfigurationParameter,
-	deleted []string,
-	err error,
-) {
-	done := make(chan struct{})
-	defer close(done)
-
-	type result struct {
-		created *ProviderConfigurationParameter
-		updated *ProviderConfigurationParameter
-		deleted *string
-		err     error
-	}
-	type task struct {
-		createOption *ProviderConfigurationParameterCreateOptions
-		updateOption *ProviderConfigurationParameterUpdateOptions
-		deleteId     *string
-	}
-
-	inputCh := make(chan task)
-	var tasks []task
-
-	if toDelete != nil {
-		for i := range *toDelete {
-			tasks = append(tasks, task{deleteId: &(*toDelete)[i]})
-		}
-	}
-	if toUpdate != nil {
-		for i := range *toUpdate {
-			tasks = append(tasks, task{updateOption: &(*toUpdate)[i]})
-		}
-	}
-	if toCreate != nil {
-		for i := range *toCreate {
-			tasks = append(tasks, task{createOption: &(*toCreate)[i]})
-		}
-	}
-
-	if tasks == nil {
-		return
-	}
-
-	go func() {
-		defer close(inputCh)
-		for _, t := range tasks {
-			select {
-			case inputCh <- t:
-
-			case <-done:
-				return
-			}
-		}
-	}()
-
-	var wg sync.WaitGroup
-	wg.Add(NUM_PARALLEL)
-
-	resultCh := make(chan result)
-
-	for i := 0; i < NUM_PARALLEL; i++ {
-		go func() {
-			for t := range inputCh {
-				if t.createOption != nil {
-					parameter, err := s.client.ProviderConfigurationParameters.Create(ctx, configurationID, *t.createOption)
-					resultCh <- result{created: parameter, err: err}
-				} else if t.updateOption != nil {
-					parameter, err := s.client.ProviderConfigurationParameters.Update(ctx, t.updateOption.ID, *t.updateOption)
-					resultCh <- result{updated: parameter, err: err}
-				} else {
-					err := s.client.ProviderConfigurationParameters.Delete(ctx, *t.deleteId)
-					resultCh <- result{deleted: t.deleteId, err: err}
-				}
-			}
-			wg.Done()
-		}()
-	}
-
-	go func() {
-		wg.Wait()
-		close(resultCh)
-	}()
-
-	for result := range resultCh {
-		if result.err != nil {
-			err = result.err
-			break
-		} else if result.created != nil {
-			created = append(created, *result.created)
-		} else if result.updated != nil {
-			updated = append(updated, *result.updated)
-		} else {
-			deleted = append(deleted, *result.deleted)
-		}
-	}
-
-	return
-}
-
-// CreateParameters is used to create parameters for provider configuratio.
-func (s *providerConfigurations) CreateParameters(
-	ctx context.Context,
-	configurationID string,
-	optionsList *[]ProviderConfigurationParameterCreateOptions,
-) (
-	created []ProviderConfigurationParameter,
-	err error,
-) {
-	created, _, _, err = s.client.ProviderConfigurations.ChangeParameters(
-		ctx, configurationID, optionsList, nil, nil,
-	)
-	return
 }

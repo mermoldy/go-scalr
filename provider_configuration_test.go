@@ -120,239 +120,32 @@ func TestProviderConfigurationRead(t *testing.T) {
 				Value: String("my-host"),
 			},
 		}
-		expectedParameters, err := client.ProviderConfigurations.CreateParameters(
-			ctx, configuration.ID, &optionsList,
-		)
-		require.NoError(t, err)
+		for _, option := range optionsList {
+			_, err := client.ProviderConfigurationParameters.Create(
+				ctx, configuration.ID, option,
+			)
+			require.NoError(t, err)
+		}
 
-		configuration, err = client.ProviderConfigurations.Read(ctx, configuration.ID)
+		configuration, err := client.ProviderConfigurations.Read(ctx, configuration.ID)
 		require.NoError(t, err)
-		assert.Equal(t, len(expectedParameters), len(configuration.Parameters))
+		assert.Equal(t, len(optionsList), len(configuration.Parameters))
 
 		includedParameters := make(map[string]ProviderConfigurationParameter)
 		for _, p := range configuration.Parameters {
-			includedParameters[p.ID] = *p
+			includedParameters[p.Key] = *p
 		}
 
-		for _, parameter := range expectedParameters {
-			includedParameter := includedParameters[parameter.ID]
-			assert.Equal(t, parameter.Key, includedParameter.Key)
-			assert.Equal(t, parameter.Description, includedParameter.Description)
-			assert.Equal(t, parameter.Sensitive, includedParameter.Sensitive)
-		}
-
-	})
-}
-
-func TestProviderConfigurationCreateParameters(t *testing.T) {
-	client := testClient(t)
-	ctx := context.Background()
-
-	t.Run("success", func(t *testing.T) {
-		configuration, deleteConfiguration := createProviderConfiguration(
-			t, client, "kubernetes", "kubernetes_dev",
-		)
-		defer deleteConfiguration()
-
-		optionsList := []ProviderConfigurationParameterCreateOptions{
-			{
-				Key:         String("config_path"),
-				Sensitive:   Bool(false),
-				Value:       String("~/.kube/config"),
-				Description: String("A path to a kube config file."),
-			},
-			{
-				Key:       String("client_certificate"),
-				Sensitive: Bool(true),
-				Value:     String("-----BEGIN CERTIFICATE-----\nMIIB9TCCAWACAQAwgbgxGTAXB"),
-			},
-			{
-				Key:   String("host"),
-				Value: String("my-host"),
-			},
-			{
-				Key:   String("username"),
-				Value: String("my-username"),
-			},
-
-			{
-				Key:   String("password"),
-				Value: String("my-password"),
-			},
-
-			{
-				Key:   String("insecure"),
-				Value: String("my-insecure"),
-			},
-			{
-				Key:   String("config_context"),
-				Value: String("my-config_context"),
-			},
-			{
-				Key:   String("config_context_auth_info"),
-				Value: String("my-config_context_auth_info"),
-			},
-			{
-				Key:   String("config_context_cluster"),
-				Value: String("myconfig_context_cluster"),
-			},
-			{
-				Key:   String("token"),
-				Value: String("my-token"),
-			},
-
-			{
-				Key:   String("proxy_url"),
-				Value: String("my-proxy_url"),
-			},
-			{
-				Key:   String("exec"),
-				Value: String("my-exec"),
-			},
-		}
-		createdParameters, err := client.ProviderConfigurations.CreateParameters(ctx, configuration.ID, &optionsList)
-		require.NoError(t, err)
-
-		assert.Equal(t, len(optionsList), len(createdParameters))
-
-		optionsMap := make(map[string]ProviderConfigurationParameterCreateOptions)
-		for _, createOption := range optionsList {
-			optionsMap[*createOption.Key] = createOption
-		}
-
-		configuration, err = client.ProviderConfigurations.Read(ctx, configuration.ID)
-		require.NoError(t, err)
-
-		for _, parameter := range configuration.Parameters {
-			createOption := optionsMap[parameter.Key]
-			if createOption.Sensitive != nil && *createOption.Sensitive {
-				assert.Equal(t, "", parameter.Value)
-			} else {
-				assert.Equal(t, *createOption.Value, parameter.Value)
+		for _, option := range optionsList {
+			includedParameter := includedParameters[*option.Key]
+			assert.Equal(t, *option.Key, includedParameter.Key)
+			var description string
+			if option.Description != nil {
+				description = *option.Description
 			}
+			assert.Equal(t, description, includedParameter.Description)
+			assert.Equal(t, option.Sensitive != nil && *option.Sensitive, includedParameter.Sensitive)
 		}
-	})
-	t.Run("key duplication error", func(t *testing.T) {
-		configuration, deleteConfiguration := createProviderConfiguration(
-			t, client, "kubernetes", "kubernetes_dev",
-		)
-		defer deleteConfiguration()
-
-		optionsList := []ProviderConfigurationParameterCreateOptions{
-			{
-				Key:         String("config_path"),
-				Sensitive:   Bool(false),
-				Value:       String("~/.kube/config"),
-				Description: String("A path to a kube config file."),
-			},
-			{
-				Key:       String("client_certificate"),
-				Sensitive: Bool(true),
-				Value:     String("-----BEGIN CERTIFICATE-----\nMIIB9TCCAWACAQAwgbgxGTAXB"),
-			},
-			{
-				Key:   String("config_path"),
-				Value: String("my-another-path"),
-			},
-		}
-		_, err := client.ProviderConfigurations.CreateParameters(ctx, configuration.ID, &optionsList)
-		require.Error(t, err)
-		assert.EqualError(t, err, "Invalid Attribute\n\nCan not create parameter. Key 'config_path' has already been taken.")
-	})
-
-}
-
-func TestProviderConfigurationChangeParameters(t *testing.T) {
-	client := testClient(t)
-	ctx := context.Background()
-
-	t.Run("success", func(t *testing.T) {
-		configuration, deleteConfiguration := createProviderConfiguration(
-			t, client, "kubernetes", "kubernetes_dev",
-		)
-		defer deleteConfiguration()
-
-		initParameterOptions := []ProviderConfigurationParameterCreateOptions{
-			{
-				Key:       String("client_certificate"),
-				Sensitive: Bool(true),
-				Value:     String("-----BEGIN CERTIFICATE-----\nMIIB9TCCAWACAQAwgbgxGTAXB"),
-			},
-			{
-				Key:   String("host"),
-				Value: String("my-host"),
-			},
-			{
-				Key:   String("username"),
-				Value: String("my-username"),
-			},
-		}
-
-		toCreate := []ProviderConfigurationParameterCreateOptions{
-			{
-				Key:   String("insecure"),
-				Value: String("my-insecure"),
-			},
-		}
-		var toUpdate []ProviderConfigurationParameterUpdateOptions
-		var toDelete []string
-
-		initParameters, err := client.ProviderConfigurations.CreateParameters(ctx, configuration.ID, &initParameterOptions)
-		require.NoError(t, err)
-
-		var notChanged ProviderConfigurationParameter
-
-		for _, param := range initParameters {
-			if param.Key == "username" {
-				notChanged = param
-			}
-			if param.Key == "host" {
-				toUpdate = append(toUpdate, ProviderConfigurationParameterUpdateOptions{
-					ID:    param.ID,
-					Key:   String("host"),
-					Value: String("new-host"),
-				})
-			} else if param.Key == "client_certificate" {
-				toDelete = append(toDelete, param.ID)
-			}
-		}
-		assert.Equal(t, 1, len(toUpdate))
-		assert.Equal(t, 1, len(toDelete))
-
-		created, updated, deleted, err := client.ProviderConfigurations.ChangeParameters(
-			ctx,
-			configuration.ID,
-			&toCreate,
-			&toUpdate,
-			&toDelete,
-		)
-		require.NoError(t, err)
-
-		assert.ElementsMatch(t, deleted, toDelete)
-
-		assert.Equal(t, len(updated), 1)
-		assert.Equal(t, "host", updated[0].Key)
-		assert.Equal(t, "new-host", updated[0].Value)
-
-		assert.Equal(t, len(created), 1)
-		assert.Equal(t, "insecure", created[0].Key)
-		assert.Equal(t, "my-insecure", created[0].Value)
-
-		configuration, err = client.ProviderConfigurations.Read(ctx, configuration.ID)
-		require.NoError(t, err)
-
-		expected := []ProviderConfigurationParameter{
-			notChanged,
-			created[0],
-			updated[0],
-		}
-
-		var result []ProviderConfigurationParameter
-		for _, param := range configuration.Parameters {
-			result = append(result, *param)
-		}
-
-		assert.ElementsMatch(t, expected, result)
 	})
 }
 

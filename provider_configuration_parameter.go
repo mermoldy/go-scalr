@@ -7,8 +7,6 @@ import (
 	"net/url"
 )
 
-const NUM_PARALLEL = 10
-
 // Compile-time proof of interface implementation.
 var _ ProviderConfigurationParameters = (*providerConfigurationParameters)(nil)
 
