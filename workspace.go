@@ -30,6 +30,9 @@ type Workspaces interface {
 
 	// Delete deletes a workspace by its ID.
 	Delete(ctx context.Context, workspaceID string) error
+
+	// SetSchedule sets run schedules for workspace.
+	SetSchedule(ctx context.Context, workspaceID string, options WorkspaceRunScheduleOptions) (*Workspace, error)
 }
 
 // workspaces implements Workspaces.
@@ -59,6 +62,8 @@ type Workspace struct {
 	TerraformVersion     string                `jsonapi:"attr,terraform-version"`
 	VCSRepo              *WorkspaceVCSRepo     `jsonapi:"attr,vcs-repo"`
 	WorkingDirectory     string                `jsonapi:"attr,working-directory"`
+	ApplySchedule        string                `jsonapi:"attr,apply-schedule"`
+	DestroySchedule      string                `jsonapi:"attr,destroy-schedule"`
 	HasResources         bool                  `jsonapi:"attr,has-resources"`
 	Hooks                *Hooks                `jsonapi:"attr,hooks"`
 	RunOperationTimeout  *int                  `jsonapi:"attr,run-operation-timeout"`
@@ -118,6 +123,12 @@ type WorkspaceListOptions struct {
 	AgentPool   *string `url:"filter[agent-pool],omitempty"`
 	Name        *string `url:"filter[name],omitempty"`
 	Include     string  `url:"include,omitempty"`
+}
+
+// WorkspaceRunScheduleOptions represents option for setting run schedules for workspace
+type WorkspaceRunScheduleOptions struct {
+	ApplySchedule   string `json:"apply-schedule"`
+	DestroySchedule string `json:"destroy-schedule"`
 }
 
 // List all the workspaces within an environment.
@@ -389,4 +400,25 @@ func (s *workspaces) Delete(ctx context.Context, workspaceID string) error {
 	}
 
 	return s.client.do(ctx, req, nil)
+}
+
+// SetSchedule set scheduled runs
+func (s *workspaces) SetSchedule(ctx context.Context, workspaceID string, options WorkspaceRunScheduleOptions) (*Workspace, error) {
+	if !validStringID(&workspaceID) {
+		return nil, errors.New("invalid value for workspace ID")
+	}
+
+	u := fmt.Sprintf("workspaces/%s/actions/set-schedule", url.QueryEscape(workspaceID))
+	req, err := s.client.newJsonRequest("POST", u, &options)
+	if err != nil {
+		return nil, err
+	}
+
+	w := &Workspace{}
+	err = s.client.do(ctx, req, w)
+	if err != nil {
+		return nil, err
+	}
+
+	return w, nil
 }
