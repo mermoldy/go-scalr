@@ -62,6 +62,7 @@ type Workspace struct {
 	HasResources         bool                  `jsonapi:"attr,has-resources"`
 	Hooks                *Hooks                `jsonapi:"attr,hooks"`
 	RunOperationTimeout  *int                  `jsonapi:"attr,run-operation-timeout"`
+	VarFiles             []string              `jsonapi:"attr,var-files"`
 
 	// Relations
 	CurrentRun    *Run           `jsonapi:"relation,current-run"`
@@ -177,6 +178,9 @@ type WorkspaceCreateOptions struct {
 
 	// Specifies the AgentPool for workspace.
 	AgentPool *AgentPool `jsonapi:"relation,agent-pool,omitempty"`
+
+	// Specifies the VarFiles for workspace.
+	VarFiles []string `jsonapi:"attr,var-files"`
 
 	// Specifies the ModuleVersion based on create workspace
 	ModuleVersion *ModuleVersion `jsonapi:"relation,module-version,omitempty"`
@@ -337,6 +341,9 @@ type WorkspaceUpdateOptions struct {
 
 	// Specifies the AgentPool for workspace.
 	AgentPool *AgentPool `jsonapi:"relation,agent-pool"`
+
+	//Specifies the VarFiles for workspace.
+	VarFiles []string `jsonapi:"attr,var_files"`
 
 	// Specifies the ModuleVersion based on create workspace
 	ModuleVersion *ModuleVersion `jsonapi:"relation,module-version"`
