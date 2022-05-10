@@ -335,7 +335,7 @@ type WorkspaceUpdateOptions struct {
 	// the keys below you wish to modify. To add a new VCS repo to a workspace
 	// that didn't previously have one, include at least the oauth-token-id and
 	// identifier keys.
-	VCSRepo *WorkspaceVCSRepoOptions `jsonapi:"attr,vcs-repo,omitempty"`
+	VCSRepo *WorkspaceVCSRepoOptions `jsonapi:"attr,vcs-repo"`
 
 	// Contains configuration for custom hooks,
 	// which can be triggered before or after plan or apply phases
