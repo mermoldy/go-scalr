@@ -348,7 +348,7 @@ type WorkspaceUpdateOptions struct {
 	WorkingDirectory *string `jsonapi:"attr,working-directory,omitempty"`
 
 	// Specifies the VcsProvider for workspace vcs-repo.
-	VcsProvider *VcsProvider `jsonapi:"relation,vcs-provider,omitempty"`
+	VcsProvider *VcsProvider `jsonapi:"relation,vcs-provider"`
 
 	// Specifies the AgentPool for workspace.
 	AgentPool *AgentPool `jsonapi:"relation,agent-pool"`
