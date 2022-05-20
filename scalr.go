@@ -116,28 +116,29 @@ type Client struct {
 	retryLogHook      RetryLogHook
 	retryServerErrors bool
 
-	Accounts              Accounts
-	AccessPolicies        AccessPolicies
-	AccessTokens          AccessTokens
-	AccountUsers          AccountUsers
-	AgentPoolTokens       AgentPoolTokens
-	AgentPools            AgentPools
-	ConfigurationVersions ConfigurationVersions
-	Endpoints             Endpoints
-	Environments          Environments
-	ModuleVersions        ModuleVersions
-	Modules               Modules
-	PolicyGroups          PolicyGroups
-	Roles                 Roles
-	Runs                  Runs
-	Teams                 Teams
-	Users                 Users
-	Variables             Variables
-	VcsProviders          VcsProviders
-	VcsRevisions          VcsRevisions
-	Webhooks              Webhooks
-	Workspaces            Workspaces
-	RunTriggers           RunTriggers
+	Accounts                Accounts
+	AccessPolicies          AccessPolicies
+	AccessTokens            AccessTokens
+	AccountUsers            AccountUsers
+	AgentPoolTokens         AgentPoolTokens
+	AgentPools              AgentPools
+	ConfigurationVersions   ConfigurationVersions
+	Endpoints               Endpoints
+	Environments            Environments
+	ModuleVersions          ModuleVersions
+	Modules                 Modules
+	PolicyGroups            PolicyGroups
+	PolicyGroupEnvironments PolicyGroupEnvironments
+	Roles                   Roles
+	Runs                    Runs
+	Teams                   Teams
+	Users                   Users
+	Variables               Variables
+	VcsProviders            VcsProviders
+	VcsRevisions            VcsRevisions
+	Webhooks                Webhooks
+	Workspaces              Workspaces
+	RunTriggers             RunTriggers
 }
 
 // NewClient creates a new Scalr API client.
@@ -216,6 +217,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.ModuleVersions = &moduleVersions{client: client}
 	client.Modules = &modules{client: client}
 	client.PolicyGroups = &policyGroups{client: client}
+	client.PolicyGroupEnvironments = &policyGroupEnvironment{client: client}
 	client.Roles = &roles{client: client}
 	client.Runs = &runs{client: client}
 	client.Teams = &teams{client: client}
