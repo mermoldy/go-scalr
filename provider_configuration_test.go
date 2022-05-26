@@ -97,8 +97,8 @@ func TestProviderConfigurationCreate(t *testing.T) {
 			Name:                 String("Scalr dev account"),
 			ProviderName:         String("scalr"),
 			ExportShellVariables: Bool(false),
-			ScalrHostname:        String("my-scalr_hostname"),
-			ScalrToken:           String("my-scalr_token"),
+			ScalrHostname:        String("my-scalr-hostname"),
+			ScalrToken:           String("my-scalr-token"),
 		}
 		pcfg, err := client.ProviderConfigurations.Create(ctx, options)
 		if err != nil {
@@ -208,7 +208,7 @@ func TestProviderConfigurationList(t *testing.T) {
 		configurationsList, err := client.ProviderConfigurations.List(ctx, requestOptions)
 
 		require.NoError(t, err)
-		assert.Equal(t, 3, len(configurationsList.Items))
+		assert.Equal(t, 2, len(configurationsList.Items))
 
 		var resultNames []string
 		for _, configuration := range configurationsList.Items {
