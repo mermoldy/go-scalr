@@ -40,7 +40,7 @@ func TestProviderConfigurationCreate(t *testing.T) {
 	t.Run("success azurerm", func(t *testing.T) {
 		options := ProviderConfigurationCreateOptions{
 			Account:               &Account{ID: defaultAccountID},
-			Name:                  String("azurerm dev"),
+			Name:                  String("azurermdev"),
 			ProviderName:          String("azurerm"),
 			ExportShellVariables:  Bool(false),
 			AzurermClientId:       String("my-client-id"),
@@ -290,8 +290,8 @@ func TestProviderConfigurationUpdate(t *testing.T) {
 		assert.Equal(t, "", updatedConfiguration.GoogleCredentials)
 	})
 	t.Run("success scalr", func(t *testing.T) {
-		configuration, removeConfiguration := createProviderConfiguration(
-			t, client, "scalr", "scalr_dev",
+		configuration, removeConfiguration := createProviderConfigurationScalr(
+			t, client, "scalr", "scalr_dev", "scalr-host", "scalr-token",
 		)
 		defer removeConfiguration()
 
