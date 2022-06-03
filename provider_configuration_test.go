@@ -3,13 +3,24 @@ package scalr
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestProviderConfigurationCreate(t *testing.T) {
+func getGoogleTestingCreds(t *testing.T) (credentials, project string) {
+	credentials = os.Getenv("TEST_GOOGLE_CREDENTIALS")
+	project = os.Getenv("TEST_GOOGLE_PROJECT")
+	if len(credentials) == 0 ||
+		len(project) == 0 {
+		t.Skip("Please set TEST_GOOGLE_CREDENTIALS, TEST_GOOGLE_PROJECT env variables to run this test.")
+	}
+	return
+}
+
+func TestProviderConfigurationCreateAws(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 	t.Run("success aws", func(t *testing.T) {
@@ -37,6 +48,12 @@ func TestProviderConfigurationCreate(t *testing.T) {
 		assert.Equal(t, *options.AwsAccessKey, pcfg.AwsAccessKey)
 		assert.Equal(t, "", pcfg.AwsSecretKey)
 	})
+}
+
+func TestProviderConfigurationCreateAzuerm(t *testing.T) {
+	client := testClient(t)
+	ctx := context.Background()
+
 	t.Run("success azurerm", func(t *testing.T) {
 		options := ProviderConfigurationCreateOptions{
 			Account:               &Account{ID: defaultAccountID},
@@ -66,14 +83,22 @@ func TestProviderConfigurationCreate(t *testing.T) {
 		assert.Equal(t, *options.AzurermSubscriptionId, pcfg.AzurermSubscriptionId)
 		assert.Equal(t, *options.AzurermTenantId, pcfg.AzurermTenantId)
 	})
+}
+
+func TestProviderConfigurationCreateGoogle(t *testing.T) {
+	client := testClient(t)
+	ctx := context.Background()
+
+	credentials, project := getGoogleTestingCreds(t)
+
 	t.Run("success google", func(t *testing.T) {
 		options := ProviderConfigurationCreateOptions{
 			Account:              &Account{ID: defaultAccountID},
-			Name:                 String("AWS dev account us-east-1"),
+			Name:                 String("google_dev_project"),
 			ProviderName:         String("google"),
 			ExportShellVariables: Bool(false),
-			GoogleProject:        String("my-google-project"),
-			GoogleCredentials:    String("my-google-credentials"),
+			GoogleProject:        String(project),
+			GoogleCredentials:    String(credentials),
 		}
 		pcfg, err := client.ProviderConfigurations.Create(ctx, options)
 		if err != nil {
@@ -193,7 +218,7 @@ func TestProviderConfigurationList(t *testing.T) {
 	})
 }
 
-func TestProviderConfigurationUpdate(t *testing.T) {
+func TestProviderConfigurationUpdateAws(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
@@ -217,6 +242,12 @@ func TestProviderConfigurationUpdate(t *testing.T) {
 		assert.Equal(t, *options.ExportShellVariables, updatedConfiguration.ExportShellVariables)
 		assert.Equal(t, *options.AwsAccessKey, updatedConfiguration.AwsAccessKey)
 	})
+}
+
+func TestProviderConfigurationUpdateAzurerm(t *testing.T) {
+	client := testClient(t)
+	ctx := context.Background()
+
 	t.Run("success azurerm", func(t *testing.T) {
 		configuration, removeConfiguration := createProviderConfiguration(
 			t, client, "azurerm", "azurerm_dev",
@@ -242,25 +273,43 @@ func TestProviderConfigurationUpdate(t *testing.T) {
 		assert.Equal(t, *options.AzurermSubscriptionId, updatedConfiguration.AzurermSubscriptionId)
 		assert.Equal(t, *options.AzurermTenantId, updatedConfiguration.AzurermTenantId)
 	})
-	t.Run("success google", func(t *testing.T) {
-		configuration, removeConfiguration := createProviderConfiguration(
-			t, client, "google", "google_dev",
-		)
-		defer removeConfiguration()
 
-		options := ProviderConfigurationUpdateOptions{
-			Name:                 String("azurerm_dev2"),
+}
+
+func TestProviderConfigurationUpdateGoogle(t *testing.T) {
+	client := testClient(t)
+	ctx := context.Background()
+
+	credentials, project := getGoogleTestingCreds(t)
+
+	t.Run("success google", func(t *testing.T) {
+		createOptions := ProviderConfigurationCreateOptions{
+			Account:              &Account{ID: defaultAccountID},
+			Name:                 String("google_dev_project"),
+			ProviderName:         String("google"),
+			ExportShellVariables: Bool(false),
+			GoogleProject:        String(project),
+			GoogleCredentials:    String(credentials),
+		}
+		configuration, err := client.ProviderConfigurations.Create(ctx, createOptions)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer client.ProviderConfigurations.Delete(ctx, configuration.ID)
+
+		updateOptions := ProviderConfigurationUpdateOptions{
+			Name:                 String("google_dev2"),
 			ExportShellVariables: Bool(true),
-			GoogleProject:        String("my-project"),
-			GoogleCredentials:    String("my-credentials"),
+			GoogleProject:        String(project),
+			GoogleCredentials:    String(credentials),
 		}
 		updatedConfiguration, err := client.ProviderConfigurations.Update(
-			ctx, configuration.ID, options,
+			ctx, configuration.ID, updateOptions,
 		)
 		require.NoError(t, err)
-		assert.Equal(t, *options.Name, updatedConfiguration.Name)
-		assert.Equal(t, *options.ExportShellVariables, updatedConfiguration.ExportShellVariables)
-		assert.Equal(t, *options.GoogleProject, updatedConfiguration.GoogleProject)
+		assert.Equal(t, *updateOptions.Name, updatedConfiguration.Name)
+		assert.Equal(t, *updateOptions.ExportShellVariables, updatedConfiguration.ExportShellVariables)
+		assert.Equal(t, *updateOptions.GoogleProject, updatedConfiguration.GoogleProject)
 		assert.Equal(t, "", updatedConfiguration.GoogleCredentials)
 	})
 }
