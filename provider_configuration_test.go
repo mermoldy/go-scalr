@@ -135,31 +135,6 @@ func TestProviderConfigurationCreate(t *testing.T) {
 		assert.Equal(t, *options.GoogleProject, pcfg.GoogleProject)
 		assert.Equal(t, "", pcfg.GoogleCredentials)
 	})
-	t.Run("success scalr", func(t *testing.T) {
-		options := ProviderConfigurationCreateOptions{
-			Account:              &Account{ID: defaultAccountID},
-			Name:                 String("Scalr dev account"),
-			ProviderName:         String("scalr"),
-			ExportShellVariables: Bool(false),
-			ScalrHostname:        String("my-scalr-hostname"),
-			ScalrToken:           String("my-scalr-token"),
-		}
-		pcfg, err := client.ProviderConfigurations.Create(ctx, options)
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer client.ProviderConfigurations.Delete(ctx, pcfg.ID)
-
-		pcfg, err = client.ProviderConfigurations.Read(ctx, pcfg.ID)
-		require.NoError(t, err)
-
-		assert.Equal(t, options.Account.ID, pcfg.Account.ID)
-		assert.Equal(t, *options.Name, pcfg.Name)
-		assert.Equal(t, *options.ProviderName, pcfg.ProviderName)
-		assert.Equal(t, *options.ExportShellVariables, pcfg.ExportShellVariables)
-		assert.Equal(t, *options.ScalrHostname, pcfg.ScalrHostname)
-		assert.Equal(t, "", pcfg.ScalrToken)
-	})
 }
 
 func TestProviderConfigurationRead(t *testing.T) {
@@ -332,27 +307,6 @@ func TestProviderConfigurationUpdate(t *testing.T) {
 		assert.Equal(t, *options.ExportShellVariables, updatedConfiguration.ExportShellVariables)
 		assert.Equal(t, *options.GoogleProject, updatedConfiguration.GoogleProject)
 		assert.Equal(t, "", updatedConfiguration.GoogleCredentials)
-	})
-	t.Run("success scalr", func(t *testing.T) {
-		configuration, removeConfiguration := createProviderConfigurationScalr(
-			t, client, "scalr", "scalr_dev", "scalr-host", "scalr-token",
-		)
-		defer removeConfiguration()
-
-		options := ProviderConfigurationUpdateOptions{
-			Name:                 String("scalr_dev2"),
-			ExportShellVariables: Bool(true),
-			ScalrHostname:        String("my-hostname"),
-			ScalrToken:           String("my-token"),
-		}
-		updatedConfiguration, err := client.ProviderConfigurations.Update(
-			ctx, configuration.ID, options,
-		)
-		require.NoError(t, err)
-		assert.Equal(t, *options.Name, updatedConfiguration.Name)
-		assert.Equal(t, *options.ExportShellVariables, updatedConfiguration.ExportShellVariables)
-		assert.Equal(t, *options.ScalrHostname, updatedConfiguration.ScalrHostname)
-		assert.Equal(t, "", updatedConfiguration.ScalrToken)
 	})
 }
 
