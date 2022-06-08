@@ -430,7 +430,7 @@ func TestProviderConfigurationDelete(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	configuration, _ := createProviderConfiguration(t, client, "aws", "aws_dev_us_east_1")
+	configuration, _ := createProviderConfiguration(t, client, "kubernetes", "kubernetes1")
 
 	t.Run("success", func(t *testing.T) {
 		err := client.ProviderConfigurations.Delete(ctx, configuration.ID)
