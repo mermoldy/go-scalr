@@ -22,8 +22,8 @@ func TestProviderConfigurationCreateScalr(t *testing.T) {
 			Name:                  String("scalr_dev"),
 			ProviderName:          String("scalr"),
 			ExportShellVariables:  Bool(false),
-			ScalrHostname: 	  	   String(scalrHostname),
-			ScalrToken: 		   String(scalrToken),
+			ScalrHostname: 	  String(scalrHostname),
+			ScalrToken: 	  String(scalrToken),
 
 		}
 		pcfg, err := client.ProviderConfigurations.Create(ctx, options)
