@@ -445,3 +445,49 @@ func TestWorkspacesDelete(t *testing.T) {
 		assert.EqualError(t, err, "invalid value for workspace ID")
 	})
 }
+
+func TestWorkspacesSetSchedule(t *testing.T) {
+	client := testClient(t)
+	ctx := context.Background()
+
+	envTest, envTestCleanup := createEnvironment(t, client)
+	defer envTestCleanup()
+
+	wTest, _ := createWorkspace(t, client, envTest)
+
+	t.Run("with valid options", func(t *testing.T) {
+		options := WorkspaceRunScheduleOptions{
+			ApplySchedule:   "30 3 5 3-5 2",
+			DestroySchedule: "30 5 5 3-5 2",
+		}
+
+		w, err := client.Workspaces.SetSchedule(ctx, wTest.ID, options)
+		require.NoError(t, err)
+
+		// Get a refreshed view of the workspace from the API
+		refreshed, err := client.Workspaces.ReadByID(ctx, wTest.ID)
+		require.NoError(t, err)
+
+		for _, item := range []*Workspace{
+			w,
+			refreshed,
+		} {
+			assert.Equal(t, options.ApplySchedule, item.ApplySchedule)
+			assert.Equal(t, options.DestroySchedule, item.DestroySchedule)
+		}
+	})
+
+	t.Run("when an error is returned from the api", func(t *testing.T) {
+		w, err := client.Workspaces.SetSchedule(ctx, wTest.ID, WorkspaceRunScheduleOptions{
+			ApplySchedule: "bla-bla-bla",
+		})
+		assert.Nil(t, w)
+		assert.Error(t, err)
+	})
+
+	t.Run("without a valid workspace ID", func(t *testing.T) {
+		w, err := client.Workspaces.SetSchedule(ctx, badIdentifier, WorkspaceRunScheduleOptions{})
+		assert.Nil(t, w)
+		assert.EqualError(t, err, "invalid value for workspace ID")
+	})
+}
