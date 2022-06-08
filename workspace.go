@@ -30,6 +30,9 @@ type Workspaces interface {
 
 	// Delete deletes a workspace by its ID.
 	Delete(ctx context.Context, workspaceID string) error
+
+	// SetSchedule sets run schedules for workspace.
+	SetSchedule(ctx context.Context, workspaceID string, options WorkspaceRunScheduleOptions) (*Workspace, error)
 }
 
 // workspaces implements Workspaces.
@@ -59,9 +62,12 @@ type Workspace struct {
 	TerraformVersion     string                `jsonapi:"attr,terraform-version"`
 	VCSRepo              *WorkspaceVCSRepo     `jsonapi:"attr,vcs-repo"`
 	WorkingDirectory     string                `jsonapi:"attr,working-directory"`
+	ApplySchedule        string                `jsonapi:"attr,apply-schedule"`
+	DestroySchedule      string                `jsonapi:"attr,destroy-schedule"`
 	HasResources         bool                  `jsonapi:"attr,has-resources"`
 	Hooks                *Hooks                `jsonapi:"attr,hooks"`
 	RunOperationTimeout  *int                  `jsonapi:"attr,run-operation-timeout"`
+	VarFiles             []string              `jsonapi:"attr,var-files"`
 
 	// Relations
 	CurrentRun    *Run           `jsonapi:"relation,current-run"`
@@ -117,6 +123,12 @@ type WorkspaceListOptions struct {
 	AgentPool   *string `url:"filter[agent-pool],omitempty"`
 	Name        *string `url:"filter[name],omitempty"`
 	Include     string  `url:"include,omitempty"`
+}
+
+// WorkspaceRunScheduleOptions represents option for setting run schedules for workspace
+type WorkspaceRunScheduleOptions struct {
+	ApplySchedule   string `json:"apply-schedule"`
+	DestroySchedule string `json:"destroy-schedule"`
 }
 
 // List all the workspaces within an environment.
@@ -177,6 +189,9 @@ type WorkspaceCreateOptions struct {
 
 	// Specifies the AgentPool for workspace.
 	AgentPool *AgentPool `jsonapi:"relation,agent-pool,omitempty"`
+
+	// Specifies the VarFiles for workspace.
+	VarFiles []string `jsonapi:"attr,var-files"`
 
 	// Specifies the ModuleVersion based on create workspace
 	ModuleVersion *ModuleVersion `jsonapi:"relation,module-version,omitempty"`
@@ -320,7 +335,7 @@ type WorkspaceUpdateOptions struct {
 	// the keys below you wish to modify. To add a new VCS repo to a workspace
 	// that didn't previously have one, include at least the oauth-token-id and
 	// identifier keys.
-	VCSRepo *WorkspaceVCSRepoOptions `jsonapi:"attr,vcs-repo,omitempty"`
+	VCSRepo *WorkspaceVCSRepoOptions `jsonapi:"attr,vcs-repo"`
 
 	// Contains configuration for custom hooks,
 	// which can be triggered before or after plan or apply phases
@@ -333,10 +348,13 @@ type WorkspaceUpdateOptions struct {
 	WorkingDirectory *string `jsonapi:"attr,working-directory,omitempty"`
 
 	// Specifies the VcsProvider for workspace vcs-repo.
-	VcsProvider *VcsProvider `jsonapi:"relation,vcs-provider,omitempty"`
+	VcsProvider *VcsProvider `jsonapi:"relation,vcs-provider"`
 
 	// Specifies the AgentPool for workspace.
 	AgentPool *AgentPool `jsonapi:"relation,agent-pool"`
+
+	//Specifies the VarFiles for workspace.
+	VarFiles []string `jsonapi:"attr,var_files"`
 
 	// Specifies the ModuleVersion based on create workspace
 	ModuleVersion *ModuleVersion `jsonapi:"relation,module-version"`
@@ -382,4 +400,25 @@ func (s *workspaces) Delete(ctx context.Context, workspaceID string) error {
 	}
 
 	return s.client.do(ctx, req, nil)
+}
+
+// SetSchedule set scheduled runs
+func (s *workspaces) SetSchedule(ctx context.Context, workspaceID string, options WorkspaceRunScheduleOptions) (*Workspace, error) {
+	if !validStringID(&workspaceID) {
+		return nil, errors.New("invalid value for workspace ID")
+	}
+
+	u := fmt.Sprintf("workspaces/%s/actions/set-schedule", url.QueryEscape(workspaceID))
+	req, err := s.client.newJsonRequest("POST", u, &options)
+	if err != nil {
+		return nil, err
+	}
+
+	w := &Workspace{}
+	err = s.client.do(ctx, req, w)
+	if err != nil {
+		return nil, err
+	}
+
+	return w, nil
 }

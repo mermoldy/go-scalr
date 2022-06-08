@@ -128,6 +128,7 @@ type Client struct {
 	ModuleVersions                  ModuleVersions
 	Modules                         Modules
 	PolicyGroups                    PolicyGroups
+	PolicyGroupEnvironments         PolicyGroupEnvironments
 	ProviderConfigurationParameters ProviderConfigurationParameters
 	ProviderConfigurations          ProviderConfigurations
 	Roles                           Roles
@@ -218,6 +219,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.ModuleVersions = &moduleVersions{client: client}
 	client.Modules = &modules{client: client}
 	client.PolicyGroups = &policyGroups{client: client}
+	client.PolicyGroupEnvironments = &policyGroupEnvironment{client: client}
 	client.Roles = &roles{client: client}
 	client.Runs = &runs{client: client}
 	client.Teams = &teams{client: client}
@@ -300,7 +302,37 @@ func (c *Client) newRequest(method, path string, v interface{}) (*retryablehttp.
 		body = v
 	}
 
-	req, err := retryablehttp.NewRequest(method, u.String(), body)
+	return c.createRequest(method, u.String(), body, reqHeaders)
+}
+
+func (c *Client) newJsonRequest(method, path string, v interface{}) (*retryablehttp.Request, error) {
+	u, err := c.baseURL.Parse(path)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a request specific headers map.
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("Authorization", "Bearer "+c.token)
+
+	var body interface{}
+	reqHeaders.Set("Accept", "application/vnd.api+json")
+	reqHeaders.Set("Content-Type", "application/json")
+
+	if v != nil {
+		buf := bytes.NewBuffer(nil)
+		if err := json.NewEncoder(buf).Encode(v); err != nil {
+			return nil, err
+		}
+		body = buf
+	}
+
+	return c.createRequest(method, u.String(), body, reqHeaders)
+}
+
+func (c *Client) createRequest(method, url string, rawBody interface{}, reqHeaders http.Header) (*retryablehttp.Request, error) {
+
+	req, err := retryablehttp.NewRequest(method, url, rawBody)
 	if err != nil {
 		return nil, err
 	}
