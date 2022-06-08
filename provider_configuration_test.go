@@ -313,7 +313,7 @@ func TestProviderConfigurationUpdateScalr(t *testing.T) {
 			Name:                 String("scalr_dev"),
 			ProviderName:         String("scalr"),
 			ExportShellVariables: Bool(false),
-			ScalrHostname: 	  	  String(scalrHostname), 
+			ScalrHostname:        String(scalrHostname), 
 			ScalrToken:           String(scalrToken),
 			
 		}
