@@ -4,25 +4,16 @@ import (
 	"context"
 	"fmt"
 	"testing"
-	"os"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func getScalrTestingCreds(t *testing.T) (scalrHostname, scalrToken string) {
-	scalrHostname = os.Getenv("SCALR_HOSTNAME")
-	scalrToken = os.Getenv("SCALR_TOKEN")
-	if len(scalrHostname) == 0 ||
-		len(scalrToken) == 0 {
-		t.Skip("Please set SCALR_HOSTNAME, SCALR_TOKEN env variables to run this test.")
-	}
-	return
-}
 
 func TestProviderConfigurationCreateScalr(t *testing.T) {
-	scalrHostname, scalrToken := getScalrTestingCreds(t)
 	client := testClient(t)
+	scalrHostname := client.baseURL.Host
+	scalrToken := client.token
 	ctx := context.Background()
 
 	t.Run("success scalr", func(t *testing.T) {
@@ -313,8 +304,8 @@ func TestProviderConfigurationUpdate(t *testing.T) {
 func TestProviderConfigurationUpdateScalr(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
-
-	scalrHostname, scalrToken := getScalrTestingCreds(t)
+	scalrHostname := client.baseURL.Host
+	scalrToken := client.token
 
 	t.Run("success scalr", func(t *testing.T) {
 		createOptions := ProviderConfigurationCreateOptions{
