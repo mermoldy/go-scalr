@@ -326,8 +326,8 @@ func TestProviderConfigurationUpdateScalr(t *testing.T) {
 		updateOptions := ProviderConfigurationUpdateOptions{
 			Name:                 String("scalr_prod"),
 			ExportShellVariables: Bool(true),
-			ScalrHostname: 	  	  String(scalrHostname+"/"),
-			ScalrToken: 		  String(scalrToken),
+			ScalrHostname:        String(scalrHostname+"/"),
+			ScalrToken:           String(scalrToken),
 		}
 		updatedConfiguration, err := client.ProviderConfigurations.Update(
 			ctx, configuration.ID, updateOptions,
