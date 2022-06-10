@@ -300,7 +300,6 @@ func TestProviderConfigurationList(t *testing.T) {
 			{Name: "kubernetes_prod_us_east_2", ProviderName: "kubernetes"},
 			{Name: "kubernetes_dev_us_east1", ProviderName: "kubernetes"},
 			{Name: "consul_prod_us_west1_b", ProviderName: "consul"},
-			{Name: "scalr_dev", ProviderName: "scalr"},
 		}
 
 		for _, providerData := range providerTestingDataSet {
