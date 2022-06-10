@@ -33,7 +33,7 @@ func TestProviderConfigurationCreateScalr(t *testing.T) {
 	t.Run("success scalr", func(t *testing.T) {
 		options := ProviderConfigurationCreateOptions{
 			Account:               &Account{ID: defaultAccountID},
-			Name:                  String("scalr_dev"),
+			Name:                  String("scalr_dev1"),
 			ProviderName:          String("scalr"),
 			ExportShellVariables:  Bool(false),
 			ScalrHostname: 	       String(scalrHostname),
