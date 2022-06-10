@@ -80,6 +80,7 @@ type Workspace struct {
 
 // Hooks contains the custom hooks field.
 type Hooks struct {
+	PreInit   string `jsonapi:"pre-init"`
 	PrePlan   string `json:"pre-plan"`
 	PostPlan  string `json:"post-plan"`
 	PreApply  string `json:"pre-apply"`
