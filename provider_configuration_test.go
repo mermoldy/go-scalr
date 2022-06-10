@@ -3,12 +3,26 @@ package scalr
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
+func getAwsTestingCreds(t *testing.T) (accessKeyId, secretAccessKey, roleArn, externalId string) {
+	accessKeyId = os.Getenv("TEST_AWS_ACCESS_KEY")
+	secretAccessKey = os.Getenv("TEST_AWS_SECRET_KEY")
+	roleArn = os.Getenv("TEST_AWS_ROLE_ARN")
+	externalId = os.Getenv("TEST_AWS_EXTERNAL_ID")
+	if len(accessKeyId) == 0 ||
+		len(secretAccessKey) == 0 ||
+		len(roleArn) == 0 ||
+		len(externalId) == 0 {
+		t.Skip("Please set TEST_AWS_ACCESS_KEY, TEST_AWS_SECRET_KEY, TEST_AWS_ROLE_ARN and TEST_AWS_EXTERNAL_ID env variables to run this test.")
+	}
+	return
+}
 
 func TestProviderConfigurationCreateScalr(t *testing.T) {
 	client := testClient(t)
@@ -44,17 +58,22 @@ func TestProviderConfigurationCreateScalr(t *testing.T) {
 	})
 }
 
-func TestProviderConfigurationCreate(t *testing.T) {
+func TestProviderConfigurationCreateAws(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
-	t.Run("success aws", func(t *testing.T) {
+
+	accessKeyId, secretAccessKey, roleArn, externalId := getAwsTestingCreds(t)
+
+	t.Run("success aws access keys auth", func(t *testing.T) {
 		options := ProviderConfigurationCreateOptions{
 			Account:              &Account{ID: defaultAccountID},
-			Name:                 String("AWS dev account us-east-1"),
+			Name:                 String("AWS_dev_account_us_east_1"),
 			ProviderName:         String("aws"),
 			ExportShellVariables: Bool(false),
-			AwsAccessKey:         String("my-access-key"),
-			AwsSecretKey:         String("my-secret-key"),
+			AwsAccessKey:         String(accessKeyId),
+			AwsSecretKey:         String(secretAccessKey),
+			AwsAccountType:       String("regular"),
+			AwsCredentialsType:   String("access_keys"),
 		}
 		pcfg, err := client.ProviderConfigurations.Create(ctx, options)
 		if err != nil {
@@ -70,8 +89,85 @@ func TestProviderConfigurationCreate(t *testing.T) {
 		assert.Equal(t, *options.ProviderName, pcfg.ProviderName)
 		assert.Equal(t, *options.ExportShellVariables, pcfg.ExportShellVariables)
 		assert.Equal(t, *options.AwsAccessKey, pcfg.AwsAccessKey)
+		assert.Equal(t, *options.AwsAccountType, pcfg.AwsAccountType)
+		assert.Equal(t, *options.AwsCredentialsType, pcfg.AwsCredentialsType)
 		assert.Equal(t, "", pcfg.AwsSecretKey)
 	})
+
+	t.Run("success aws role delegation auth service entity", func(t *testing.T) {
+		options := ProviderConfigurationCreateOptions{
+			Account:              &Account{ID: defaultAccountID},
+			Name:                 String("AWS_dev_account_us_east_1"),
+			ProviderName:         String("aws"),
+			ExportShellVariables: Bool(false),
+			AwsAccountType:       String("regular"),
+			AwsCredentialsType:   String("role_delegation"),
+			AwsTrustedEntityType: String("aws_service"),
+			AwsRoleArn:           String(roleArn),
+			AwsExternalId:        String(externalId),
+		}
+		pcfg, err := client.ProviderConfigurations.Create(ctx, options)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer client.ProviderConfigurations.Delete(ctx, pcfg.ID)
+
+		pcfg, err = client.ProviderConfigurations.Read(ctx, pcfg.ID)
+		require.NoError(t, err)
+
+		assert.Equal(t, options.Account.ID, pcfg.Account.ID)
+		assert.Equal(t, *options.Name, pcfg.Name)
+		assert.Equal(t, *options.ProviderName, pcfg.ProviderName)
+		assert.Equal(t, *options.ExportShellVariables, pcfg.ExportShellVariables)
+		assert.Equal(t, *options.AwsAccountType, pcfg.AwsAccountType)
+		assert.Equal(t, *options.AwsCredentialsType, pcfg.AwsCredentialsType)
+		assert.Equal(t, *options.AwsTrustedEntityType, pcfg.AwsTrustedEntityType)
+		assert.Equal(t, *options.AwsRoleArn, pcfg.AwsRoleArn)
+		assert.Equal(t, *options.AwsExternalId, pcfg.AwsExternalId)
+
+	})
+
+	t.Run("success aws role delegation auth account entity", func(t *testing.T) {
+		options := ProviderConfigurationCreateOptions{
+			Account:              &Account{ID: defaultAccountID},
+			Name:                 String("AWS_dev_account_us_east_1"),
+			ProviderName:         String("aws"),
+			ExportShellVariables: Bool(false),
+			AwsAccountType:       String("regular"),
+			AwsCredentialsType:   String("role_delegation"),
+			AwsTrustedEntityType: String("aws_account"),
+			AwsAccessKey:         String(accessKeyId),
+			AwsSecretKey:         String(secretAccessKey),
+			AwsRoleArn:           String(roleArn),
+			AwsExternalId:        String(externalId),
+		}
+		pcfg, err := client.ProviderConfigurations.Create(ctx, options)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer client.ProviderConfigurations.Delete(ctx, pcfg.ID)
+
+		pcfg, err = client.ProviderConfigurations.Read(ctx, pcfg.ID)
+		require.NoError(t, err)
+
+		assert.Equal(t, options.Account.ID, pcfg.Account.ID)
+		assert.Equal(t, *options.Name, pcfg.Name)
+		assert.Equal(t, *options.ProviderName, pcfg.ProviderName)
+		assert.Equal(t, *options.ExportShellVariables, pcfg.ExportShellVariables)
+		assert.Equal(t, *options.AwsAccountType, pcfg.AwsAccountType)
+		assert.Equal(t, *options.AwsCredentialsType, pcfg.AwsCredentialsType)
+		assert.Equal(t, *options.AwsTrustedEntityType, pcfg.AwsTrustedEntityType)
+		assert.Equal(t, *options.AwsAccessKey, pcfg.AwsAccessKey)
+		assert.Equal(t, "", pcfg.AwsSecretKey)
+		assert.Equal(t, *options.AwsRoleArn, pcfg.AwsRoleArn)
+		assert.Equal(t, *options.AwsExternalId, pcfg.AwsExternalId)
+	})
+}
+
+func TestProviderConfigurationCreateAzuerm(t *testing.T) {
+	client := testClient(t)
+	ctx := context.Background()
+
 	t.Run("success azurerm", func(t *testing.T) {
 		options := ProviderConfigurationCreateOptions{
 			Account:               &Account{ID: defaultAccountID},
@@ -101,6 +197,12 @@ func TestProviderConfigurationCreate(t *testing.T) {
 		assert.Equal(t, *options.AzurermSubscriptionId, pcfg.AzurermSubscriptionId)
 		assert.Equal(t, *options.AzurermTenantId, pcfg.AzurermTenantId)
 	})
+}
+
+func TestProviderConfigurationCreateGoogle(t *testing.T) {
+	client := testClient(t)
+	ctx := context.Background()
+
 	t.Run("success google", func(t *testing.T) {
 		options := ProviderConfigurationCreateOptions{
 			Account:              &Account{ID: defaultAccountID},
@@ -194,10 +296,10 @@ func TestProviderConfigurationList(t *testing.T) {
 			ProviderName string
 		}
 		providerTestingDataSet := []providerTestingData{
-			{Name: "aws_prod_us_east_1", ProviderName: "aws"},
-			{Name: "aws_prod_us_east_2", ProviderName: "aws"},
-			{Name: "aws_dev_us_east1", ProviderName: "aws"},
-			{Name: "gc_prod_us_west1_b", ProviderName: "google"},
+			{Name: "kubernetes_prod_us_east_1", ProviderName: "kubernetes"},
+			{Name: "kubernetes_prod_us_east_2", ProviderName: "kubernetes"},
+			{Name: "kubernetes_dev_us_east1", ProviderName: "kubernetes"},
+			{Name: "consul_prod_us_west1_b", ProviderName: "consul"},
 			{Name: "scalr_dev", ProviderName: "scalr"},
 		}
 
@@ -211,7 +313,7 @@ func TestProviderConfigurationList(t *testing.T) {
 
 		requestOptions := ProviderConfigurationsListOptions{
 			Filter: &ProviderConfigurationFilter{
-				ProviderName: "aws",
+				ProviderName: "kubernetes",
 				Name:         "like:_prod_",
 			},
 		}
@@ -224,35 +326,64 @@ func TestProviderConfigurationList(t *testing.T) {
 		for _, configuration := range configurationsList.Items {
 			resultNames = append(resultNames, configuration.Name)
 		}
-		assert.Contains(t, resultNames, "aws_prod_us_east_1")
-		assert.Contains(t, resultNames, "aws_prod_us_east_2")
+		assert.Contains(t, resultNames, "kubernetes_prod_us_east_1")
+		assert.Contains(t, resultNames, "kubernetes_prod_us_east_2")
 	})
 }
 
-func TestProviderConfigurationUpdate(t *testing.T) {
+func TestProviderConfigurationUpdateAws(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	t.Run("success aws", func(t *testing.T) {
-		configuration, removeConfiguration := createProviderConfiguration(
-			t, client, "aws", "aws_dev_us_east_1",
-		)
-		defer removeConfiguration()
+	accessKeyId, secretAccessKey, roleArn, externalId := getAwsTestingCreds(t)
 
-		options := ProviderConfigurationUpdateOptions{
+	t.Run("success aws", func(t *testing.T) {
+		createOptions := ProviderConfigurationCreateOptions{
+			Account:              &Account{ID: defaultAccountID},
+			Name:                 String("AWS_dev_account_us_east_1"),
+			ProviderName:         String("aws"),
+			ExportShellVariables: Bool(false),
+			AwsAccountType:       String("regular"),
+			AwsCredentialsType:   String("role_delegation"),
+			AwsTrustedEntityType: String("aws_service"),
+			AwsRoleArn:           String(roleArn),
+			AwsExternalId:        String(externalId),
+		}
+		configuration, err := client.ProviderConfigurations.Create(ctx, createOptions)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer client.ProviderConfigurations.Delete(ctx, configuration.ID)
+
+		updateOptions := ProviderConfigurationUpdateOptions{
 			Name:                 String("aws_dev_us_east_2"),
 			ExportShellVariables: Bool(true),
-			AwsAccessKey:         String("my-aws-access-key1"),
-			AwsSecretKey:         String("my-aws-secret-key"),
+			AwsAccountType:       String("regular"),
+			AwsCredentialsType:   String("role_delegation"),
+			AwsTrustedEntityType: String("aws_account"),
+			AwsAccessKey:         String(accessKeyId),
+			AwsSecretKey:         String(secretAccessKey),
+			AwsRoleArn:           String(roleArn),
+			AwsExternalId:        String(externalId),
 		}
 		updatedConfiguration, err := client.ProviderConfigurations.Update(
-			ctx, configuration.ID, options,
+			ctx, configuration.ID, updateOptions,
 		)
 		require.NoError(t, err)
-		assert.Equal(t, *options.Name, updatedConfiguration.Name)
-		assert.Equal(t, *options.ExportShellVariables, updatedConfiguration.ExportShellVariables)
-		assert.Equal(t, *options.AwsAccessKey, updatedConfiguration.AwsAccessKey)
+		assert.Equal(t, *updateOptions.Name, updatedConfiguration.Name)
+		assert.Equal(t, *updateOptions.ExportShellVariables, updatedConfiguration.ExportShellVariables)
+		assert.Equal(t, *updateOptions.AwsCredentialsType, updatedConfiguration.AwsCredentialsType)
+		assert.Equal(t, *updateOptions.AwsTrustedEntityType, updatedConfiguration.AwsTrustedEntityType)
+		assert.Equal(t, *updateOptions.AwsAccessKey, updatedConfiguration.AwsAccessKey)
+		assert.Equal(t, *updateOptions.AwsRoleArn, updatedConfiguration.AwsRoleArn)
+		assert.Equal(t, *updateOptions.AwsExternalId, updatedConfiguration.AwsExternalId)
 	})
+}
+
+func TestProviderConfigurationUpdateAzurerm(t *testing.T) {
+	client := testClient(t)
+	ctx := context.Background()
+
 	t.Run("success azurerm", func(t *testing.T) {
 		configuration, removeConfiguration := createProviderConfiguration(
 			t, client, "azurerm", "azurerm_dev",
@@ -278,6 +409,12 @@ func TestProviderConfigurationUpdate(t *testing.T) {
 		assert.Equal(t, *options.AzurermSubscriptionId, updatedConfiguration.AzurermSubscriptionId)
 		assert.Equal(t, *options.AzurermTenantId, updatedConfiguration.AzurermTenantId)
 	})
+}
+
+func TestProviderConfigurationUpdateGoogle(t *testing.T) {
+	client := testClient(t)
+	ctx := context.Background()
+
 	t.Run("success google", func(t *testing.T) {
 		configuration, removeConfiguration := createProviderConfiguration(
 			t, client, "google", "google_dev",
@@ -313,9 +450,9 @@ func TestProviderConfigurationUpdateScalr(t *testing.T) {
 			Name:                 String("scalr_dev"),
 			ProviderName:         String("scalr"),
 			ExportShellVariables: Bool(false),
-			ScalrHostname:        String(scalrHostname), 
+			ScalrHostname:        String(scalrHostname),
 			ScalrToken:           String(scalrToken),
-			
+
 		}
 		configuration, err := client.ProviderConfigurations.Create(ctx, createOptions)
 		if err != nil {

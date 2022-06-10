@@ -38,6 +38,11 @@ type ProviderConfiguration struct {
 	ExportShellVariables  bool   `jsonapi:"attr,export-shell-variables"`
 	AwsAccessKey          string `jsonapi:"attr,aws-access-key"`
 	AwsSecretKey          string `jsonapi:"attr,aws-secret-key"`
+	AwsAccountType        string `jsonapi:"attr,aws-account-type"`
+	AwsCredentialsType    string `jsonapi:"attr,aws-credentials-type"`
+	AwsTrustedEntityType  string `jsonapi:"attr,aws-trusted-entity-type"`
+	AwsRoleArn            string `jsonapi:"attr,aws-role-arn"`
+	AwsExternalId         string `jsonapi:"attr,aws-external-id"`
 	AzurermClientId       string `jsonapi:"attr,azurerm-client-id"`
 	AzurermClientSecret   string `jsonapi:"attr,azurerm-client-secret"`
 	AzurermSubscriptionId string `jsonapi:"attr,azurerm-subscription-id"`
@@ -91,6 +96,11 @@ type ProviderConfigurationCreateOptions struct {
 	ExportShellVariables  *bool   `jsonapi:"attr,export-shell-variables,omitempty"`
 	AwsAccessKey          *string `jsonapi:"attr,aws-access-key,omitempty"`
 	AwsSecretKey          *string `jsonapi:"attr,aws-secret-key,omitempty"`
+	AwsAccountType        *string `jsonapi:"attr,aws-account-type"`
+	AwsCredentialsType    *string `jsonapi:"attr,aws-credentials-type"`
+	AwsTrustedEntityType  *string `jsonapi:"attr,aws-trusted-entity-type"`
+	AwsRoleArn            *string `jsonapi:"attr,aws-role-arn"`
+	AwsExternalId         *string `jsonapi:"attr,aws-external-id"`
 	AzurermClientId       *string `jsonapi:"attr,azurerm-client-id,omitempty"`
 	AzurermClientSecret   *string `jsonapi:"attr,azurerm-client-secret,omitempty"`
 	AzurermSubscriptionId *string `jsonapi:"attr,azurerm-subscription-id,omitempty"`
@@ -154,6 +164,11 @@ type ProviderConfigurationUpdateOptions struct {
 	ExportShellVariables  *bool   `jsonapi:"attr,export-shell-variables"`
 	AwsAccessKey          *string `jsonapi:"attr,aws-access-key"`
 	AwsSecretKey          *string `jsonapi:"attr,aws-secret-key"`
+	AwsAccountType        *string `jsonapi:"attr,aws-account-type"`
+	AwsCredentialsType    *string `jsonapi:"attr,aws-credentials-type"`
+	AwsTrustedEntityType  *string `jsonapi:"attr,aws-trusted-entity-type"`
+	AwsRoleArn            *string `jsonapi:"attr,aws-role-arn"`
+	AwsExternalId         *string `jsonapi:"attr,aws-external-id"`
 	AzurermClientId       *string `jsonapi:"attr,azurerm-client-id"`
 	AzurermClientSecret   *string `jsonapi:"attr,azurerm-client-secret"`
 	AzurermSubscriptionId *string `jsonapi:"attr,azurerm-subscription-id"`
