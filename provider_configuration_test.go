@@ -73,7 +73,6 @@ func TestProviderConfigurationCreateAzurerm(t *testing.T) {
 		assert.Equal(t, *options.AzurermTenantId, pcfg.AzurermTenantId)
 	})
 }
-}
 
 func TestProviderConfigurationCreateAws(t *testing.T) {
 	client := testClient(t)
