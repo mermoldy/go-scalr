@@ -212,6 +212,7 @@ type WorkspaceVCSRepoOptions struct {
 
 // HooksOptions represents the WorkspaceHooks configuration.
 type HooksOptions struct {
+	PreInit   *string `json:"pre-init,omitempty"`
 	PrePlan   *string `json:"pre-plan,omitempty"`
 	PostPlan  *string `json:"post-plan,omitempty"`
 	PreApply  *string `json:"pre-apply,omitempty"`
@@ -338,7 +339,7 @@ type WorkspaceUpdateOptions struct {
 	VCSRepo *WorkspaceVCSRepoOptions `jsonapi:"attr,vcs-repo"`
 
 	// Contains configuration for custom hooks,
-	// which can be triggered before or after plan or apply phases
+	// which can be triggered before init, before or after plan or apply phases
 	Hooks *HooksOptions `jsonapi:"attr,hooks,omitempty"`
 
 	// A relative path that Terraform will execute within. This defaults to the
