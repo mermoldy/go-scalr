@@ -380,3 +380,28 @@ func createProviderConfiguration(t *testing.T, client *Client, providerName stri
 		}
 	}
 }
+
+func createProviderConfigurationScalr(t *testing.T, client *Client, providerName string, configurationName string, scalrHostname string, scalrToken string) (*ProviderConfiguration, func()) {
+	ctx := context.Background()
+	config, err := client.ProviderConfigurations.Create(
+		ctx,
+		ProviderConfigurationCreateOptions{
+			Account:       &Account{ID: defaultAccountID},
+			Name:          String(configurationName),
+			ProviderName:  String(providerName),
+			ScalrToken:    String(scalrToken),
+			ScalrHostname: String(scalrHostname),
+		},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return config, func() {
+		if err := client.ProviderConfigurations.Delete(ctx, config.ID); err != nil {
+			t.Errorf("Error destroying provider configuration ! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"Provider configuration: %s\nError: %s", config.ID, err)
+		}
+	}
+}

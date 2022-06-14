@@ -49,6 +49,8 @@ type ProviderConfiguration struct {
 	AzurermTenantId       string `jsonapi:"attr,azurerm-tenant-id"`
 	GoogleProject         string `jsonapi:"attr,google-project"`
 	GoogleCredentials     string `jsonapi:"attr,google-credentials"`
+	ScalrHostname         string `jsonapi:"attr,scalr-hostname"`
+	ScalrToken            string `jsonapi:"attr,scalr-token"`
 
 	Account    *Account                          `jsonapi:"relation,account"`
 	Parameters []*ProviderConfigurationParameter `jsonapi:"relation,parameters"`
@@ -105,6 +107,8 @@ type ProviderConfigurationCreateOptions struct {
 	AzurermTenantId       *string `jsonapi:"attr,azurerm-tenant-id,omitempty"`
 	GoogleProject         *string `jsonapi:"attr,google-project,omitempty"`
 	GoogleCredentials     *string `jsonapi:"attr,google-credentials,omitempty"`
+	ScalrHostname         *string `jsonapi:"attr,scalr-hostname,omitempty"`
+	ScalrToken            *string `jsonapi:"attr,scalr-token,omitempty"`
 
 	Account *Account `jsonapi:"relation,account,omitempty"`
 }
@@ -171,6 +175,8 @@ type ProviderConfigurationUpdateOptions struct {
 	AzurermTenantId       *string `jsonapi:"attr,azurerm-tenant-id"`
 	GoogleProject         *string `jsonapi:"attr,google-project"`
 	GoogleCredentials     *string `jsonapi:"attr,google-credentials"`
+	ScalrHostname         *string `jsonapi:"attr,scalr-hostname"`
+	ScalrToken            *string `jsonapi:"attr,scalr-token"`
 }
 
 // Update an existing provider configuration.
