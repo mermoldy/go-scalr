@@ -65,7 +65,7 @@ func TestProviderConfigurationParametersList(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		configuration, removeConfiguration := createProviderConfiguration(
-			t, client, "kubernetes", "kubernetes dev",
+			t, client, "kubernetes", "kubernetes_dev",
 		)
 		defer removeConfiguration()
 
@@ -115,7 +115,7 @@ func TestProviderConfigurationParameterUpdate(t *testing.T) {
 
 	t.Run("success all attributes", func(t *testing.T) {
 		configuration, removeConfiguration := createProviderConfiguration(
-			t, client, "kubernetes", "kubernetes dev",
+			t, client, "kubernetes", "kubernetes_dev",
 		)
 		defer removeConfiguration()
 
@@ -151,7 +151,7 @@ func TestProviderConfigurationParameterDelete(t *testing.T) {
 
 	ctx := context.Background()
 
-	configuration, removeConfiguration := createProviderConfiguration(t, client, "kubernetes", "kubernetes dev")
+	configuration, removeConfiguration := createProviderConfiguration(t, client, "kubernetes", "kubernetes_dev")
 	defer removeConfiguration()
 
 	t.Run("success", func(t *testing.T) {

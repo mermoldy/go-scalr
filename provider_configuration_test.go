@@ -10,6 +10,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func getGoogleTestingCreds(t *testing.T) (credentials, project string) {
+	credentials = os.Getenv("TEST_GOOGLE_CREDENTIALS")
+	project = os.Getenv("TEST_GOOGLE_PROJECT")
+	if len(credentials) == 0 ||
+		len(project) == 0 {
+		t.Skip("Please set TEST_GOOGLE_CREDENTIALS, TEST_GOOGLE_PROJECT env variables to run this test.")
+	}
+	return
+}
+
 func getAzureTestingCreds(t *testing.T) (armClientId, armClientSecret, armSubscriptionId, armTenantId string) {
 	armClientId = os.Getenv("TEST_ARM_CLIENT_ID")
 	armClientSecret = os.Getenv("TEST_ARM_CLIENT_SECRET")
@@ -71,6 +81,40 @@ func TestProviderConfigurationCreateAzurerm(t *testing.T) {
 		assert.Equal(t, "", pcfg.AzurermClientSecret)
 		assert.Equal(t, *options.AzurermSubscriptionId, pcfg.AzurermSubscriptionId)
 		assert.Equal(t, *options.AzurermTenantId, pcfg.AzurermTenantId)
+	})
+}
+
+func TestProviderConfigurationCreateScalr(t *testing.T) {
+	client := testClient(t)
+	scalrHostname := client.baseURL.Host
+	scalrToken := client.token
+	ctx := context.Background()
+
+	t.Run("success scalr", func(t *testing.T) {
+		options := ProviderConfigurationCreateOptions{
+			Account:               &Account{ID: defaultAccountID},
+			Name:                  String("scalr_dev"),
+			ProviderName:          String("scalr"),
+			ExportShellVariables:  Bool(false),
+			ScalrHostname: 	       String(scalrHostname),
+			ScalrToken: 	       String(scalrToken),
+
+		}
+		pcfg, err := client.ProviderConfigurations.Create(ctx, options)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer client.ProviderConfigurations.Delete(ctx, pcfg.ID)
+
+		pcfg, err = client.ProviderConfigurations.Read(ctx, pcfg.ID)
+		require.NoError(t, err)
+
+		assert.Equal(t, options.Account.ID, pcfg.Account.ID)
+		assert.Equal(t, *options.Name, pcfg.Name)
+		assert.Equal(t, *options.ProviderName, pcfg.ProviderName)
+		assert.Equal(t, *options.ExportShellVariables, pcfg.ExportShellVariables)
+		assert.Equal(t, *options.ScalrHostname, pcfg.ScalrHostname)
+		assert.Equal(t, "", pcfg.ScalrToken)
 	})
 }
 
@@ -184,14 +228,16 @@ func TestProviderConfigurationCreateGoogle(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
+	credentials, project := getGoogleTestingCreds(t)
+
 	t.Run("success google", func(t *testing.T) {
 		options := ProviderConfigurationCreateOptions{
 			Account:              &Account{ID: defaultAccountID},
-			Name:                 String("AWS dev account us-east-1"),
+			Name:                 String("google_dev_project"),
 			ProviderName:         String("google"),
 			ExportShellVariables: Bool(false),
-			GoogleProject:        String("my-google-project"),
-			GoogleCredentials:    String("my-google-credentials"),
+			GoogleProject:        String(project),
+			GoogleCredentials:    String(credentials),
 		}
 		pcfg, err := client.ProviderConfigurations.Create(ctx, options)
 		if err != nil {
@@ -316,7 +362,7 @@ func TestProviderConfigurationUpdateAzurerm(t *testing.T) {
 	ctx := context.Background()
 	armClientId, armClientSecret, armSubscriptionId, armTenantId := getAzureTestingCreds(t)
 
-	
+
 	t.Run("success", func(t *testing.T) {
 		createOptions := ProviderConfigurationCreateOptions{
 			Account:               &Account{ID: defaultAccountID},
@@ -354,7 +400,7 @@ func TestProviderConfigurationUpdateAzurerm(t *testing.T) {
 		assert.Equal(t, *updateOptions.AzurermSubscriptionId, updatedConfiguration.AzurermSubscriptionId)
 		assert.Equal(t, *updateOptions.AzurermTenantId, updatedConfiguration.AzurermTenantId)
 	})
-	
+
 }
 func TestProviderConfigurationUpdateAws(t *testing.T) {
 	client := testClient(t)
@@ -409,26 +455,75 @@ func TestProviderConfigurationUpdateGoogle(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	t.Run("success google", func(t *testing.T) {
-		configuration, removeConfiguration := createProviderConfiguration(
-			t, client, "google", "google_dev",
-		)
-		defer removeConfiguration()
+	credentials, project := getGoogleTestingCreds(t)
 
-		options := ProviderConfigurationUpdateOptions{
-			Name:                 String("azurerm_dev2"),
+	t.Run("success google", func(t *testing.T) {
+		createOptions := ProviderConfigurationCreateOptions{
+			Account:              &Account{ID: defaultAccountID},
+			Name:                 String("google_dev_project"),
+			ProviderName:         String("google"),
+			ExportShellVariables: Bool(false),
+			GoogleProject:        String(project),
+			GoogleCredentials:    String(credentials),
+		}
+		configuration, err := client.ProviderConfigurations.Create(ctx, createOptions)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer client.ProviderConfigurations.Delete(ctx, configuration.ID)
+
+		updateOptions := ProviderConfigurationUpdateOptions{
+			Name:                 String("google_dev2"),
 			ExportShellVariables: Bool(true),
-			GoogleProject:        String("my-project"),
-			GoogleCredentials:    String("my-credentials"),
+			GoogleProject:        String(project),
+			GoogleCredentials:    String(credentials),
 		}
 		updatedConfiguration, err := client.ProviderConfigurations.Update(
-			ctx, configuration.ID, options,
+			ctx, configuration.ID, updateOptions,
 		)
 		require.NoError(t, err)
-		assert.Equal(t, *options.Name, updatedConfiguration.Name)
-		assert.Equal(t, *options.ExportShellVariables, updatedConfiguration.ExportShellVariables)
-		assert.Equal(t, *options.GoogleProject, updatedConfiguration.GoogleProject)
+		assert.Equal(t, *updateOptions.Name, updatedConfiguration.Name)
+		assert.Equal(t, *updateOptions.ExportShellVariables, updatedConfiguration.ExportShellVariables)
+		assert.Equal(t, *updateOptions.GoogleProject, updatedConfiguration.GoogleProject)
 		assert.Equal(t, "", updatedConfiguration.GoogleCredentials)
+	})
+}
+
+func TestProviderConfigurationUpdateScalr(t *testing.T) {
+	client := testClient(t)
+	ctx := context.Background()
+	scalrHostname := client.baseURL.Host
+	scalrToken := client.token
+
+	t.Run("success scalr", func(t *testing.T) {
+		createOptions := ProviderConfigurationCreateOptions{
+			Account:              &Account{ID: defaultAccountID},
+			Name:                 String("scalr_dev"),
+			ProviderName:         String("scalr"),
+			ExportShellVariables: Bool(false),
+			ScalrHostname:        String(scalrHostname),
+			ScalrToken:           String(scalrToken),
+
+		}
+		configuration, err := client.ProviderConfigurations.Create(ctx, createOptions)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer client.ProviderConfigurations.Delete(ctx, configuration.ID)
+
+		updateOptions := ProviderConfigurationUpdateOptions{
+			Name:                 String("scalr_prod"),
+			ExportShellVariables: Bool(true),
+			ScalrHostname:        String(scalrHostname+"/"),
+			ScalrToken:           String(scalrToken),
+		}
+		updatedConfiguration, err := client.ProviderConfigurations.Update(
+			ctx, configuration.ID, updateOptions,
+		)
+		require.NoError(t, err)
+		assert.Equal(t, *updateOptions.Name, updatedConfiguration.Name)
+		assert.Equal(t, *updateOptions.ExportShellVariables, updatedConfiguration.ExportShellVariables)
+		assert.Equal(t, *updateOptions.ScalrHostname, updatedConfiguration.ScalrHostname)
 	})
 }
 
@@ -436,7 +531,7 @@ func TestProviderConfigurationDelete(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	configuration, _ := createProviderConfiguration(t, client, "aws", "aws_dev_us_east_1")
+	configuration, _ := createProviderConfiguration(t, client, "kubernetes", "kubernetes1")
 
 	t.Run("success", func(t *testing.T) {
 		err := client.ProviderConfigurations.Delete(ctx, configuration.ID)
