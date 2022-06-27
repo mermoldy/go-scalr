@@ -20,6 +20,20 @@ func getGoogleTestingCreds(t *testing.T) (credentials, project string) {
 	return
 }
 
+func getAzureTestingCreds(t *testing.T) (armClientId, armClientSecret, armSubscriptionId, armTenantId string) {
+	armClientId = os.Getenv("TEST_ARM_CLIENT_ID")
+	armClientSecret = os.Getenv("TEST_ARM_CLIENT_SECRET")
+	armSubscriptionId = os.Getenv("TEST_ARM_SUBSCRIPTION_ID")
+	armTenantId = os.Getenv("TEST_ARM_TENANT_ID")
+	if len(armClientId) == 0 ||
+		len(armClientSecret) == 0 ||
+		len(armSubscriptionId) == 0 ||
+		len(armTenantId) == 0 {
+		t.Skip("Please set TEST_ARM_CLIENT_ID, TEST_ARM_CLIENT_SECRET, TEST_ARM_SUBSCRIPTION_ID and TEST_ARM_TENANT_ID env variables to run this test.")
+	}
+	return
+}
+
 func getAwsTestingCreds(t *testing.T) (accessKeyId, secretAccessKey, roleArn, externalId string) {
 	accessKeyId = os.Getenv("TEST_AWS_ACCESS_KEY")
 	secretAccessKey = os.Getenv("TEST_AWS_SECRET_KEY")
@@ -32,6 +46,42 @@ func getAwsTestingCreds(t *testing.T) (accessKeyId, secretAccessKey, roleArn, ex
 		t.Skip("Please set TEST_AWS_ACCESS_KEY, TEST_AWS_SECRET_KEY, TEST_AWS_ROLE_ARN and TEST_AWS_EXTERNAL_ID env variables to run this test.")
 	}
 	return
+}
+
+func TestProviderConfigurationCreateAzurerm(t *testing.T) {
+	client := testClient(t)
+	ctx := context.Background()
+	armClientId, armClientSecret, armSubscriptionId, armTenantId := getAzureTestingCreds(t)
+
+	t.Run("success azurerm", func(t *testing.T) {
+		options := ProviderConfigurationCreateOptions{
+			Account:               &Account{ID: defaultAccountID},
+			Name:                  String("azurerm_dev"),
+			ProviderName:          String("azurerm"),
+			ExportShellVariables:  Bool(false),
+			AzurermClientId:       String(armClientId),
+			AzurermClientSecret:   String(armClientSecret),
+			AzurermSubscriptionId: String(armSubscriptionId),
+			AzurermTenantId:       String(armTenantId),
+		}
+		pcfg, err := client.ProviderConfigurations.Create(ctx, options)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer client.ProviderConfigurations.Delete(ctx, pcfg.ID)
+
+		pcfg, err = client.ProviderConfigurations.Read(ctx, pcfg.ID)
+		require.NoError(t, err)
+
+		assert.Equal(t, options.Account.ID, pcfg.Account.ID)
+		assert.Equal(t, *options.Name, pcfg.Name)
+		assert.Equal(t, *options.ProviderName, pcfg.ProviderName)
+		assert.Equal(t, *options.ExportShellVariables, pcfg.ExportShellVariables)
+		assert.Equal(t, *options.AzurermClientId, pcfg.AzurermClientId)
+		assert.Equal(t, "", pcfg.AzurermClientSecret)
+		assert.Equal(t, *options.AzurermSubscriptionId, pcfg.AzurermSubscriptionId)
+		assert.Equal(t, *options.AzurermTenantId, pcfg.AzurermTenantId)
+	})
 }
 
 func TestProviderConfigurationCreateScalr(t *testing.T) {
@@ -174,41 +224,6 @@ func TestProviderConfigurationCreateAws(t *testing.T) {
 	})
 }
 
-func TestProviderConfigurationCreateAzuerm(t *testing.T) {
-	client := testClient(t)
-	ctx := context.Background()
-
-	t.Run("success azurerm", func(t *testing.T) {
-		options := ProviderConfigurationCreateOptions{
-			Account:               &Account{ID: defaultAccountID},
-			Name:                  String("azurermdev"),
-			ProviderName:          String("azurerm"),
-			ExportShellVariables:  Bool(false),
-			AzurermClientId:       String("my-client-id"),
-			AzurermClientSecret:   String("my-client-secret"),
-			AzurermSubscriptionId: String("my-subscription-id"),
-			AzurermTenantId:       String("my-azurerm-tenant-id"),
-		}
-		pcfg, err := client.ProviderConfigurations.Create(ctx, options)
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer client.ProviderConfigurations.Delete(ctx, pcfg.ID)
-
-		pcfg, err = client.ProviderConfigurations.Read(ctx, pcfg.ID)
-		require.NoError(t, err)
-
-		assert.Equal(t, options.Account.ID, pcfg.Account.ID)
-		assert.Equal(t, *options.Name, pcfg.Name)
-		assert.Equal(t, *options.ProviderName, pcfg.ProviderName)
-		assert.Equal(t, *options.ExportShellVariables, pcfg.ExportShellVariables)
-		assert.Equal(t, *options.AzurermClientId, pcfg.AzurermClientId)
-		assert.Equal(t, "", pcfg.AzurermClientSecret)
-		assert.Equal(t, *options.AzurermSubscriptionId, pcfg.AzurermSubscriptionId)
-		assert.Equal(t, *options.AzurermTenantId, pcfg.AzurermTenantId)
-	})
-}
-
 func TestProviderConfigurationCreateGoogle(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
@@ -342,6 +357,51 @@ func TestProviderConfigurationList(t *testing.T) {
 	})
 }
 
+func TestProviderConfigurationUpdateAzurerm(t *testing.T) {
+	client := testClient(t)
+	ctx := context.Background()
+	armClientId, armClientSecret, armSubscriptionId, armTenantId := getAzureTestingCreds(t)
+
+
+	t.Run("success", func(t *testing.T) {
+		createOptions := ProviderConfigurationCreateOptions{
+			Account:               &Account{ID: defaultAccountID},
+			Name:                  String("azurerm_dev"),
+			ProviderName:          String("azurerm"),
+			ExportShellVariables:  Bool(false),
+			AzurermClientId:       String(armClientId),
+			AzurermClientSecret:   String(armClientSecret),
+			AzurermSubscriptionId: String(armSubscriptionId),
+			AzurermTenantId:       String(armTenantId),
+		}
+		configuration, err := client.ProviderConfigurations.Create(ctx, createOptions)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer client.ProviderConfigurations.Delete(ctx, configuration.ID)
+
+		updateOptions := ProviderConfigurationUpdateOptions{
+			Name:                 String("azurerm_dev_updated"),
+			ExportShellVariables: Bool(true),
+			AzurermClientId:       String(armClientId),
+			AzurermClientSecret:   String(armClientSecret),
+			AzurermSubscriptionId: String(armSubscriptionId),
+			AzurermTenantId:       String(armTenantId),
+		}
+
+		updatedConfiguration, err := client.ProviderConfigurations.Update(
+			ctx, configuration.ID, updateOptions,
+		)
+		require.NoError(t, err)
+		assert.Equal(t, *updateOptions.Name, updatedConfiguration.Name)
+		assert.Equal(t, *updateOptions.ExportShellVariables, updatedConfiguration.ExportShellVariables)
+		assert.Equal(t, *updateOptions.AzurermClientId, updatedConfiguration.AzurermClientId)
+		assert.Equal(t, "", updatedConfiguration.AzurermClientSecret)
+		assert.Equal(t, *updateOptions.AzurermSubscriptionId, updatedConfiguration.AzurermSubscriptionId)
+		assert.Equal(t, *updateOptions.AzurermTenantId, updatedConfiguration.AzurermTenantId)
+	})
+
+}
 func TestProviderConfigurationUpdateAws(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
@@ -388,37 +448,6 @@ func TestProviderConfigurationUpdateAws(t *testing.T) {
 		assert.Equal(t, *updateOptions.AwsAccessKey, updatedConfiguration.AwsAccessKey)
 		assert.Equal(t, *updateOptions.AwsRoleArn, updatedConfiguration.AwsRoleArn)
 		assert.Equal(t, *updateOptions.AwsExternalId, updatedConfiguration.AwsExternalId)
-	})
-}
-
-func TestProviderConfigurationUpdateAzurerm(t *testing.T) {
-	client := testClient(t)
-	ctx := context.Background()
-
-	t.Run("success azurerm", func(t *testing.T) {
-		configuration, removeConfiguration := createProviderConfiguration(
-			t, client, "azurerm", "azurerm_dev",
-		)
-		defer removeConfiguration()
-
-		options := ProviderConfigurationUpdateOptions{
-			Name:                  String("azure_dev2"),
-			ExportShellVariables:  Bool(true),
-			AzurermClientId:       String("my-client-id"),
-			AzurermClientSecret:   String("my-client-secret-"),
-			AzurermSubscriptionId: String("my-subscription-id"),
-			AzurermTenantId:       String("my-tenant-id"),
-		}
-		updatedConfiguration, err := client.ProviderConfigurations.Update(
-			ctx, configuration.ID, options,
-		)
-		require.NoError(t, err)
-		assert.Equal(t, *options.Name, updatedConfiguration.Name)
-		assert.Equal(t, *options.ExportShellVariables, updatedConfiguration.ExportShellVariables)
-		assert.Equal(t, *options.AzurermClientId, updatedConfiguration.AzurermClientId)
-		assert.Equal(t, "", updatedConfiguration.AzurermClientSecret)
-		assert.Equal(t, *options.AzurermSubscriptionId, updatedConfiguration.AzurermSubscriptionId)
-		assert.Equal(t, *options.AzurermTenantId, updatedConfiguration.AzurermTenantId)
 	})
 }
 
