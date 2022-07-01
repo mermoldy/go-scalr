@@ -36,6 +36,7 @@ type ProviderConfiguration struct {
 	Name                  string `jsonapi:"attr,name"`
 	ProviderName          string `jsonapi:"attr,provider-name"`
 	ExportShellVariables  bool   `jsonapi:"attr,export-shell-variables"`
+	IsShared              bool   `jsonapi:"attr,is-shared"`
 	AwsAccessKey          string `jsonapi:"attr,aws-access-key"`
 	AwsSecretKey          string `jsonapi:"attr,aws-secret-key"`
 	AwsAccountType        string `jsonapi:"attr,aws-account-type"`
@@ -52,8 +53,9 @@ type ProviderConfiguration struct {
 	ScalrHostname         string `jsonapi:"attr,scalr-hostname"`
 	ScalrToken            string `jsonapi:"attr,scalr-token"`
 
-	Account    *Account                          `jsonapi:"relation,account"`
-	Parameters []*ProviderConfigurationParameter `jsonapi:"relation,parameters"`
+	Account      *Account                          `jsonapi:"relation,account"`
+	Parameters   []*ProviderConfigurationParameter `jsonapi:"relation,parameters"`
+	Environments []*Environment                    `jsonapi:"relation,environments"`
 }
 
 // ProviderConfigurationsListOptions represents the options for listing provider configurations.
@@ -94,6 +96,7 @@ type ProviderConfigurationCreateOptions struct {
 	Name                  *string `jsonapi:"attr,name"`
 	ProviderName          *string `jsonapi:"attr,provider-name"`
 	ExportShellVariables  *bool   `jsonapi:"attr,export-shell-variables,omitempty"`
+	IsShared              *bool   `jsonapi:"attr,is-shared,omitempty"`
 	AwsAccessKey          *string `jsonapi:"attr,aws-access-key,omitempty"`
 	AwsSecretKey          *string `jsonapi:"attr,aws-secret-key,omitempty"`
 	AwsAccountType        *string `jsonapi:"attr,aws-account-type"`
@@ -110,7 +113,8 @@ type ProviderConfigurationCreateOptions struct {
 	ScalrHostname         *string `jsonapi:"attr,scalr-hostname,omitempty"`
 	ScalrToken            *string `jsonapi:"attr,scalr-token,omitempty"`
 
-	Account *Account `jsonapi:"relation,account,omitempty"`
+	Account      *Account       `jsonapi:"relation,account,omitempty"`
+	Environments []*Environment `jsonapi:"relation,environments,omitempty"`
 }
 
 // Create is used to create a new provider configuration.
@@ -160,23 +164,25 @@ func (s *providerConfigurations) Read(ctx context.Context, configurationID strin
 type ProviderConfigurationUpdateOptions struct {
 	ID string `jsonapi:"primary,provider-configurations"`
 
-	Name                  *string `jsonapi:"attr,name"`
-	ExportShellVariables  *bool   `jsonapi:"attr,export-shell-variables"`
-	AwsAccessKey          *string `jsonapi:"attr,aws-access-key"`
-	AwsSecretKey          *string `jsonapi:"attr,aws-secret-key"`
-	AwsAccountType        *string `jsonapi:"attr,aws-account-type"`
-	AwsCredentialsType    *string `jsonapi:"attr,aws-credentials-type"`
-	AwsTrustedEntityType  *string `jsonapi:"attr,aws-trusted-entity-type"`
-	AwsRoleArn            *string `jsonapi:"attr,aws-role-arn"`
-	AwsExternalId         *string `jsonapi:"attr,aws-external-id"`
-	AzurermClientId       *string `jsonapi:"attr,azurerm-client-id"`
-	AzurermClientSecret   *string `jsonapi:"attr,azurerm-client-secret"`
-	AzurermSubscriptionId *string `jsonapi:"attr,azurerm-subscription-id"`
-	AzurermTenantId       *string `jsonapi:"attr,azurerm-tenant-id"`
-	GoogleProject         *string `jsonapi:"attr,google-project"`
-	GoogleCredentials     *string `jsonapi:"attr,google-credentials"`
-	ScalrHostname         *string `jsonapi:"attr,scalr-hostname"`
-	ScalrToken            *string `jsonapi:"attr,scalr-token"`
+	Name                  *string        `jsonapi:"attr,name"`
+	IsShared              *bool          `jsonapi:"attr,is-shared,omitempty"`
+	Environments          []*Environment `jsonapi:"relation,environments,omitempty"`
+	ExportShellVariables  *bool          `jsonapi:"attr,export-shell-variables"`
+	AwsAccessKey          *string        `jsonapi:"attr,aws-access-key"`
+	AwsSecretKey          *string        `jsonapi:"attr,aws-secret-key"`
+	AwsAccountType        *string        `jsonapi:"attr,aws-account-type"`
+	AwsCredentialsType    *string        `jsonapi:"attr,aws-credentials-type"`
+	AwsTrustedEntityType  *string        `jsonapi:"attr,aws-trusted-entity-type"`
+	AwsRoleArn            *string        `jsonapi:"attr,aws-role-arn"`
+	AwsExternalId         *string        `jsonapi:"attr,aws-external-id"`
+	AzurermClientId       *string        `jsonapi:"attr,azurerm-client-id"`
+	AzurermClientSecret   *string        `jsonapi:"attr,azurerm-client-secret"`
+	AzurermSubscriptionId *string        `jsonapi:"attr,azurerm-subscription-id"`
+	AzurermTenantId       *string        `jsonapi:"attr,azurerm-tenant-id"`
+	GoogleProject         *string        `jsonapi:"attr,google-project"`
+	GoogleCredentials     *string        `jsonapi:"attr,google-credentials"`
+	ScalrHostname         *string        `jsonapi:"attr,scalr-hostname"`
+	ScalrToken            *string        `jsonapi:"attr,scalr-token"`
 }
 
 // Update an existing provider configuration.

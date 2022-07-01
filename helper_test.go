@@ -366,6 +366,7 @@ func createProviderConfiguration(t *testing.T, client *Client, providerName stri
 			Account:      &Account{ID: defaultAccountID},
 			Name:         String(configurationName),
 			ProviderName: String(providerName),
+			IsShared:     Bool(true),
 		},
 	)
 	if err != nil {

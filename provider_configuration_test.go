@@ -92,13 +92,12 @@ func TestProviderConfigurationCreateScalr(t *testing.T) {
 
 	t.Run("success scalr", func(t *testing.T) {
 		options := ProviderConfigurationCreateOptions{
-			Account:               &Account{ID: defaultAccountID},
-			Name:                  String("scalr_dev"),
-			ProviderName:          String("scalr"),
-			ExportShellVariables:  Bool(false),
-			ScalrHostname: 	       String(scalrHostname),
-			ScalrToken: 	       String(scalrToken),
-
+			Account:              &Account{ID: defaultAccountID},
+			Name:                 String("scalr_dev"),
+			ProviderName:         String("scalr"),
+			ExportShellVariables: Bool(false),
+			ScalrHostname:        String(scalrHostname),
+			ScalrToken:           String(scalrToken),
 		}
 		pcfg, err := client.ProviderConfigurations.Create(ctx, options)
 		if err != nil {
@@ -257,6 +256,64 @@ func TestProviderConfigurationCreateGoogle(t *testing.T) {
 	})
 }
 
+func TestProviderConfigurationCreateWithLinkage(t *testing.T) {
+	client := testClient(t)
+	ctx := context.Background()
+
+	t.Run("success", func(t *testing.T) {
+		environment, deleteEnvironment := createEnvironment(t, client)
+		defer deleteEnvironment()
+
+		options := ProviderConfigurationCreateOptions{
+			Account:      &Account{ID: defaultAccountID},
+			Name:         String("consul_dev"),
+			ProviderName: String("consul"),
+			Environments: []*Environment{environment},
+		}
+		pcfg, err := client.ProviderConfigurations.Create(ctx, options)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer client.ProviderConfigurations.Delete(ctx, pcfg.ID)
+
+		pcfg, err = client.ProviderConfigurations.Read(ctx, pcfg.ID)
+		require.NoError(t, err)
+
+		assert.Equal(t, options.Account.ID, pcfg.Account.ID)
+		assert.Equal(t, *options.Name, pcfg.Name)
+		assert.Equal(t, *options.ProviderName, pcfg.ProviderName)
+		assert.Len(t, pcfg.Environments, 1)
+		assert.Equal(t, environment.ID, pcfg.Environments[0].ID)
+	})
+}
+
+func TestProviderConfigurationCreateShared(t *testing.T) {
+	client := testClient(t)
+	ctx := context.Background()
+
+	t.Run("success", func(t *testing.T) {
+		options := ProviderConfigurationCreateOptions{
+			Account:      &Account{ID: defaultAccountID},
+			Name:         String("consul_dev"),
+			ProviderName: String("consul"),
+			IsShared:     Bool(true),
+		}
+		pcfg, err := client.ProviderConfigurations.Create(ctx, options)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer client.ProviderConfigurations.Delete(ctx, pcfg.ID)
+
+		pcfg, err = client.ProviderConfigurations.Read(ctx, pcfg.ID)
+		require.NoError(t, err)
+
+		assert.Equal(t, options.Account.ID, pcfg.Account.ID)
+		assert.Equal(t, *options.Name, pcfg.Name)
+		assert.Equal(t, *options.ProviderName, pcfg.ProviderName)
+		assert.Equal(t, *options.IsShared, pcfg.IsShared)
+	})
+}
+
 func TestProviderConfigurationRead(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
@@ -362,7 +419,6 @@ func TestProviderConfigurationUpdateAzurerm(t *testing.T) {
 	ctx := context.Background()
 	armClientId, armClientSecret, armSubscriptionId, armTenantId := getAzureTestingCreds(t)
 
-
 	t.Run("success", func(t *testing.T) {
 		createOptions := ProviderConfigurationCreateOptions{
 			Account:               &Account{ID: defaultAccountID},
@@ -381,8 +437,8 @@ func TestProviderConfigurationUpdateAzurerm(t *testing.T) {
 		defer client.ProviderConfigurations.Delete(ctx, configuration.ID)
 
 		updateOptions := ProviderConfigurationUpdateOptions{
-			Name:                 String("azurerm_dev_updated"),
-			ExportShellVariables: Bool(true),
+			Name:                  String("azurerm_dev_updated"),
+			ExportShellVariables:  Bool(true),
 			AzurermClientId:       String(armClientId),
 			AzurermClientSecret:   String(armClientSecret),
 			AzurermSubscriptionId: String(armSubscriptionId),
@@ -495,6 +551,9 @@ func TestProviderConfigurationUpdateScalr(t *testing.T) {
 	scalrHostname := client.baseURL.Host
 	scalrToken := client.token
 
+	environment, deleteEnvironment := createEnvironment(t, client)
+	defer deleteEnvironment()
+
 	t.Run("success scalr", func(t *testing.T) {
 		createOptions := ProviderConfigurationCreateOptions{
 			Account:              &Account{ID: defaultAccountID},
@@ -503,7 +562,8 @@ func TestProviderConfigurationUpdateScalr(t *testing.T) {
 			ExportShellVariables: Bool(false),
 			ScalrHostname:        String(scalrHostname),
 			ScalrToken:           String(scalrToken),
-
+			IsShared:             Bool(false),
+			Environments:         []*Environment{environment},
 		}
 		configuration, err := client.ProviderConfigurations.Create(ctx, createOptions)
 		if err != nil {
@@ -514,8 +574,10 @@ func TestProviderConfigurationUpdateScalr(t *testing.T) {
 		updateOptions := ProviderConfigurationUpdateOptions{
 			Name:                 String("scalr_prod"),
 			ExportShellVariables: Bool(true),
-			ScalrHostname:        String(scalrHostname+"/"),
+			ScalrHostname:        String(scalrHostname + "/"),
 			ScalrToken:           String(scalrToken),
+			IsShared:             Bool(false),
+			Environments:         []*Environment{},
 		}
 		updatedConfiguration, err := client.ProviderConfigurations.Update(
 			ctx, configuration.ID, updateOptions,
@@ -524,6 +586,7 @@ func TestProviderConfigurationUpdateScalr(t *testing.T) {
 		assert.Equal(t, *updateOptions.Name, updatedConfiguration.Name)
 		assert.Equal(t, *updateOptions.ExportShellVariables, updatedConfiguration.ExportShellVariables)
 		assert.Equal(t, *updateOptions.ScalrHostname, updatedConfiguration.ScalrHostname)
+		assert.Equal(t, *updateOptions.IsShared, updatedConfiguration.IsShared)
 	})
 }
 
