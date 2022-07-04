@@ -36,7 +36,7 @@ type ProviderConfigurationLink struct {
 	Default bool   `jsonapi:"attr,default"`
 	Alias   string `jsonapi:"attr,alias"`
 
-	ProviderConfiguration *ProviderConfiguration `jsonapi:"relation,provider-configurations,omitempty"`
+	ProviderConfiguration *ProviderConfiguration `jsonapi:"relation,provider-configuration,omitempty"`
 	Environment           *Environment           `jsonapi:"relation,environment,omitempty"`
 	Workspace             *Workspace             `jsonapi:"relation,workspace,omitempty"`
 }
@@ -106,7 +106,13 @@ func (s *providerConfigurationLinks) Read(ctx context.Context, linkID string) (*
 
 	url_path := fmt.Sprintf("provider-configuration-links/%s", url.QueryEscape(linkID))
 
-	req, err := s.client.newRequest("GET", url_path, nil)
+	options := struct {
+		Include string `url:"include"`
+	}{
+		Include: "provider-configuration",
+	}
+
+	req, err := s.client.newRequest("GET", url_path, options)
 	if err != nil {
 		return nil, err
 	}
