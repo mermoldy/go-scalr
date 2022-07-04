@@ -576,7 +576,7 @@ func TestProviderConfigurationUpdateScalr(t *testing.T) {
 			ExportShellVariables: Bool(true),
 			ScalrHostname:        String(scalrHostname + "/"),
 			ScalrToken:           String(scalrToken),
-			IsShared:             Bool(false),
+			IsShared:             Bool(true),
 			Environments:         []*Environment{},
 		}
 		updatedConfiguration, err := client.ProviderConfigurations.Update(

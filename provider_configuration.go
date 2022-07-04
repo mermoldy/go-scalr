@@ -166,7 +166,7 @@ type ProviderConfigurationUpdateOptions struct {
 
 	Name                  *string        `jsonapi:"attr,name"`
 	IsShared              *bool          `jsonapi:"attr,is-shared,omitempty"`
-	Environments          []*Environment `jsonapi:"relation,environments,omitempty"`
+	Environments          []*Environment `jsonapi:"relation,environments"`
 	ExportShellVariables  *bool          `jsonapi:"attr,export-shell-variables"`
 	AwsAccessKey          *string        `jsonapi:"attr,aws-access-key"`
 	AwsSecretKey          *string        `jsonapi:"attr,aws-secret-key"`
