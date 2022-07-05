@@ -129,6 +129,7 @@ type Client struct {
 	Modules                         Modules
 	PolicyGroups                    PolicyGroups
 	PolicyGroupEnvironments         PolicyGroupEnvironments
+	ProviderConfigurationLinks      ProviderConfigurationLinks
 	ProviderConfigurationParameters ProviderConfigurationParameters
 	ProviderConfigurations          ProviderConfigurations
 	Roles                           Roles
@@ -232,6 +233,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.RunTriggers = &runTriggers{client: client}
 	client.ProviderConfigurations = &providerConfigurations{client: client}
 	client.ProviderConfigurationParameters = &providerConfigurationParameters{client: client}
+	client.ProviderConfigurationLinks = &providerConfigurationLinks{client: client}
 	return client, nil
 }
 
