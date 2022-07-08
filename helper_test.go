@@ -21,7 +21,6 @@ func testClient(t *testing.T) *Client {
 	if err != nil {
 		t.Fatal(err)
 	}
-	client.headers.Set("Prefer", "profile=internal")
 
 	return client
 }
