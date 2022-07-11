@@ -104,7 +104,7 @@ func TestVcsProvidersCreate(t *testing.T) {
 			t,
 			ResourceNotFoundError{
 				Message: fmt.Sprintf(
-					"Relationship 'environments' with ID '%s' not found or user unauthorized",
+					"Invalid Relationship\n\nEnvironment with ID '%s' not found or user unauthorized",
 					badIdentifier,
 				),
 			}.Error(),
@@ -141,6 +141,7 @@ func TestVcsProvidersRead(t *testing.T) {
 		vcs, err := client.VcsProviders.Read(ctx, vcsTest.ID)
 		require.NoError(t, err)
 		assert.Equal(t, vcsTest.ID, vcs.ID)
+		assert.Len(t, vcs.Environments, 1)
 
 		t.Run("relationships are properly decoded", func(t *testing.T) {
 			assert.Equal(t, envTest.ID, vcs.Environments[0].ID)
