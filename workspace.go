@@ -86,6 +86,7 @@ type Workspace struct {
 	VcsProvider   *VcsProvider   `jsonapi:"relation,vcs-provider"`
 	AgentPool     *AgentPool     `jsonapi:"relation,agent-pool"`
 	ModuleVersion *ModuleVersion `jsonapi:"relation,module-version,omitempty"`
+	Tags          []*Tag         `jsonapi:"relation,tags,omitempty"`
 }
 
 // Hooks contains the custom hooks field.

@@ -22,7 +22,6 @@ type Tags interface {
 	ReadByID(ctx context.Context, tagID string) (*Tag, error)
 	// Update existing tag by its ID.
 	Update(ctx context.Context, tagID string, options TagUpdateOptions) (*Tag, error)
-
 	// Delete deletes a tag by its ID.
 	Delete(ctx context.Context, tagID string) error
 }
