@@ -258,6 +258,25 @@ func createVcsProvider(t *testing.T, client *Client, envs []*Environment) (*VcsP
 	}
 }
 
+func createTag(t *testing.T, client *Client) (*Tag, func()) {
+	ctx := context.Background()
+	tag, err := client.Tags.Create(ctx, TagCreateOptions{
+		Name:    String("test-role-" + randomString(t)),
+		Account: &Account{ID: defaultAccountID},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return tag, func() {
+		if err := client.Tags.Delete(ctx, tag.ID); err != nil {
+			t.Errorf("Error destroying tag! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"Tag: %s\nError: %s", tag.ID, err)
+		}
+	}
+}
+
 func createTeam(t *testing.T, client *Client, users []*User) (*Team, func()) {
 	ctx := context.Background()
 	team, err := client.Teams.Create(

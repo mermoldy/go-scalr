@@ -163,13 +163,13 @@ func (s *tags) Create(ctx context.Context, options TagCreateOptions) (*Tag, erro
 		return nil, err
 	}
 
-	w := &Tag{}
-	err = s.client.do(ctx, req, w)
+	t := &Tag{}
+	err = s.client.do(ctx, req, t)
 	if err != nil {
 		return nil, err
 	}
 
-	return w, nil
+	return t, nil
 }
 
 // Update is used to update a tag.
@@ -187,13 +187,13 @@ func (s *tags) Update(ctx context.Context, tagID string, options TagUpdateOption
 		return nil, err
 	}
 
-	w := &Tag{}
-	err = s.client.do(ctx, req, w)
+	t := &Tag{}
+	err = s.client.do(ctx, req, t)
 	if err != nil {
 		return nil, err
 	}
 
-	return w, nil
+	return t, nil
 }
 
 // Delete tag by its ID.
