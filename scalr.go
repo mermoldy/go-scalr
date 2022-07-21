@@ -134,6 +134,7 @@ type Client struct {
 	ProviderConfigurations          ProviderConfigurations
 	Roles                           Roles
 	Runs                            Runs
+	Tags                            Tags
 	Teams                           Teams
 	Users                           Users
 	Variables                       Variables
@@ -223,6 +224,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.PolicyGroupEnvironments = &policyGroupEnvironment{client: client}
 	client.Roles = &roles{client: client}
 	client.Runs = &runs{client: client}
+	client.Tags = &tags{client: client}
 	client.Teams = &teams{client: client}
 	client.Users = &users{client: client}
 	client.Variables = &variables{client: client}
