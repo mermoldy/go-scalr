@@ -24,3 +24,8 @@ func Int64(v int64) *int64 {
 func String(v string) *string {
 	return &v
 }
+
+// WorkspaceExecutionModePtr returns a pointer to the given execution mode
+func WorkspaceExecutionModePtr(v WorkspaceExecutionMode) *WorkspaceExecutionMode {
+	return &v
+}

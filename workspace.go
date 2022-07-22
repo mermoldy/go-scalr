@@ -40,6 +40,15 @@ type workspaces struct {
 	client *Client
 }
 
+// WorkspaceExecutionMode represents an execution mode setting of the workspace.
+type WorkspaceExecutionMode string
+
+// Available execution modes
+const (
+	WorkspaceExecutionModeRemote WorkspaceExecutionMode = "remote"
+	WorkspaceExecutionModeLocal  WorkspaceExecutionMode = "local"
+)
+
 // WorkspaceList represents a list of workspaces.
 type WorkspaceList struct {
 	*Pagination
@@ -48,26 +57,27 @@ type WorkspaceList struct {
 
 // Workspace represents a Scalr workspace.
 type Workspace struct {
-	ID                   string                `jsonapi:"primary,workspaces"`
-	Actions              *WorkspaceActions     `jsonapi:"attr,actions"`
-	AutoApply            bool                  `jsonapi:"attr,auto-apply"`
-	CanQueueDestroyPlan  bool                  `jsonapi:"attr,can-queue-destroy-plan"`
-	CreatedAt            time.Time             `jsonapi:"attr,created-at,iso8601"`
-	FileTriggersEnabled  bool                  `jsonapi:"attr,file-triggers-enabled"`
-	Locked               bool                  `jsonapi:"attr,locked"`
-	MigrationEnvironment string                `jsonapi:"attr,migration-environment"`
-	Name                 string                `jsonapi:"attr,name"`
-	Operations           bool                  `jsonapi:"attr,operations"`
-	Permissions          *WorkspacePermissions `jsonapi:"attr,permissions"`
-	TerraformVersion     string                `jsonapi:"attr,terraform-version"`
-	VCSRepo              *WorkspaceVCSRepo     `jsonapi:"attr,vcs-repo"`
-	WorkingDirectory     string                `jsonapi:"attr,working-directory"`
-	ApplySchedule        string                `jsonapi:"attr,apply-schedule"`
-	DestroySchedule      string                `jsonapi:"attr,destroy-schedule"`
-	HasResources         bool                  `jsonapi:"attr,has-resources"`
-	Hooks                *Hooks                `jsonapi:"attr,hooks"`
-	RunOperationTimeout  *int                  `jsonapi:"attr,run-operation-timeout"`
-	VarFiles             []string              `jsonapi:"attr,var-files"`
+	ID                   string                 `jsonapi:"primary,workspaces"`
+	Actions              *WorkspaceActions      `jsonapi:"attr,actions"`
+	AutoApply            bool                   `jsonapi:"attr,auto-apply"`
+	CanQueueDestroyPlan  bool                   `jsonapi:"attr,can-queue-destroy-plan"`
+	CreatedAt            time.Time              `jsonapi:"attr,created-at,iso8601"`
+	FileTriggersEnabled  bool                   `jsonapi:"attr,file-triggers-enabled"`
+	Locked               bool                   `jsonapi:"attr,locked"`
+	MigrationEnvironment string                 `jsonapi:"attr,migration-environment"`
+	Name                 string                 `jsonapi:"attr,name"`
+	Operations           bool                   `jsonapi:"attr,operations"`
+	ExecutionMode        WorkspaceExecutionMode `jsonapi:"attr,execution-mode"`
+	Permissions          *WorkspacePermissions  `jsonapi:"attr,permissions"`
+	TerraformVersion     string                 `jsonapi:"attr,terraform-version"`
+	VCSRepo              *WorkspaceVCSRepo      `jsonapi:"attr,vcs-repo"`
+	WorkingDirectory     string                 `jsonapi:"attr,working-directory"`
+	ApplySchedule        string                 `jsonapi:"attr,apply-schedule"`
+	DestroySchedule      string                 `jsonapi:"attr,destroy-schedule"`
+	HasResources         bool                   `jsonapi:"attr,has-resources"`
+	Hooks                *Hooks                 `jsonapi:"attr,hooks"`
+	RunOperationTimeout  *int                   `jsonapi:"attr,run-operation-timeout"`
+	VarFiles             []string               `jsonapi:"attr,var-files"`
 
 	// Relations
 	CurrentRun    *Run           `jsonapi:"relation,current-run"`
@@ -162,7 +172,8 @@ type WorkspaceCreateOptions struct {
 	Name *string `jsonapi:"attr,name"`
 
 	// Whether the workspace will use remote or local execution mode.
-	Operations *bool `jsonapi:"attr,operations,omitempty"`
+	Operations    *bool                   `jsonapi:"attr,operations,omitempty"`
+	ExecutionMode *WorkspaceExecutionMode `jsonapi:"attr,execution-mode,omitempty"`
 
 	// The version of Terraform to use for this workspace. Upon creating a
 	// workspace, the latest version is selected unless otherwise specified.
@@ -327,7 +338,8 @@ type WorkspaceUpdateOptions struct {
 	FileTriggersEnabled *bool `jsonapi:"attr,file-triggers-enabled,omitempty"`
 
 	// Whether the workspace will use remote or local execution mode.
-	Operations *bool `jsonapi:"attr,operations,omitempty"`
+	Operations    *bool                   `jsonapi:"attr,operations,omitempty"`
+	ExecutionMode *WorkspaceExecutionMode `jsonapi:"attr,execution-mode,omitempty"`
 
 	// The version of Terraform to use for this workspace.
 	TerraformVersion *string `jsonapi:"attr,terraform-version,omitempty"`
