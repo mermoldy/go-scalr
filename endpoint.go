@@ -55,6 +55,8 @@ type EndpointListOptions struct {
 	// Query string.
 	Query *string `url:"query,omitempty"`
 
+	Name *string `url:"query,omitempty"`
+
 	// The comma-separated list of attributes.
 	Sort *string `url:"sort,omitempty"`
 
