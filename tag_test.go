@@ -21,23 +21,23 @@ func TestTagsList(t *testing.T) {
 	t.Run("without options", func(t *testing.T) {
 		tagl, err := client.Tags.List(ctx, TagListOptions{})
 		require.NoError(t, err)
-		taglIDs := make([]string, len(tagl.Items))
-		for _, tag := range tagl.Items {
-			taglIDs = append(taglIDs, tag.ID)
+		assert.Equal(t, 2, tagl.TotalCount)
+
+		tagIDs := make([]string, len(tagl.Items))
+		for i, tag := range tagl.Items {
+			tagIDs[i] = tag.ID
 		}
-		assert.Contains(t, taglIDs, tagTest1.ID)
-		assert.Contains(t, taglIDs, tagTest2.ID)
+		assert.Contains(t, tagIDs, tagTest1.ID)
+		assert.Contains(t, tagIDs, tagTest2.ID)
 	})
 
 	t.Run("with options", func(t *testing.T) {
-		tagl, err := client.Tags.List(ctx, TagListOptions{Account: String(defaultAccountID)})
+		tagl, err := client.Tags.List(ctx,
+			TagListOptions{Account: String(defaultAccountID), Name: String(tagTest1.Name)},
+		)
 		require.NoError(t, err)
-		taglIDs := make([]string, len(tagl.Items))
-		for _, tag := range tagl.Items {
-			taglIDs = append(taglIDs, tag.ID)
-		}
-		assert.Contains(t, taglIDs, tagTest1.ID)
-		assert.Contains(t, taglIDs, tagTest2.ID)
+		assert.Equal(t, 1, tagl.TotalCount)
+		assert.Equal(t, tagTest1.ID, tagl.Items[0].ID)
 	})
 }
 
@@ -47,7 +47,7 @@ func TestTagsCreate(t *testing.T) {
 
 	t.Run("with valid options", func(t *testing.T) {
 		options := TagCreateOptions{
-			Name:    String("test-role-" + randomString(t)),
+			Name:    String("tst-" + randomString(t)),
 			Account: &Account{ID: defaultAccountID},
 		}
 
@@ -55,7 +55,7 @@ func TestTagsCreate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Get a refreshed view from the API.
-		refreshed, err := client.Tags.ReadByID(ctx, tag.ID)
+		refreshed, err := client.Tags.Read(ctx, tag.ID)
 		require.NoError(t, err)
 
 		for _, item := range []*Tag{
@@ -111,39 +111,21 @@ func TestTagsRead(t *testing.T) {
 	defer tagTestCleanup()
 
 	t.Run("by ID when the tag exists", func(t *testing.T) {
-		tag, err := client.Tags.ReadByID(ctx, tagTest.ID)
+		tag, err := client.Tags.Read(ctx, tagTest.ID)
 		require.NoError(t, err)
 		assert.Equal(t, tagTest.ID, tag.ID)
 	})
 
 	t.Run("by ID when the tag does not exist", func(t *testing.T) {
-		tag, err := client.Tags.ReadByID(ctx, "tag-nonexisting")
+		tag, err := client.Tags.Read(ctx, "tag-nonexisting")
 		assert.Nil(t, tag)
 		assert.Error(t, err)
 	})
 
 	t.Run("by ID without a valid tag ID", func(t *testing.T) {
-		tag, err := client.Tags.ReadByID(ctx, badIdentifier)
+		tag, err := client.Tags.Read(ctx, badIdentifier)
 		assert.Nil(t, tag)
 		assert.EqualError(t, err, "invalid value for tag ID")
-	})
-
-	t.Run("by name when the tag exists", func(t *testing.T) {
-		tag, err := client.Tags.Read(ctx, defaultAccountID, tagTest.Name)
-		require.NoError(t, err)
-		assert.Equal(t, tagTest.ID, tag.ID)
-	})
-
-	t.Run("by name when the tag does not exist", func(t *testing.T) {
-		tag, err := client.Tags.Read(ctx, defaultAccountID, "tag-nonexisting")
-		assert.Nil(t, tag)
-		assert.Error(t, err)
-	})
-
-	t.Run("by name without a valid account ID", func(t *testing.T) {
-		tag, err := client.Tags.Read(ctx, "acc-nonexisting", tagTest.Name)
-		assert.Nil(t, tag)
-		assert.Error(t, err)
 	})
 }
 
@@ -163,7 +145,7 @@ func TestTagsUpdate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Get a refreshed view from the API.
-		refreshed, err := client.Tags.ReadByID(ctx, tagTest.ID)
+		refreshed, err := client.Tags.Read(ctx, tagTest.ID)
 		require.NoError(t, err)
 
 		for _, item := range []*Tag{
@@ -193,7 +175,7 @@ func TestTagsDelete(t *testing.T) {
 		err := client.Tags.Delete(ctx, tagTest.ID)
 		require.NoError(t, err)
 
-		_, err = client.Tags.ReadByID(ctx, tagTest.ID)
+		_, err = client.Tags.Read(ctx, tagTest.ID)
 		assert.Equal(
 			t,
 			ResourceNotFoundError{

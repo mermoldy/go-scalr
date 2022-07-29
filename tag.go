@@ -16,10 +16,8 @@ type Tags interface {
 	List(ctx context.Context, options TagListOptions) (*TagList, error)
 	// Create is used to create a new tag.
 	Create(ctx context.Context, options TagCreateOptions) (*Tag, error)
-	// Read a tag by its account ID and name.
-	Read(ctx context.Context, accountID, tagName string) (*Tag, error)
-	// ReadByID reads a tag by its ID.
-	ReadByID(ctx context.Context, tagID string) (*Tag, error)
+	// Read reads a tag by its ID.
+	Read(ctx context.Context, tagID string) (*Tag, error)
 	// Update existing tag by its ID.
 	Update(ctx context.Context, tagID string, options TagUpdateOptions) (*Tag, error)
 	// Delete deletes a tag by its ID.
@@ -45,12 +43,17 @@ type Tag struct {
 	Account *Account `jsonapi:"relation,account"`
 }
 
+type TagRelation struct {
+	ID string `jsonapi:"primary,tags"`
+}
+
 // TagListOptions represents the options for listing tags.
 type TagListOptions struct {
 	ListOptions
 
 	Account *string `url:"filter[account],omitempty"`
-	Name    *string `url:"query,omitempty"`
+	Name    *string `url:"filter[name],omitempty"`
+	Query   *string `url:"query,omitempty"`
 }
 
 // TagCreateOptions represents the options for creating a new tag.
@@ -87,36 +90,8 @@ func (s *tags) List(ctx context.Context, options TagListOptions) (*TagList, erro
 	return tl, nil
 }
 
-// Read tag by account ID and name.
-func (s *tags) Read(ctx context.Context, accountID, tagName string) (*Tag, error) {
-	if !validStringID(&accountID) {
-		return nil, errors.New("invalid value for account")
-	}
-	if !validStringID(&tagName) {
-		return nil, errors.New("invalid value for tag")
-	}
-
-	options := TagListOptions{Account: &accountID, Name: &tagName}
-
-	req, err := s.client.newRequest("GET", "tags", &options)
-	if err != nil {
-		return nil, err
-	}
-
-	tl := &TagList{}
-	err = s.client.do(ctx, req, tl)
-	if err != nil {
-		return nil, err
-	}
-	if len(tl.Items) != 1 {
-		return nil, errors.New("invalid filters")
-	}
-
-	return tl.Items[0], nil
-}
-
-// ReadByID reads a tag by its ID.
-func (s *tags) ReadByID(ctx context.Context, tagID string) (*Tag, error) {
+// Read reads a tag by its ID.
+func (s *tags) Read(ctx context.Context, tagID string) (*Tag, error) {
 	if !validStringID(&tagID) {
 		return nil, errors.New("invalid value for tag ID")
 	}

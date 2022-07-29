@@ -86,7 +86,7 @@ type Workspace struct {
 	VcsProvider   *VcsProvider   `jsonapi:"relation,vcs-provider"`
 	AgentPool     *AgentPool     `jsonapi:"relation,agent-pool"`
 	ModuleVersion *ModuleVersion `jsonapi:"relation,module-version,omitempty"`
-	Tags          []*Tag         `jsonapi:"relation,tags,omitempty"`
+	Tags          []*Tag         `jsonapi:"relation,tags"`
 }
 
 // Hooks contains the custom hooks field.
@@ -211,6 +211,9 @@ type WorkspaceCreateOptions struct {
 
 	// Specifies the number of minutes run operation can be executed before termination.
 	RunOperationTimeout *int `jsonapi:"attr,run-operation-timeout"`
+
+	// Specifies tags assigned to the workspace
+	Tags []*Tag `jsonapi:"relation,tags,omitempty"`
 }
 
 // WorkspaceVCSRepoOptions represents the configuration options of a VCS integration.
