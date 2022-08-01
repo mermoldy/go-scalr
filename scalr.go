@@ -134,6 +134,7 @@ type Client struct {
 	ProviderConfigurations          ProviderConfigurations
 	Roles                           Roles
 	Runs                            Runs
+	Tags                            Tags
 	Teams                           Teams
 	Users                           Users
 	Variables                       Variables
@@ -141,6 +142,7 @@ type Client struct {
 	VcsRevisions                    VcsRevisions
 	Webhooks                        Webhooks
 	Workspaces                      Workspaces
+	WorkspaceTags                   WorkspaceTags
 	RunTriggers                     RunTriggers
 }
 
@@ -223,6 +225,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.PolicyGroupEnvironments = &policyGroupEnvironment{client: client}
 	client.Roles = &roles{client: client}
 	client.Runs = &runs{client: client}
+	client.Tags = &tags{client: client}
 	client.Teams = &teams{client: client}
 	client.Users = &users{client: client}
 	client.Variables = &variables{client: client}
@@ -230,6 +233,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.VcsRevisions = &vcsRevisions{client: client}
 	client.Webhooks = &webhooks{client: client}
 	client.Workspaces = &workspaces{client: client}
+	client.WorkspaceTags = &workspaceTag{client: client}
 	client.RunTriggers = &runTriggers{client: client}
 	client.ProviderConfigurations = &providerConfigurations{client: client}
 	client.ProviderConfigurationParameters = &providerConfigurationParameters{client: client}
