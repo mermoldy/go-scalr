@@ -171,13 +171,10 @@ func TestEnvironmentsUpdate(t *testing.T) {
 	t.Run("with valid options", func(t *testing.T) {
 		envTest, envTestCleanup := createEnvironment(t, client)
 		defer envTestCleanup()
-		providerConfiguration, removeProviderConfiguration := createProviderConfiguration(t, client, "consul", "consul")
-		defer removeProviderConfiguration()
 
 		options := EnvironmentUpdateOptions{
-			Name:                          String("tst-" + randomString(t)),
-			CostEstimationEnabled:         Bool(false),
-			DefaultProviderConfigurations: []*ProviderConfiguration{providerConfiguration},
+			Name:                  String("tst-" + randomString(t)),
+			CostEstimationEnabled: Bool(false),
 		}
 
 		env, err := client.Environments.Update(ctx, envTest.ID, options)
@@ -194,8 +191,48 @@ func TestEnvironmentsUpdate(t *testing.T) {
 		} {
 			assert.Equal(t, *options.Name, item.Name)
 			assert.Equal(t, *options.CostEstimationEnabled, item.CostEstimationEnabled)
+		}
+	})
+
+	t.Run("update default provider configuration", func(t *testing.T) {
+		envTest, envTestCleanup := createEnvironment(t, client)
+		defer envTestCleanup()
+		providerConfiguration, removeProviderConfiguration := createProviderConfiguration(t, client, "consul", "consul")
+		defer removeProviderConfiguration()
+
+		options := EnvironmentUpdateOptions{
+			DefaultProviderConfigurations: []*ProviderConfiguration{providerConfiguration},
+		}
+
+		env, err := client.Environments.Update(ctx, envTest.ID, options)
+		require.NoError(t, err)
+
+		refreshed, err := client.Environments.Read(ctx, env.ID)
+		require.NoError(t, err)
+
+		for _, item := range []*Environment{
+			env,
+			refreshed,
+		} {
 			assert.Len(t, item.DefaultProviderConfigurations, 1)
 			assert.Equal(t, providerConfiguration.ID, item.DefaultProviderConfigurations[0].ID)
+		}
+
+		options = EnvironmentUpdateOptions{
+			DefaultProviderConfigurations: make([]*ProviderConfiguration, 0),
+		}
+
+		env, err = client.Environments.Update(ctx, envTest.ID, options)
+		require.NoError(t, err)
+
+		refreshed, err = client.Environments.Read(ctx, env.ID)
+		require.NoError(t, err)
+
+		for _, item := range []*Environment{
+			env,
+			refreshed,
+		} {
+			assert.Len(t, item.DefaultProviderConfigurations, 0)
 		}
 	})
 
