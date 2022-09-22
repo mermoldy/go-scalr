@@ -199,20 +199,16 @@ func createRun(t *testing.T, client *Client, ws *Workspace, cv *ConfigurationVer
 	}
 }
 
-func createVariable(t *testing.T, client *Client, ws *Workspace) (*Variable, func()) {
-	var wsCleanup func()
-
-	if ws == nil {
-		ws, wsCleanup = createWorkspace(t, client, nil)
-	}
-
+func createVariable(t *testing.T, client *Client, ws *Workspace, env *Environment, acc *Account) (*Variable, func()) {
 	ctx := context.Background()
 	v, err := client.Variables.Create(ctx, VariableCreateOptions{
-		Key:         String(randomString(t)),
+		Key:         String(randomVariableKey(t)),
 		Value:       String(randomString(t)),
-		Category:    Category(CategoryTerraform),
+		Category:    Category(CategoryEnv),
 		Description: String("Create by go-scalr test helper."),
 		Workspace:   ws,
+		Environment: env,
+		Account:     acc,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -223,10 +219,6 @@ func createVariable(t *testing.T, client *Client, ws *Workspace) (*Variable, fun
 			t.Errorf("Error destroying variable! WARNING: Dangling resources\n"+
 				"may exist! The full error is shown below.\n\n"+
 				"Variable: %s\nError: %s", v.Key, err)
-		}
-
-		if wsCleanup != nil {
-			wsCleanup()
 		}
 	}
 }

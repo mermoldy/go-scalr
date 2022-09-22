@@ -78,16 +78,21 @@ type VariableListOptions struct {
 	// The comma-separated list of relationship paths.
 	Include *string `url:"include,omitempty"`
 
+	// Filters
+	Filter *VariableFilter `url:"filter,omitempty"`
+}
+
+type VariableFilter struct {
 	// Filter by key
-	Key *string `url:"filter[key],omitempty"`
+	Key *string `url:"key,omitempty"`
 
 	// Filter by key
-	Category *string `url:"filter[category],omitempty"`
+	Category *string `url:"category,omitempty"`
 
 	// Scope filters.
-	Workspace   *string `url:"filter[workspace],omitempty"`
-	Environment *string `url:"filter[environment],omitempty"`
-	Account     *string `url:"filter[account],omitempty"`
+	Workspace   *string `url:"workspace,omitempty"`
+	Environment *string `url:"environment,omitempty"`
+	Account     *string `url:"account,omitempty"`
 }
 
 // List the variables.
