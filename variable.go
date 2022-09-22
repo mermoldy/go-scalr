@@ -14,6 +14,9 @@ var _ Variables = (*variables)(nil)
 
 // Variables describes all the variable related methods that the Scalr API supports.
 type Variables interface {
+	// List variables by filter options.
+	List(ctx context.Context, options VariableListOptions) (*VariableList, error)
+
 	// Create is used to create a new variable.
 	Create(ctx context.Context, options VariableCreateOptions) (*Variable, error)
 
@@ -63,6 +66,44 @@ type Variable struct {
 	Workspace   *Workspace   `jsonapi:"relation,workspace"`
 	Environment *Environment `jsonapi:"relation,environment"`
 	Account     *Account     `jsonapi:"relation,account"`
+}
+
+// VariableListOptions represents the options for listing variables.
+type VariableListOptions struct {
+	ListOptions
+
+	// The comma-separated list of attributes.
+	Sort *string `url:"sort,omitempty"`
+
+	// The comma-separated list of relationship paths.
+	Include *string `url:"include,omitempty"`
+
+	// Filter by key
+	Key *string `url:"filter[key],omitempty"`
+
+	// Filter by key
+	Category *string `url:"filter[category],omitempty"`
+
+	// Scope filters.
+	Workspace   *string `url:"filter[workspace],omitempty"`
+	Environment *string `url:"filter[environment],omitempty"`
+	Account     *string `url:"filter[account],omitempty"`
+}
+
+// List the variables.
+func (s *variables) List(ctx context.Context, options VariableListOptions) (*VariableList, error) {
+	req, err := s.client.newRequest("GET", "vars", &options)
+	if err != nil {
+		return nil, err
+	}
+
+	vl := &VariableList{}
+	err = s.client.do(ctx, req, vl)
+	if err != nil {
+		return nil, err
+	}
+
+	return vl, nil
 }
 
 type VariableWriteQueryOptions struct {
