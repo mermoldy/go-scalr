@@ -72,6 +72,7 @@ func TestWorkspacesCreate(t *testing.T) {
 			Environment:         envTest,
 			Name:                String(randomString(t)),
 			AutoApply:           Bool(true),
+			AutoForceRun:        Bool(true),
 			ExecutionMode:       WorkspaceExecutionModePtr(WorkspaceExecutionModeRemote),
 			TerraformVersion:    String("0.12.25"),
 			WorkingDirectory:    String("bar/"),
@@ -92,6 +93,7 @@ func TestWorkspacesCreate(t *testing.T) {
 			assert.NotEmpty(t, item.ID)
 			assert.Equal(t, *options.Name, item.Name)
 			assert.Equal(t, *options.AutoApply, item.AutoApply)
+			assert.Equal(t, *options.AutoForceRun, item.AutoForceRun)
 			assert.Equal(t, false, item.HasResources)
 			assert.Equal(t, *options.ExecutionMode, item.ExecutionMode)
 			assert.Equal(t, *options.TerraformVersion, item.TerraformVersion)
@@ -267,6 +269,7 @@ func TestWorkspacesUpdate(t *testing.T) {
 		options := WorkspaceUpdateOptions{
 			Name:                String(wsTest.Name),
 			AutoApply:           Bool(true),
+			AutoForceRun:        Bool(true),
 			ExecutionMode:       WorkspaceExecutionModePtr(WorkspaceExecutionModeRemote),
 			TerraformVersion:    String("0.12.25"),
 			RunOperationTimeout: Int(20),
@@ -277,6 +280,7 @@ func TestWorkspacesUpdate(t *testing.T) {
 
 		assert.Equal(t, wsTest.Name, wsAfter.Name)
 		assert.NotEqual(t, wsTest.AutoApply, wsAfter.AutoApply)
+		assert.NotEqual(t, wsTest.AutoForceRun, wsAfter.AutoForceRun)
 		assert.NotEqual(t, wsTest.TerraformVersion, wsAfter.TerraformVersion)
 		assert.Equal(t, wsTest.WorkingDirectory, wsAfter.WorkingDirectory)
 		assert.Equal(t, int(20), *wsAfter.RunOperationTimeout)
@@ -307,6 +311,7 @@ func TestWorkspacesUpdate(t *testing.T) {
 		options := WorkspaceUpdateOptions{
 			Name:             String(randomString(t)),
 			AutoApply:        Bool(false),
+			AutoForceRun:     Bool(false),
 			ExecutionMode:    WorkspaceExecutionModePtr(WorkspaceExecutionModeLocal),
 			TerraformVersion: String("0.12.25"),
 			WorkingDirectory: String("baz/"),
@@ -325,6 +330,7 @@ func TestWorkspacesUpdate(t *testing.T) {
 		} {
 			assert.Equal(t, *options.Name, item.Name)
 			assert.Equal(t, *options.AutoApply, item.AutoApply)
+			assert.Equal(t, *options.AutoForceRun, item.AutoForceRun)
 			assert.Equal(t, *options.ExecutionMode, item.ExecutionMode)
 			assert.Equal(t, *options.TerraformVersion, item.TerraformVersion)
 			assert.Equal(t, *options.WorkingDirectory, item.WorkingDirectory)
@@ -360,6 +366,7 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 		options := WorkspaceUpdateOptions{
 			Name:             String(wTest.Name),
 			AutoApply:        Bool(true),
+			AutoForceRun:     Bool(true),
 			ExecutionMode:    WorkspaceExecutionModePtr(WorkspaceExecutionModeRemote),
 			TerraformVersion: String("0.12.25"),
 		}
@@ -369,6 +376,7 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 
 		assert.Equal(t, wTest.Name, wAfter.Name)
 		assert.NotEqual(t, wTest.AutoApply, wAfter.AutoApply)
+		assert.NotEqual(t, wTest.AutoForceRun, wAfter.AutoForceRun)
 		assert.NotEqual(t, wTest.TerraformVersion, wAfter.TerraformVersion)
 		assert.Equal(t, wTest.WorkingDirectory, wAfter.WorkingDirectory)
 	})
@@ -377,6 +385,7 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 		options := WorkspaceUpdateOptions{
 			Name:             String(randomString(t)),
 			AutoApply:        Bool(false),
+			AutoForceRun:     Bool(false),
 			ExecutionMode:    WorkspaceExecutionModePtr(WorkspaceExecutionModeLocal),
 			TerraformVersion: String("0.12.25"),
 			WorkingDirectory: String("baz/"),
@@ -395,6 +404,7 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 		} {
 			assert.Equal(t, *options.Name, item.Name)
 			assert.Equal(t, *options.AutoApply, item.AutoApply)
+			assert.Equal(t, *options.AutoForceRun, item.AutoForceRun)
 			assert.Equal(t, *options.ExecutionMode, item.ExecutionMode)
 			assert.Equal(t, *options.TerraformVersion, item.TerraformVersion)
 			assert.Equal(t, *options.WorkingDirectory, item.WorkingDirectory)
