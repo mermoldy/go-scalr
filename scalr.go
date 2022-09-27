@@ -125,6 +125,7 @@ type Client struct {
 	ConfigurationVersions           ConfigurationVersions
 	Endpoints                       Endpoints
 	Environments                    Environments
+	EnvironmentTags                 EnvironmentTags
 	ModuleVersions                  ModuleVersions
 	Modules                         Modules
 	PolicyGroups                    PolicyGroups
@@ -219,6 +220,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.ConfigurationVersions = &configurationVersions{client: client}
 	client.Endpoints = &endpoints{client: client}
 	client.Environments = &environments{client: client}
+	client.EnvironmentTags = &environmentTag{client: client}
 	client.ModuleVersions = &moduleVersions{client: client}
 	client.Modules = &modules{client: client}
 	client.PolicyGroups = &policyGroups{client: client}
