@@ -437,3 +437,16 @@ func assignTagsToWorkspace(t *testing.T, client *Client, workspace *Workspace, t
 		t.Fatal(err)
 	}
 }
+
+func assignTagsToEnvironment(t *testing.T, client *Client, environment *Environment, tags []*Tag) {
+	ctx := context.Background()
+	tagRels := make([]*TagRelation, len(tags))
+	for i, tag := range tags {
+		tagRels[i] = &TagRelation{ID: tag.ID}
+	}
+	err := client.EnvironmentTags.Add(ctx, environment.ID, tagRels)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+}

@@ -8,12 +8,12 @@ import (
 	"testing"
 )
 
-func TestWorkspaceTagsAdd(t *testing.T) {
+func TestEnvironmentTagsAdd(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	workspace, deleteWorkspace := createWorkspace(t, client, nil)
-	defer deleteWorkspace()
+	environment, deleteEnvironment := createEnvironment(t, client)
+	defer deleteEnvironment()
 
 	tag1, deleteTag1 := createTag(t, client)
 	defer deleteTag1()
@@ -23,7 +23,7 @@ func TestWorkspaceTagsAdd(t *testing.T) {
 	defer deleteTag3()
 
 	t.Run("with valid options", func(t *testing.T) {
-		err := client.WorkspaceTags.Add(ctx, workspace.ID,
+		err := client.EnvironmentTags.Add(ctx, environment.ID,
 			[]*TagRelation{
 				{ID: tag1.ID},
 				{ID: tag2.ID},
@@ -32,7 +32,7 @@ func TestWorkspaceTagsAdd(t *testing.T) {
 		require.NoError(t, err)
 
 		// Get a refreshed view from the API.
-		refreshed, err := client.Workspaces.ReadByID(ctx, workspace.ID)
+		refreshed, err := client.Environments.Read(ctx, environment.ID)
 		require.NoError(t, err)
 		assert.Len(t, refreshed.Tags, 2)
 
@@ -45,11 +45,11 @@ func TestWorkspaceTagsAdd(t *testing.T) {
 	})
 
 	t.Run("add another one", func(t *testing.T) {
-		err := client.WorkspaceTags.Add(ctx, workspace.ID, []*TagRelation{{ID: tag3.ID}})
+		err := client.EnvironmentTags.Add(ctx, environment.ID, []*TagRelation{{ID: tag3.ID}})
 		require.NoError(t, err)
 
 		// Get a refreshed view from the API.
-		refreshed, err := client.Workspaces.ReadByID(ctx, workspace.ID)
+		refreshed, err := client.Environments.Read(ctx, environment.ID)
 		require.NoError(t, err)
 		assert.Len(t, refreshed.Tags, 3)
 
@@ -64,17 +64,17 @@ func TestWorkspaceTagsAdd(t *testing.T) {
 
 	t.Run("with invalid tag", func(t *testing.T) {
 		tagID := "tag-invalid-id"
-		err := client.WorkspaceTags.Add(ctx, workspace.ID, []*TagRelation{{ID: tagID}})
+		err := client.EnvironmentTags.Add(ctx, environment.ID, []*TagRelation{{ID: tagID}})
 		assert.EqualError(t, err, fmt.Sprintf("Invalid Attribute\n\nTag with ID '%s' not found or user unauthorized.", tagID))
 	})
 }
 
-func TestWorkspaceTagsReplace(t *testing.T) {
+func TestEnvironmentTagsReplace(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	workspace, deleteWorkspace := createWorkspace(t, client, nil)
-	defer deleteWorkspace()
+	environment, deleteEnvironment := createEnvironment(t, client)
+	defer deleteEnvironment()
 
 	tag1, deleteTag1 := createTag(t, client)
 	defer deleteTag1()
@@ -83,10 +83,10 @@ func TestWorkspaceTagsReplace(t *testing.T) {
 	tag3, deleteTag3 := createTag(t, client)
 	defer deleteTag3()
 
-	assignTagsToWorkspace(t, client, workspace, []*Tag{tag1})
+	assignTagsToEnvironment(t, client, environment, []*Tag{tag1})
 
 	t.Run("with valid options", func(t *testing.T) {
-		err := client.WorkspaceTags.Replace(ctx, workspace.ID,
+		err := client.EnvironmentTags.Replace(ctx, environment.ID,
 			[]*TagRelation{
 				{ID: tag2.ID},
 				{ID: tag3.ID},
@@ -95,7 +95,7 @@ func TestWorkspaceTagsReplace(t *testing.T) {
 		require.NoError(t, err)
 
 		// Get a refreshed view from the API.
-		refreshed, err := client.Workspaces.ReadByID(ctx, workspace.ID)
+		refreshed, err := client.Environments.Read(ctx, environment.ID)
 		require.NoError(t, err)
 		assert.Len(t, refreshed.Tags, 2)
 
@@ -109,27 +109,27 @@ func TestWorkspaceTagsReplace(t *testing.T) {
 
 	t.Run("with invalid tag", func(t *testing.T) {
 		tagID := "tag-invalid-id"
-		err := client.WorkspaceTags.Replace(ctx, workspace.ID, []*TagRelation{{ID: tagID}})
+		err := client.EnvironmentTags.Replace(ctx, environment.ID, []*TagRelation{{ID: tagID}})
 		assert.EqualError(t, err, fmt.Sprintf("Invalid Attribute\n\nTag with ID '%s' not found or user unauthorized.", tagID))
 	})
 
 	t.Run("when all tags should be removed", func(t *testing.T) {
-		err := client.WorkspaceTags.Replace(ctx, workspace.ID, make([]*TagRelation, 0))
+		err := client.EnvironmentTags.Replace(ctx, environment.ID, make([]*TagRelation, 0))
 		require.NoError(t, err)
 
 		// Get a refreshed view from the API.
-		refreshed, err := client.Workspaces.ReadByID(ctx, workspace.ID)
+		refreshed, err := client.Environments.Read(ctx, environment.ID)
 		require.NoError(t, err)
 		assert.Empty(t, refreshed.Tags)
 	})
 }
 
-func TestWorkspaceTagsDelete(t *testing.T) {
+func TestEnvironmentTagsDelete(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	workspace, deleteWorkspace := createWorkspace(t, client, nil)
-	defer deleteWorkspace()
+	environment, deleteEnvironment := createEnvironment(t, client)
+	defer deleteEnvironment()
 
 	tag1, deleteTag1 := createTag(t, client)
 	defer deleteTag1()
@@ -138,10 +138,10 @@ func TestWorkspaceTagsDelete(t *testing.T) {
 	tag3, deleteTag3 := createTag(t, client)
 	defer deleteTag3()
 
-	assignTagsToWorkspace(t, client, workspace, []*Tag{tag1, tag2, tag3})
+	assignTagsToEnvironment(t, client, environment, []*Tag{tag1, tag2, tag3})
 
 	t.Run("with valid options", func(t *testing.T) {
-		err := client.WorkspaceTags.Delete(ctx, workspace.ID,
+		err := client.EnvironmentTags.Delete(ctx, environment.ID,
 			[]*TagRelation{
 				{ID: tag1.ID},
 				{ID: tag2.ID},
@@ -150,7 +150,7 @@ func TestWorkspaceTagsDelete(t *testing.T) {
 		require.NoError(t, err)
 
 		// Get a refreshed view from the API.
-		refreshed, err := client.Workspaces.ReadByID(ctx, workspace.ID)
+		refreshed, err := client.Environments.Read(ctx, environment.ID)
 		require.NoError(t, err)
 		assert.Len(t, refreshed.Tags, 1)
 		assert.Equal(t, tag3.ID, refreshed.Tags[0].ID)
@@ -158,7 +158,7 @@ func TestWorkspaceTagsDelete(t *testing.T) {
 
 	t.Run("with invalid tag", func(t *testing.T) {
 		tagID := "tag-invalid-id"
-		err := client.WorkspaceTags.Replace(ctx, workspace.ID, []*TagRelation{{ID: tagID}})
+		err := client.EnvironmentTags.Replace(ctx, environment.ID, []*TagRelation{{ID: tagID}})
 		assert.EqualError(t, err, fmt.Sprintf("Invalid Attribute\n\nTag with ID '%s' not found or user unauthorized.", tagID))
 	})
 }
