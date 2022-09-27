@@ -85,7 +85,6 @@ type PolicyGroup struct {
 	VcsRevision  *VcsRevision   `jsonapi:"relation,vcs-revision"`
 	Policies     []*Policy      `jsonapi:"relation,policies"`
 	Environments []*Environment `jsonapi:"relation,environments"`
-	Workspaces   []*Workspace   `jsonapi:"relation,workspaces"`
 }
 
 // PolicyGroupList represents a list of policy groups.
