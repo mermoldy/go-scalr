@@ -61,6 +61,7 @@ type Environment struct {
 	DefaultProviderConfigurations []*ProviderConfiguration `jsonapi:"relation,default-provider-configurations"`
 	ProviderConfigurations        []*ProviderConfiguration `jsonapi:"relation,provider-configurations"`
 	CreatedBy                     *User                    `jsonapi:"relation,created-by"`
+	Tags                          []*Tag                   `jsonapi:"relation,tags"`
 }
 
 // Organization is Environment included in Workspace - always prefer Environment
@@ -87,6 +88,9 @@ type EnvironmentCreateOptions struct {
 	CloudCredentials              []*CloudCredential       `jsonapi:"relation,cloud-credentials,omitempty"`
 	PolicyGroups                  []*PolicyGroup           `jsonapi:"relation,policy-groups,omitempty"`
 	DefaultProviderConfigurations []*ProviderConfiguration `jsonapi:"relation,default-provider-configurations,omitempty"`
+
+	// Specifies tags assigned to the environment
+	Tags []*Tag `jsonapi:"relation,tags,omitempty"`
 }
 
 func (o EnvironmentCreateOptions) valid() error {
