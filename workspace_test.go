@@ -279,9 +279,9 @@ func TestWorkspacesUpdate(t *testing.T) {
 		require.NoError(t, err)
 
 		assert.Equal(t, wsTest.Name, wsAfter.Name)
-		assert.NotEqual(t, wsTest.AutoApply, wsAfter.AutoApply)
 		assert.Equal(t, true, wsTest.AutoQueueRuns == nil)
 		assert.Equal(t, false, *wsAfter.AutoQueueRuns)
+		assert.NotEqual(t, wsTest.AutoApply, wsAfter.AutoApply)
 		assert.NotEqual(t, wsTest.TerraformVersion, wsAfter.TerraformVersion)
 		assert.Equal(t, wsTest.WorkingDirectory, wsAfter.WorkingDirectory)
 		assert.Equal(t, int(20), *wsAfter.RunOperationTimeout)
