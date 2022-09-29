@@ -75,7 +75,7 @@ type Workspace struct {
 	ApplySchedule        string                 `jsonapi:"attr,apply-schedule"`
 	DestroySchedule      string                 `jsonapi:"attr,destroy-schedule"`
 	HasResources         bool                   `jsonapi:"attr,has-resources"`
-	QueueAllRuns         bool                   `jsonapi:"attr,queue-all-runs"`
+	AutoQueueRuns        *bool                  `jsonapi:"attr,auto-queue-runs"`
 	Hooks                *Hooks                 `jsonapi:"attr,hooks"`
 	RunOperationTimeout  *int                   `jsonapi:"attr,run-operation-timeout"`
 	VarFiles             []string               `jsonapi:"attr,var-files"`
@@ -195,9 +195,8 @@ type WorkspaceCreateOptions struct {
 	// environment when multiple environments exist within the same repository.
 	WorkingDirectory *string `jsonapi:"attr,working-directory,omitempty"`
 
-	// Whether runs should be queued immediately after workspace creation.
 	// Whether run should be triggered by VCS
-	QueueAllRuns *bool `jsonapi:"attr,queue-all-runs,omitempty"`
+	AutoQueueRuns *bool `jsonapi:"attr,auto-queue-runs,omitempty"`
 
 	// Specifies the VcsProvider for workspace vcs-repo. Required if vcs-repo attr passed
 	VcsProvider *VcsProvider `jsonapi:"relation,vcs-provider,omitempty"`
@@ -370,9 +369,8 @@ type WorkspaceUpdateOptions struct {
 	// repository.
 	WorkingDirectory *string `jsonapi:"attr,working-directory,omitempty"`
 
-	// Whether runs should be queued immediately after workspace creation.
 	// Whether run should be triggered by VCS
-	QueueAllRuns *bool `jsonapi:"attr,queue-all-runs,omitempty"`
+	AutoQueueRuns *bool `jsonapi:"attr,auto-queue-runs,omitempty"`
 
 	// Specifies the VcsProvider for workspace vcs-repo.
 	VcsProvider *VcsProvider `jsonapi:"relation,vcs-provider"`
