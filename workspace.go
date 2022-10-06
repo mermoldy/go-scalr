@@ -195,7 +195,7 @@ type WorkspaceCreateOptions struct {
 	// environment when multiple environments exist within the same repository.
 	WorkingDirectory *string `jsonapi:"attr,working-directory,omitempty"`
 
-	// Whether run should be triggered by VCS.
+	// Indicates if runs have to be queued automatically when a new configuration version is uploaded.
 	AutoQueueRuns *bool `jsonapi:"attr,auto-queue-runs,omitempty"`
 
 	// Specifies the VcsProvider for workspace vcs-repo. Required if vcs-repo attr passed
@@ -369,7 +369,7 @@ type WorkspaceUpdateOptions struct {
 	// repository.
 	WorkingDirectory *string `jsonapi:"attr,working-directory,omitempty"`
 
-	// Whether run should be triggered by VCS.
+	// Indicates if runs have to be queued automatically when a new configuration version is uploaded.
 	AutoQueueRuns *bool `jsonapi:"attr,auto-queue-runs,omitempty"`
 
 	// Specifies the VcsProvider for workspace vcs-repo.
