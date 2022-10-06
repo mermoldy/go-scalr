@@ -76,6 +76,7 @@ type Workspace struct {
 	ApplySchedule        string                 `jsonapi:"attr,apply-schedule"`
 	DestroySchedule      string                 `jsonapi:"attr,destroy-schedule"`
 	HasResources         bool                   `jsonapi:"attr,has-resources"`
+	AutoQueueRuns        *bool                  `jsonapi:"attr,auto-queue-runs"`
 	Hooks                *Hooks                 `jsonapi:"attr,hooks"`
 	RunOperationTimeout  *int                   `jsonapi:"attr,run-operation-timeout"`
 	VarFiles             []string               `jsonapi:"attr,var-files"`
@@ -197,6 +198,9 @@ type WorkspaceCreateOptions struct {
 	// root of your repository and is typically set to a subdirectory matching the
 	// environment when multiple environments exist within the same repository.
 	WorkingDirectory *string `jsonapi:"attr,working-directory,omitempty"`
+
+	// Indicates if runs have to be queued automatically when a new configuration version is uploaded.
+	AutoQueueRuns *bool `jsonapi:"attr,auto-queue-runs,omitempty"`
 
 	// Specifies the VcsProvider for workspace vcs-repo. Required if vcs-repo attr passed
 	VcsProvider *VcsProvider `jsonapi:"relation,vcs-provider,omitempty"`
@@ -371,6 +375,9 @@ type WorkspaceUpdateOptions struct {
 	// the environment when multiple environments exist within the same
 	// repository.
 	WorkingDirectory *string `jsonapi:"attr,working-directory,omitempty"`
+
+	// Indicates if runs have to be queued automatically when a new configuration version is uploaded.
+	AutoQueueRuns *bool `jsonapi:"attr,auto-queue-runs,omitempty"`
 
 	// Specifies the VcsProvider for workspace vcs-repo.
 	VcsProvider *VcsProvider `jsonapi:"relation,vcs-provider"`

@@ -150,7 +150,7 @@ func TestVariablesRead(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	vTest, vTestCleanup := createVariable(t, client, nil)
+	vTest, vTestCleanup := createVariable(t, client, nil, nil, nil)
 	defer vTestCleanup()
 
 	t.Run("when the variable exists", func(t *testing.T) {
@@ -189,7 +189,7 @@ func TestVariablesUpdate(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	vTest, vTestCleanup := createVariable(t, client, nil)
+	vTest, vTestCleanup := createVariable(t, client, nil, nil, nil)
 	defer vTestCleanup()
 
 	t.Run("with valid options", func(t *testing.T) {
@@ -235,7 +235,7 @@ func TestVariablesUpdate(t *testing.T) {
 	})
 
 	t.Run("without any changes", func(t *testing.T) {
-		created, vTestCleanup := createVariable(t, client, vTest.Workspace)
+		created, vTestCleanup := createVariable(t, client, vTest.Workspace, nil, nil)
 		defer vTestCleanup()
 
 		updated, err := client.Variables.Update(ctx, created.ID, VariableUpdateOptions{})
@@ -257,9 +257,8 @@ func TestVariablesDelete(t *testing.T) {
 	wTest, wTestCleanup := createWorkspace(t, client, nil)
 	defer wTestCleanup()
 
-	vTest, _ := createVariable(t, client, wTest)
-
 	t.Run("with valid options", func(t *testing.T) {
+		vTest, _ := createVariable(t, client, wTest, nil, nil)
 		err := client.Variables.Delete(ctx, vTest.ID)
 		assert.NoError(t, err)
 	})
@@ -279,5 +278,179 @@ func TestVariablesDelete(t *testing.T) {
 	t.Run("with invalid variable ID", func(t *testing.T) {
 		err := client.Variables.Delete(ctx, badIdentifier)
 		assert.EqualError(t, err, "invalid value for variable ID")
+	})
+}
+
+func TestVariablesList(t *testing.T) {
+	client := testClient(t)
+	ctx := context.Background()
+
+	t.Run("scopes", func(t *testing.T) {
+		globalVariable, deleteGlobalVariable := createVariable(t, client, nil, nil, nil)
+		defer deleteGlobalVariable()
+
+		accountVariable, deleteAccountVariable := createVariable(t, client, nil, nil, &Account{ID: defaultAccountID})
+		defer deleteAccountVariable()
+
+		requestedEnvironment, deleteRequestedEnvironment := createEnvironment(t, client)
+		defer deleteRequestedEnvironment()
+
+		environmentVariable, deleteEnvironmentVariable := createVariable(t, client, nil, requestedEnvironment, nil)
+		defer deleteEnvironmentVariable()
+
+		otherEnvironment, deleteOtherEnvironment := createEnvironment(t, client)
+		defer deleteOtherEnvironment()
+
+		_, deleteOtherEnvironmentVariable := createVariable(t, client, nil, otherEnvironment, nil)
+		defer deleteOtherEnvironmentVariable()
+
+		requestedWorkspace, deleteRequestedWorkspace := createWorkspace(t, client, requestedEnvironment)
+		defer deleteRequestedWorkspace()
+
+		workspaceVariable, deleteRequestedVariable := createVariable(t, client, requestedWorkspace, nil, nil)
+		defer deleteRequestedVariable()
+
+		otherWorkspace, deleteOtherWorkspace := createWorkspace(t, client, requestedEnvironment)
+		defer deleteOtherWorkspace()
+
+		_, deleteOtherWorkspaceVariable := createVariable(t, client, otherWorkspace, nil, nil)
+		defer deleteOtherWorkspaceVariable()
+
+		responseVariables, err := client.Variables.List(
+			ctx, VariableListOptions{Filter: &VariableFilter{
+				Workspace:   String("in:null," + requestedWorkspace.ID),
+				Environment: String("in:null," + requestedEnvironment.ID),
+				Account:     String("in:null," + defaultAccountID),
+			}})
+		require.NoError(t, err)
+
+		expectedIds := []string{globalVariable.ID, accountVariable.ID, environmentVariable.ID, workspaceVariable.ID}
+		responseIds := make([]string, 0)
+		for _, variable := range responseVariables.Items {
+			responseIds = append(responseIds, variable.ID)
+		}
+
+		assert.ElementsMatch(t, expectedIds, responseIds)
+	})
+
+	t.Run("category", func(t *testing.T) {
+		workspace, deleteWorkspace := createWorkspace(t, client, nil)
+		defer deleteWorkspace()
+
+		terraformVariable, err := client.Variables.Create(ctx, VariableCreateOptions{
+			Key:       String(randomVariableKey(t)),
+			Value:     String(randomString(t)),
+			Category:  Category(CategoryTerraform),
+			Workspace: workspace,
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer func() {
+			if err := client.Variables.Delete(ctx, terraformVariable.ID); err != nil {
+				t.Errorf("Error destroying variable! WARNING: Dangling resources\n"+
+					"may exist! The full error is shown below.\n\n"+
+					"Variable: %s\nError: %s", terraformVariable.Key, err)
+			}
+		}()
+
+		envVariable, err := client.Variables.Create(ctx, VariableCreateOptions{
+			Key:       String(randomVariableKey(t)),
+			Value:     String(randomString(t)),
+			Category:  Category(CategoryEnv),
+			Workspace: workspace,
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer func() {
+			if err := client.Variables.Delete(ctx, envVariable.ID); err != nil {
+				t.Errorf("Error destroying variable! WARNING: Dangling resources\n"+
+					"may exist! The full error is shown below.\n\n"+
+					"Variable: %s\nError: %s", envVariable.Key, err)
+			}
+		}()
+		responseVariables, err := client.Variables.List(
+			ctx, VariableListOptions{Filter: &VariableFilter{
+				Category: String(string(CategoryTerraform)),
+			}},
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Len(t, responseVariables.Items, 1)
+		assert.Equal(t, responseVariables.Items[0].ID, terraformVariable.ID)
+	})
+
+	t.Run("name", func(t *testing.T) {
+		workspace, deleteWorkspace := createWorkspace(t, client, nil)
+		defer deleteWorkspace()
+
+		fooVariable, err := client.Variables.Create(ctx, VariableCreateOptions{
+			Key:       String("foo"),
+			Value:     String(randomString(t)),
+			Category:  Category(CategoryTerraform),
+			Workspace: workspace,
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer func() {
+			if err := client.Variables.Delete(ctx, fooVariable.ID); err != nil {
+				t.Errorf("Error destroying variable! WARNING: Dangling resources\n"+
+					"may exist! The full error is shown below.\n\n"+
+					"Variable: %s\nError: %s", fooVariable.Key, err)
+			}
+		}()
+
+		barVariable, err := client.Variables.Create(ctx, VariableCreateOptions{
+			Key:       String("bar"),
+			Value:     String(randomString(t)),
+			Category:  Category(CategoryTerraform),
+			Workspace: workspace,
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer func() {
+			if err := client.Variables.Delete(ctx, barVariable.ID); err != nil {
+				t.Errorf("Error destroying variable! WARNING: Dangling resources\n"+
+					"may exist! The full error is shown below.\n\n"+
+					"Variable: %s\nError: %s", barVariable.Key, err)
+			}
+		}()
+
+		bazVariable, err := client.Variables.Create(ctx, VariableCreateOptions{
+			Key:       String("baz"),
+			Value:     String(randomString(t)),
+			Category:  Category(CategoryEnv),
+			Workspace: workspace,
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer func() {
+			if err := client.Variables.Delete(ctx, bazVariable.ID); err != nil {
+				t.Errorf("Error destroying variable! WARNING: Dangling resources\n"+
+					"may exist! The full error is shown below.\n\n"+
+					"Variable: %s\nError: %s", bazVariable.Key, err)
+			}
+		}()
+		responseVariables, err := client.Variables.List(
+			ctx, VariableListOptions{Filter: &VariableFilter{
+				Key: String("in:bar,baz"),
+			}},
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		expectedIds := []string{barVariable.ID, bazVariable.ID}
+		responseIds := make([]string, 0)
+		for _, variable := range responseVariables.Items {
+			responseIds = append(responseIds, variable.ID)
+		}
+
+		assert.ElementsMatch(t, expectedIds, responseIds)
 	})
 }
