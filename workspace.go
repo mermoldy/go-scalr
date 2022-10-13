@@ -49,6 +49,16 @@ const (
 	WorkspaceExecutionModeLocal  WorkspaceExecutionMode = "local"
 )
 
+// WorkspaceAutoQueueRuns represents run triggering modes
+type WorkspaceAutoQueueRuns string
+
+// Available auto queue modes
+const (
+	AutoQueueRunsModeDefault  WorkspaceAutoQueueRuns = "default"
+	AutoQueueRunsModeEnabled  WorkspaceAutoQueueRuns = "enabled"
+	AutoQueueRunsModeDisabled WorkspaceAutoQueueRuns = "disabled"
+)
+
 // WorkspaceList represents a list of workspaces.
 type WorkspaceList struct {
 	*Pagination
@@ -76,7 +86,7 @@ type Workspace struct {
 	ApplySchedule        string                 `jsonapi:"attr,apply-schedule"`
 	DestroySchedule      string                 `jsonapi:"attr,destroy-schedule"`
 	HasResources         bool                   `jsonapi:"attr,has-resources"`
-	AutoQueueRuns        *bool                  `jsonapi:"attr,auto-queue-runs"`
+	AutoQueueRuns        WorkspaceAutoQueueRuns `jsonapi:"attr,auto-queue-runs"`
 	Hooks                *Hooks                 `jsonapi:"attr,hooks"`
 	RunOperationTimeout  *int                   `jsonapi:"attr,run-operation-timeout"`
 	VarFiles             []string               `jsonapi:"attr,var-files"`
@@ -200,7 +210,7 @@ type WorkspaceCreateOptions struct {
 	WorkingDirectory *string `jsonapi:"attr,working-directory,omitempty"`
 
 	// Indicates if runs have to be queued automatically when a new configuration version is uploaded.
-	AutoQueueRuns *bool `jsonapi:"attr,auto-queue-runs,omitempty"`
+	AutoQueueRuns *WorkspaceAutoQueueRuns `jsonapi:"attr,auto-queue-runs,omitempty"`
 
 	// Specifies the VcsProvider for workspace vcs-repo. Required if vcs-repo attr passed
 	VcsProvider *VcsProvider `jsonapi:"relation,vcs-provider,omitempty"`
@@ -377,7 +387,7 @@ type WorkspaceUpdateOptions struct {
 	WorkingDirectory *string `jsonapi:"attr,working-directory,omitempty"`
 
 	// Indicates if runs have to be queued automatically when a new configuration version is uploaded.
-	AutoQueueRuns *bool `jsonapi:"attr,auto-queue-runs,omitempty"`
+	AutoQueueRuns *WorkspaceAutoQueueRuns `jsonapi:"attr,auto-queue-runs,omitempty"`
 
 	// Specifies the VcsProvider for workspace vcs-repo.
 	VcsProvider *VcsProvider `jsonapi:"relation,vcs-provider"`
