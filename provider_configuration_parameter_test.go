@@ -141,7 +141,6 @@ func TestProviderConfigurationParameterUpdate(t *testing.T) {
 
 		assert.Equal(t, *options.Key, updatedParameter.Key)
 		assert.Equal(t, *options.Sensitive, updatedParameter.Sensitive)
-		assert.Equal(t, *options.Value, updatedParameter.Value)
 		assert.Equal(t, *options.Description, updatedParameter.Description)
 	})
 }
