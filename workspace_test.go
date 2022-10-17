@@ -77,7 +77,7 @@ func TestWorkspacesCreate(t *testing.T) {
 			TerraformVersion:    String("0.12.25"),
 			WorkingDirectory:    String("bar/"),
 			RunOperationTimeout: Int(15),
-			AutoQueueRuns:       AutoQueueRunsModePtr(AutoQueueRunsModeDisabled),
+			AutoQueueRuns:       AutoQueueRunsModePtr(AutoQueueRunsModeNever),
 		}
 
 		ws, err := client.Workspaces.Create(ctx, options)
@@ -275,14 +275,14 @@ func TestWorkspacesUpdate(t *testing.T) {
 			ExecutionMode:       WorkspaceExecutionModePtr(WorkspaceExecutionModeRemote),
 			TerraformVersion:    String("0.12.25"),
 			RunOperationTimeout: Int(20),
-			AutoQueueRuns:       AutoQueueRunsModePtr(AutoQueueRunsModeEnabled),
+			AutoQueueRuns:       AutoQueueRunsModePtr(AutoQueueRunsModeAlways),
 		}
 
 		wsAfter, err := client.Workspaces.Update(ctx, wsTest.ID, options)
 		require.NoError(t, err)
 
 		assert.Equal(t, wsTest.Name, wsAfter.Name)
-		assert.Equal(t, AutoQueueRunsModeDefault, wsTest.AutoQueueRuns)
+		assert.Equal(t, AutoQueueRunsModeSkipFirst, wsTest.AutoQueueRuns)
 		assert.Equal(t, *options.AutoQueueRuns, wsAfter.AutoQueueRuns)
 		assert.NotEqual(t, wsTest.AutoApply, wsAfter.AutoApply)
 		assert.NotEqual(t, wsTest.ForceLatestRun, wsAfter.ForceLatestRun)

@@ -54,9 +54,9 @@ type WorkspaceAutoQueueRuns string
 
 // Available auto queue modes
 const (
-	AutoQueueRunsModeDefault  WorkspaceAutoQueueRuns = "default"
-	AutoQueueRunsModeEnabled  WorkspaceAutoQueueRuns = "enabled"
-	AutoQueueRunsModeDisabled WorkspaceAutoQueueRuns = "disabled"
+	AutoQueueRunsModeSkipFirst WorkspaceAutoQueueRuns = "skip_first"
+	AutoQueueRunsModeAlways    WorkspaceAutoQueueRuns = "always"
+	AutoQueueRunsModeNever     WorkspaceAutoQueueRuns = "never"
 )
 
 // WorkspaceList represents a list of workspaces.
