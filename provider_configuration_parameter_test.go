@@ -121,7 +121,7 @@ func TestProviderConfigurationParameterUpdate(t *testing.T) {
 
 		parameter, err := client.ProviderConfigurationParameters.Create(ctx, configuration.ID, ProviderConfigurationParameterCreateOptions{
 			Key:       String("config_context"),
-			Sensitive: Bool(true),
+			Sensitive: Bool(false),
 			Value:     String("my-context"),
 		})
 		if err != nil {
@@ -130,7 +130,7 @@ func TestProviderConfigurationParameterUpdate(t *testing.T) {
 
 		options := ProviderConfigurationParameterUpdateOptions{
 			Key:         String("config_path"),
-			Sensitive:   Bool(false),
+			Sensitive:   Bool(true),
 			Value:       String("~/.kube/config"),
 			Description: String("A path to a kube config file."),
 		}
@@ -141,7 +141,6 @@ func TestProviderConfigurationParameterUpdate(t *testing.T) {
 
 		assert.Equal(t, *options.Key, updatedParameter.Key)
 		assert.Equal(t, *options.Sensitive, updatedParameter.Sensitive)
-		assert.Equal(t, *options.Value, updatedParameter.Value)
 		assert.Equal(t, *options.Description, updatedParameter.Description)
 	})
 }
