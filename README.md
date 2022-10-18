@@ -3,7 +3,7 @@ Scalr Go Client
 
 ## Installation
 
-Installation  can be done with a normal `go get`:
+Installation can be done with a normal `go get`:
 
 ```
 go get -u github.com/scalr/go-scalr
