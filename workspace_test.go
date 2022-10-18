@@ -72,11 +72,12 @@ func TestWorkspacesCreate(t *testing.T) {
 			Environment:         envTest,
 			Name:                String(randomString(t)),
 			AutoApply:           Bool(true),
+			ForceLatestRun:      Bool(true),
 			ExecutionMode:       WorkspaceExecutionModePtr(WorkspaceExecutionModeRemote),
 			TerraformVersion:    String("0.12.25"),
 			WorkingDirectory:    String("bar/"),
 			RunOperationTimeout: Int(15),
-			AutoQueueRuns:       Bool(false),
+			AutoQueueRuns:       AutoQueueRunsModePtr(AutoQueueRunsModeNever),
 		}
 
 		ws, err := client.Workspaces.Create(ctx, options)
@@ -93,12 +94,13 @@ func TestWorkspacesCreate(t *testing.T) {
 			assert.NotEmpty(t, item.ID)
 			assert.Equal(t, *options.Name, item.Name)
 			assert.Equal(t, *options.AutoApply, item.AutoApply)
+			assert.Equal(t, *options.ForceLatestRun, item.ForceLatestRun)
 			assert.Equal(t, false, item.HasResources)
 			assert.Equal(t, *options.ExecutionMode, item.ExecutionMode)
 			assert.Equal(t, *options.TerraformVersion, item.TerraformVersion)
 			assert.Equal(t, *options.WorkingDirectory, item.WorkingDirectory)
 			assert.Equal(t, options.RunOperationTimeout, item.RunOperationTimeout)
-			assert.Equal(t, *options.AutoQueueRuns, *item.AutoQueueRuns)
+			assert.Equal(t, *options.AutoQueueRuns, item.AutoQueueRuns)
 		}
 	})
 
@@ -269,19 +271,21 @@ func TestWorkspacesUpdate(t *testing.T) {
 		options := WorkspaceUpdateOptions{
 			Name:                String(wsTest.Name),
 			AutoApply:           Bool(true),
+			ForceLatestRun:      Bool(true),
 			ExecutionMode:       WorkspaceExecutionModePtr(WorkspaceExecutionModeRemote),
 			TerraformVersion:    String("0.12.25"),
 			RunOperationTimeout: Int(20),
-			AutoQueueRuns:       Bool(false),
+			AutoQueueRuns:       AutoQueueRunsModePtr(AutoQueueRunsModeAlways),
 		}
 
 		wsAfter, err := client.Workspaces.Update(ctx, wsTest.ID, options)
 		require.NoError(t, err)
 
 		assert.Equal(t, wsTest.Name, wsAfter.Name)
-		assert.Equal(t, true, wsTest.AutoQueueRuns == nil)
-		assert.Equal(t, false, *wsAfter.AutoQueueRuns)
+		assert.Equal(t, AutoQueueRunsModeSkipFirst, wsTest.AutoQueueRuns)
+		assert.Equal(t, *options.AutoQueueRuns, wsAfter.AutoQueueRuns)
 		assert.NotEqual(t, wsTest.AutoApply, wsAfter.AutoApply)
+		assert.NotEqual(t, wsTest.ForceLatestRun, wsAfter.ForceLatestRun)
 		assert.NotEqual(t, wsTest.TerraformVersion, wsAfter.TerraformVersion)
 		assert.Equal(t, wsTest.WorkingDirectory, wsAfter.WorkingDirectory)
 		assert.Equal(t, int(20), *wsAfter.RunOperationTimeout)
@@ -312,6 +316,7 @@ func TestWorkspacesUpdate(t *testing.T) {
 		options := WorkspaceUpdateOptions{
 			Name:             String(randomString(t)),
 			AutoApply:        Bool(false),
+			ForceLatestRun:   Bool(false),
 			ExecutionMode:    WorkspaceExecutionModePtr(WorkspaceExecutionModeLocal),
 			TerraformVersion: String("0.12.25"),
 			WorkingDirectory: String("baz/"),
@@ -330,6 +335,7 @@ func TestWorkspacesUpdate(t *testing.T) {
 		} {
 			assert.Equal(t, *options.Name, item.Name)
 			assert.Equal(t, *options.AutoApply, item.AutoApply)
+			assert.Equal(t, *options.ForceLatestRun, item.ForceLatestRun)
 			assert.Equal(t, *options.ExecutionMode, item.ExecutionMode)
 			assert.Equal(t, *options.TerraformVersion, item.TerraformVersion)
 			assert.Equal(t, *options.WorkingDirectory, item.WorkingDirectory)
@@ -365,6 +371,7 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 		options := WorkspaceUpdateOptions{
 			Name:             String(wTest.Name),
 			AutoApply:        Bool(true),
+			ForceLatestRun:   Bool(true),
 			ExecutionMode:    WorkspaceExecutionModePtr(WorkspaceExecutionModeRemote),
 			TerraformVersion: String("0.12.25"),
 		}
@@ -374,6 +381,7 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 
 		assert.Equal(t, wTest.Name, wAfter.Name)
 		assert.NotEqual(t, wTest.AutoApply, wAfter.AutoApply)
+		assert.NotEqual(t, wTest.ForceLatestRun, wAfter.ForceLatestRun)
 		assert.NotEqual(t, wTest.TerraformVersion, wAfter.TerraformVersion)
 		assert.Equal(t, wTest.WorkingDirectory, wAfter.WorkingDirectory)
 	})
@@ -382,6 +390,7 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 		options := WorkspaceUpdateOptions{
 			Name:             String(randomString(t)),
 			AutoApply:        Bool(false),
+			ForceLatestRun:   Bool(false),
 			ExecutionMode:    WorkspaceExecutionModePtr(WorkspaceExecutionModeLocal),
 			TerraformVersion: String("0.12.25"),
 			WorkingDirectory: String("baz/"),
@@ -400,6 +409,7 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 		} {
 			assert.Equal(t, *options.Name, item.Name)
 			assert.Equal(t, *options.AutoApply, item.AutoApply)
+			assert.Equal(t, *options.ForceLatestRun, item.ForceLatestRun)
 			assert.Equal(t, *options.ExecutionMode, item.ExecutionMode)
 			assert.Equal(t, *options.TerraformVersion, item.TerraformVersion)
 			assert.Equal(t, *options.WorkingDirectory, item.WorkingDirectory)

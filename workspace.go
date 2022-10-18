@@ -49,6 +49,16 @@ const (
 	WorkspaceExecutionModeLocal  WorkspaceExecutionMode = "local"
 )
 
+// WorkspaceAutoQueueRuns represents run triggering modes
+type WorkspaceAutoQueueRuns string
+
+// Available auto queue modes
+const (
+	AutoQueueRunsModeSkipFirst WorkspaceAutoQueueRuns = "skip_first"
+	AutoQueueRunsModeAlways    WorkspaceAutoQueueRuns = "always"
+	AutoQueueRunsModeNever     WorkspaceAutoQueueRuns = "never"
+)
+
 // WorkspaceList represents a list of workspaces.
 type WorkspaceList struct {
 	*Pagination
@@ -60,6 +70,7 @@ type Workspace struct {
 	ID                   string                 `jsonapi:"primary,workspaces"`
 	Actions              *WorkspaceActions      `jsonapi:"attr,actions"`
 	AutoApply            bool                   `jsonapi:"attr,auto-apply"`
+	ForceLatestRun       bool                   `jsonapi:"attr,force-latest-run"`
 	CanQueueDestroyPlan  bool                   `jsonapi:"attr,can-queue-destroy-plan"`
 	CreatedAt            time.Time              `jsonapi:"attr,created-at,iso8601"`
 	FileTriggersEnabled  bool                   `jsonapi:"attr,file-triggers-enabled"`
@@ -75,7 +86,7 @@ type Workspace struct {
 	ApplySchedule        string                 `jsonapi:"attr,apply-schedule"`
 	DestroySchedule      string                 `jsonapi:"attr,destroy-schedule"`
 	HasResources         bool                   `jsonapi:"attr,has-resources"`
-	AutoQueueRuns        *bool                  `jsonapi:"attr,auto-queue-runs"`
+	AutoQueueRuns        WorkspaceAutoQueueRuns `jsonapi:"attr,auto-queue-runs"`
 	Hooks                *Hooks                 `jsonapi:"attr,hooks"`
 	RunOperationTimeout  *int                   `jsonapi:"attr,run-operation-timeout"`
 	VarFiles             []string               `jsonapi:"attr,var-files"`
@@ -168,6 +179,9 @@ type WorkspaceCreateOptions struct {
 	// Whether to automatically apply changes when a Terraform plan is successful.
 	AutoApply *bool `jsonapi:"attr,auto-apply,omitempty"`
 
+	// Whether to automatically raise the priority of the latest new run.
+	ForceLatestRun *bool `jsonapi:"attr,force-latest-run,omitempty"`
+
 	// The name of the workspace, which can only include letters, numbers, -,
 	// and _. This will be used as an identifier and must be unique in the
 	// environment.
@@ -196,7 +210,7 @@ type WorkspaceCreateOptions struct {
 	WorkingDirectory *string `jsonapi:"attr,working-directory,omitempty"`
 
 	// Indicates if runs have to be queued automatically when a new configuration version is uploaded.
-	AutoQueueRuns *bool `jsonapi:"attr,auto-queue-runs,omitempty"`
+	AutoQueueRuns *WorkspaceAutoQueueRuns `jsonapi:"attr,auto-queue-runs,omitempty"`
 
 	// Specifies the VcsProvider for workspace vcs-repo. Required if vcs-repo attr passed
 	VcsProvider *VcsProvider `jsonapi:"relation,vcs-provider,omitempty"`
@@ -333,6 +347,9 @@ type WorkspaceUpdateOptions struct {
 	// Whether to automatically apply changes when a Terraform plan is successful.
 	AutoApply *bool `jsonapi:"attr,auto-apply,omitempty"`
 
+	// Whether to automatically raise the priority of the latest new run.
+	ForceLatestRun *bool `jsonapi:"attr,force-latest-run,omitempty"`
+
 	// A new name for the workspace, which can only include letters, numbers, -,
 	// and _. This will be used as an identifier and must be unique in the
 	// environment. Warning: Changing a workspace's name changes its URL in the
@@ -370,7 +387,7 @@ type WorkspaceUpdateOptions struct {
 	WorkingDirectory *string `jsonapi:"attr,working-directory,omitempty"`
 
 	// Indicates if runs have to be queued automatically when a new configuration version is uploaded.
-	AutoQueueRuns *bool `jsonapi:"attr,auto-queue-runs,omitempty"`
+	AutoQueueRuns *WorkspaceAutoQueueRuns `jsonapi:"attr,auto-queue-runs,omitempty"`
 
 	// Specifies the VcsProvider for workspace vcs-repo.
 	VcsProvider *VcsProvider `jsonapi:"relation,vcs-provider"`

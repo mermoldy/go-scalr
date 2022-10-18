@@ -29,3 +29,8 @@ func String(v string) *string {
 func WorkspaceExecutionModePtr(v WorkspaceExecutionMode) *WorkspaceExecutionMode {
 	return &v
 }
+
+// AutoQueueRunsModePtr returns a pointer to the given auto queue runs mode
+func AutoQueueRunsModePtr(v WorkspaceAutoQueueRuns) *WorkspaceAutoQueueRuns {
+	return &v
+}
