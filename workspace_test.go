@@ -273,7 +273,7 @@ func TestWorkspacesUpdate(t *testing.T) {
 			AutoApply:           Bool(true),
 			ForceLatestRun:      Bool(true),
 			ExecutionMode:       WorkspaceExecutionModePtr(WorkspaceExecutionModeRemote),
-			TerraformVersion:    String("1.1.9"),
+			TerraformVersion:    String("1.2.9"),
 			RunOperationTimeout: Int(20),
 			AutoQueueRuns:       AutoQueueRunsModePtr(AutoQueueRunsModeAlways),
 		}
@@ -373,7 +373,7 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 			AutoApply:        Bool(true),
 			ForceLatestRun:   Bool(true),
 			ExecutionMode:    WorkspaceExecutionModePtr(WorkspaceExecutionModeRemote),
-			TerraformVersion: String("1.1.9"),
+			TerraformVersion: String("1.2.9"),
 		}
 
 		wAfter, err := client.Workspaces.Update(ctx, wTest.ID, options)
