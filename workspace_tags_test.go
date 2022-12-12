@@ -65,7 +65,7 @@ func TestWorkspaceTagsAdd(t *testing.T) {
 	t.Run("with invalid tag", func(t *testing.T) {
 		tagID := "tag-invalid-id"
 		err := client.WorkspaceTags.Add(ctx, workspace.ID, []*TagRelation{{ID: tagID}})
-		assert.EqualError(t, err, fmt.Sprintf("Invalid Attribute\n\nTag with ID '%s' not found or user unauthorized.", tagID))
+		assert.EqualError(t, err, fmt.Sprintf("Validation Error\n\nTag with ID '%s' not found or user unauthorized.", tagID))
 	})
 }
 
@@ -110,7 +110,7 @@ func TestWorkspaceTagsReplace(t *testing.T) {
 	t.Run("with invalid tag", func(t *testing.T) {
 		tagID := "tag-invalid-id"
 		err := client.WorkspaceTags.Replace(ctx, workspace.ID, []*TagRelation{{ID: tagID}})
-		assert.EqualError(t, err, fmt.Sprintf("Invalid Attribute\n\nTag with ID '%s' not found or user unauthorized.", tagID))
+		assert.EqualError(t, err, fmt.Sprintf("Validation Error\n\nTag with ID '%s' not found or user unauthorized.", tagID))
 	})
 
 	t.Run("when all tags should be removed", func(t *testing.T) {
@@ -159,6 +159,6 @@ func TestWorkspaceTagsDelete(t *testing.T) {
 	t.Run("with invalid tag", func(t *testing.T) {
 		tagID := "tag-invalid-id"
 		err := client.WorkspaceTags.Replace(ctx, workspace.ID, []*TagRelation{{ID: tagID}})
-		assert.EqualError(t, err, fmt.Sprintf("Invalid Attribute\n\nTag with ID '%s' not found or user unauthorized.", tagID))
+		assert.EqualError(t, err, fmt.Sprintf("Validation Error\n\nTag with ID '%s' not found or user unauthorized.", tagID))
 	})
 }
