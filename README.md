@@ -88,7 +88,7 @@ func main() {
 }
 ```
 
-#Tests
+## Tests
 
 You will need to set up the environment variables for your Scalr installation. For example:
 

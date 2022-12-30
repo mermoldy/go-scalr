@@ -74,7 +74,7 @@ func TestWorkspacesCreate(t *testing.T) {
 			AutoApply:           Bool(true),
 			ForceLatestRun:      Bool(true),
 			ExecutionMode:       WorkspaceExecutionModePtr(WorkspaceExecutionModeRemote),
-			TerraformVersion:    String("0.12.25"),
+			TerraformVersion:    String("1.1.9"),
 			WorkingDirectory:    String("bar/"),
 			RunOperationTimeout: Int(15),
 			AutoQueueRuns:       AutoQueueRunsModePtr(AutoQueueRunsModeNever),
@@ -111,7 +111,7 @@ func TestWorkspacesCreate(t *testing.T) {
 			Name:             String(randomString(t)),
 			AutoApply:        Bool(true),
 			ExecutionMode:    WorkspaceExecutionModePtr(WorkspaceExecutionModeRemote),
-			TerraformVersion: String("0.12.25"),
+			TerraformVersion: String("1.1.9"),
 			WorkingDirectory: String("bar/"),
 		}
 
@@ -273,7 +273,7 @@ func TestWorkspacesUpdate(t *testing.T) {
 			AutoApply:           Bool(true),
 			ForceLatestRun:      Bool(true),
 			ExecutionMode:       WorkspaceExecutionModePtr(WorkspaceExecutionModeRemote),
-			TerraformVersion:    String("0.12.25"),
+			TerraformVersion:    String("1.2.9"),
 			RunOperationTimeout: Int(20),
 			AutoQueueRuns:       AutoQueueRunsModePtr(AutoQueueRunsModeAlways),
 		}
@@ -318,7 +318,7 @@ func TestWorkspacesUpdate(t *testing.T) {
 			AutoApply:        Bool(false),
 			ForceLatestRun:   Bool(false),
 			ExecutionMode:    WorkspaceExecutionModePtr(WorkspaceExecutionModeLocal),
-			TerraformVersion: String("0.12.25"),
+			TerraformVersion: String("1.1.9"),
 			WorkingDirectory: String("baz/"),
 		}
 
@@ -373,7 +373,7 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 			AutoApply:        Bool(true),
 			ForceLatestRun:   Bool(true),
 			ExecutionMode:    WorkspaceExecutionModePtr(WorkspaceExecutionModeRemote),
-			TerraformVersion: String("0.12.25"),
+			TerraformVersion: String("1.2.9"),
 		}
 
 		wAfter, err := client.Workspaces.Update(ctx, wTest.ID, options)
@@ -392,7 +392,7 @@ func TestWorkspacesUpdateByID(t *testing.T) {
 			AutoApply:        Bool(false),
 			ForceLatestRun:   Bool(false),
 			ExecutionMode:    WorkspaceExecutionModePtr(WorkspaceExecutionModeLocal),
-			TerraformVersion: String("0.12.25"),
+			TerraformVersion: String("1.1.9"),
 			WorkingDirectory: String("baz/"),
 		}
 
