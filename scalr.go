@@ -116,25 +116,27 @@ type Client struct {
 	retryLogHook      RetryLogHook
 	retryServerErrors bool
 
-	Accounts                        Accounts
 	AccessPolicies                  AccessPolicies
 	AccessTokens                    AccessTokens
 	AccountUsers                    AccountUsers
+	Accounts                        Accounts
 	AgentPoolTokens                 AgentPoolTokens
 	AgentPools                      AgentPools
 	ConfigurationVersions           ConfigurationVersions
 	Endpoints                       Endpoints
-	Environments                    Environments
 	EnvironmentTags                 EnvironmentTags
+	Environments                    Environments
 	ModuleVersions                  ModuleVersions
 	Modules                         Modules
-	PolicyGroups                    PolicyGroups
 	PolicyGroupEnvironments         PolicyGroupEnvironments
+	PolicyGroups                    PolicyGroups
 	ProviderConfigurationLinks      ProviderConfigurationLinks
 	ProviderConfigurationParameters ProviderConfigurationParameters
 	ProviderConfigurations          ProviderConfigurations
 	Roles                           Roles
+	RunTriggers                     RunTriggers
 	Runs                            Runs
+	ServiceAccounts                 ServiceAccounts
 	Tags                            Tags
 	Teams                           Teams
 	Users                           Users
@@ -142,9 +144,8 @@ type Client struct {
 	VcsProviders                    VcsProviders
 	VcsRevisions                    VcsRevisions
 	Webhooks                        Webhooks
-	Workspaces                      Workspaces
 	WorkspaceTags                   WorkspaceTags
-	RunTriggers                     RunTriggers
+	Workspaces                      Workspaces
 }
 
 // NewClient creates a new Scalr API client.
@@ -211,22 +212,27 @@ func NewClient(cfg *Config) (*Client, error) {
 	}
 
 	// Create the services.
-	client.Accounts = &accounts{client: client}
 	client.AccessPolicies = &accessPolicies{client: client}
 	client.AccessTokens = &accessTokens{client: client}
 	client.AccountUsers = &accountUsers{client: client}
+	client.Accounts = &accounts{client: client}
 	client.AgentPoolTokens = &agentPoolTokens{client: client}
 	client.AgentPools = &agentPools{client: client}
 	client.ConfigurationVersions = &configurationVersions{client: client}
 	client.Endpoints = &endpoints{client: client}
-	client.Environments = &environments{client: client}
 	client.EnvironmentTags = &environmentTag{client: client}
+	client.Environments = &environments{client: client}
 	client.ModuleVersions = &moduleVersions{client: client}
 	client.Modules = &modules{client: client}
-	client.PolicyGroups = &policyGroups{client: client}
 	client.PolicyGroupEnvironments = &policyGroupEnvironment{client: client}
+	client.PolicyGroups = &policyGroups{client: client}
+	client.ProviderConfigurationLinks = &providerConfigurationLinks{client: client}
+	client.ProviderConfigurationParameters = &providerConfigurationParameters{client: client}
+	client.ProviderConfigurations = &providerConfigurations{client: client}
 	client.Roles = &roles{client: client}
+	client.RunTriggers = &runTriggers{client: client}
 	client.Runs = &runs{client: client}
+	client.ServiceAccounts = &serviceAccounts{client: client}
 	client.Tags = &tags{client: client}
 	client.Teams = &teams{client: client}
 	client.Users = &users{client: client}
@@ -234,12 +240,8 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.VcsProviders = &vcsProviders{client: client}
 	client.VcsRevisions = &vcsRevisions{client: client}
 	client.Webhooks = &webhooks{client: client}
-	client.Workspaces = &workspaces{client: client}
 	client.WorkspaceTags = &workspaceTag{client: client}
-	client.RunTriggers = &runTriggers{client: client}
-	client.ProviderConfigurations = &providerConfigurations{client: client}
-	client.ProviderConfigurationParameters = &providerConfigurationParameters{client: client}
-	client.ProviderConfigurationLinks = &providerConfigurationLinks{client: client}
+	client.Workspaces = &workspaces{client: client}
 	return client, nil
 }
 

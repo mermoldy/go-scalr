@@ -417,6 +417,31 @@ func createProviderConfigurationScalr(t *testing.T, client *Client, providerName
 	}
 }
 
+func createServiceAccount(
+	t *testing.T,
+	client *Client,
+	account *Account,
+	status *ServiceAccountStatus) (*ServiceAccount, func()) {
+	ctx := context.Background()
+	sa, err := client.ServiceAccounts.Create(ctx, ServiceAccountCreateOptions{
+		Name:        String("tst-" + randomString(t)),
+		Description: String("tst-description-" + randomString(t)),
+		Status:      status,
+		Account:     account,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return sa, func() {
+		if err := client.ServiceAccounts.Delete(ctx, sa.ID); err != nil {
+			t.Errorf("Error destroying service account! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"Service account: %s\nError: %s", sa.ID, err)
+		}
+	}
+}
+
 func assignTagsToWorkspace(t *testing.T, client *Client, workspace *Workspace, tags []*Tag) {
 	ctx := context.Background()
 	tagRels := make([]*TagRelation, len(tags))
