@@ -65,6 +65,7 @@ type ServiceAccountListOptions struct {
 	Account *string `url:"filter[account],omitempty"`
 	Email   *string `url:"filter[email],omitempty"`
 	Query   *string `url:"query,omitempty"`
+	Include *string `url:"include,omitempty"`
 }
 
 // ServiceAccountCreateOptions represents the options for creating a new service account.
@@ -107,8 +108,13 @@ func (s *serviceAccounts) Read(ctx context.Context, serviceAccountID string) (*S
 		return nil, errors.New("invalid value for service account ID")
 	}
 
+	options := struct {
+		Include string `url:"include"`
+	}{
+		Include: "created-by",
+	}
 	u := fmt.Sprintf("service-accounts/%s", url.QueryEscape(serviceAccountID))
-	req, err := s.client.newRequest("GET", u, nil)
+	req, err := s.client.newRequest("GET", u, options)
 	if err != nil {
 		return nil, err
 	}
