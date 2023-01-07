@@ -9,6 +9,33 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestAccessTokenRead(t *testing.T) {
+	client := testClient(t)
+	ctx := context.Background()
+
+	ap, apCleanup := createAgentPool(t, client)
+	defer apCleanup()
+
+	atTest, atTestCleanup := createAgentPoolToken(t, client, ap.ID)
+	defer atTestCleanup()
+
+	t.Run("when the token exists", func(t *testing.T) {
+		at, err := client.AccessTokens.Read(ctx, atTest.ID)
+		require.NoError(t, err)
+		assert.Equal(t, atTest.ID, at.ID)
+	})
+
+	t.Run("when the token does not exist", func(t *testing.T) {
+		_, err := client.AccessTokens.Read(ctx, "at-nonexisting")
+		assert.Error(t, err)
+	})
+
+	t.Run("with invalid token ID", func(t *testing.T) {
+		_, err := client.AccessTokens.Read(ctx, badIdentifier)
+		assert.EqualError(t, err, "invalid value for access token ID")
+	})
+}
+
 func TestAccessTokenUpdate(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
