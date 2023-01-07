@@ -136,6 +136,7 @@ type Client struct {
 	Roles                           Roles
 	RunTriggers                     RunTriggers
 	Runs                            Runs
+	ServiceAccountTokens            ServiceAccountTokens
 	ServiceAccounts                 ServiceAccounts
 	Tags                            Tags
 	Teams                           Teams
@@ -232,6 +233,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.Roles = &roles{client: client}
 	client.RunTriggers = &runTriggers{client: client}
 	client.Runs = &runs{client: client}
+	client.ServiceAccountTokens = &serviceAccountTokens{client: client}
 	client.ServiceAccounts = &serviceAccounts{client: client}
 	client.Tags = &tags{client: client}
 	client.Teams = &teams{client: client}

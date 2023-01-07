@@ -37,10 +37,25 @@ type AccessToken struct {
 	Token       string    `jsonapi:"attr,token"`
 }
 
+// AccessTokenListOptions represents the options for listing access tokens.
+type AccessTokenListOptions struct {
+	ListOptions
+}
+
+// AccessTokenCreateOptions represents the options for creating a new AccessToken.
+type AccessTokenCreateOptions struct {
+	// For internal use only!
+	ID string `jsonapi:"primary,access-tokens"`
+
+	Description *string `jsonapi:"attr,description,omitempty"`
+}
+
 // AccessTokenUpdateOptions represents the options for updating an AccessToken.
 type AccessTokenUpdateOptions struct {
-	ID          string  `jsonapi:"primary,access-tokens"`
-	Description *string `jsonapi:"attr,description"`
+	// For internal use only!
+	ID string `jsonapi:"primary,access-tokens"`
+
+	Description *string `jsonapi:"attr,description,omitempty"`
 }
 
 // Update is used to update an AccessToken.

@@ -20,13 +20,13 @@ func TestAgentPoolTokenList(t *testing.T) {
 	defer aptCleanup()
 
 	t.Run("with valid agent pool", func(t *testing.T) {
-		tList, err := client.AgentPoolTokens.List(ctx, ap.ID, AgentPoolTokenListOptions{})
+		tList, err := client.AgentPoolTokens.List(ctx, ap.ID, AccessTokenListOptions{})
 		require.NoError(t, err)
 		assert.Len(t, tList.Items, 1)
 		assert.Equal(t, tList.Items[0].ID, apt.ID)
 	})
 	t.Run("with nonexistent agent pool", func(t *testing.T) {
-		_, err := client.AgentPoolTokens.List(ctx, "ap-123", AgentPoolTokenListOptions{})
+		_, err := client.AgentPoolTokens.List(ctx, "ap-123", AccessTokenListOptions{})
 		assert.Equal(
 			t,
 			ResourceNotFoundError{
@@ -45,7 +45,7 @@ func TestAgentPoolTokenCreate(t *testing.T) {
 	defer apCleanup()
 
 	t.Run("when description is provided", func(t *testing.T) {
-		options := AgentPoolTokenCreateOptions{
+		options := AccessTokenCreateOptions{
 			Description: String("provider tests token"),
 		}
 
@@ -53,7 +53,7 @@ func TestAgentPoolTokenCreate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Get a refreshed view from the API.
-		aptList, err := client.AgentPoolTokens.List(ctx, ap.ID, AgentPoolTokenListOptions{})
+		aptList, err := client.AgentPoolTokens.List(ctx, ap.ID, AccessTokenListOptions{})
 		require.NoError(t, err)
 
 		refreshed := aptList.Items[0]
@@ -66,12 +66,12 @@ func TestAgentPoolTokenCreate(t *testing.T) {
 	})
 
 	t.Run("when description is not provided", func(t *testing.T) {
-		options := AgentPoolTokenCreateOptions{}
+		options := AccessTokenCreateOptions{}
 		apToken, err := client.AgentPoolTokens.Create(ctx, ap.ID, options)
 		require.NoError(t, err)
 
 		// Get a refreshed view from the API.
-		aptList, err := client.AgentPoolTokens.List(ctx, ap.ID, AgentPoolTokenListOptions{})
+		aptList, err := client.AgentPoolTokens.List(ctx, ap.ID, AccessTokenListOptions{})
 		require.NoError(t, err)
 
 		refreshed := aptList.Items[0]
@@ -85,7 +85,7 @@ func TestAgentPoolTokenCreate(t *testing.T) {
 
 	t.Run("with nonexistent pool id", func(t *testing.T) {
 		var apID = "ap-234"
-		_, err := client.AgentPoolTokens.Create(ctx, apID, AgentPoolTokenCreateOptions{})
+		_, err := client.AgentPoolTokens.Create(ctx, apID, AccessTokenCreateOptions{})
 		assert.Equal(
 			t,
 			ResourceNotFoundError{
@@ -97,7 +97,7 @@ func TestAgentPoolTokenCreate(t *testing.T) {
 
 	t.Run("with invalid pool id", func(t *testing.T) {
 		apID := badIdentifier
-		ap, err := client.AgentPoolTokens.Create(ctx, apID, AgentPoolTokenCreateOptions{})
+		ap, err := client.AgentPoolTokens.Create(ctx, apID, AccessTokenCreateOptions{})
 		assert.Nil(t, ap)
 		assert.EqualError(t, err, fmt.Sprintf("invalid value for agent pool ID: '%s'", apID))
 
