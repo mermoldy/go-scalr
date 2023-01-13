@@ -90,10 +90,6 @@ func (s *accessTokens) Update(ctx context.Context, accessTokenID string, options
 		return nil, fmt.Errorf("invalid value for access token ID: '%s'", accessTokenID)
 	}
 
-	if !validString(options.Description) {
-		return nil, errors.New("value for description must be a valid string")
-	}
-
 	req, err := s.client.newRequest("PATCH", fmt.Sprintf("access-tokens/%s", url.QueryEscape(accessTokenID)), &options)
 	if err != nil {
 		return nil, err
