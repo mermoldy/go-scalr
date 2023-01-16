@@ -34,3 +34,8 @@ func WorkspaceExecutionModePtr(v WorkspaceExecutionMode) *WorkspaceExecutionMode
 func AutoQueueRunsModePtr(v WorkspaceAutoQueueRuns) *WorkspaceAutoQueueRuns {
 	return &v
 }
+
+// ServiceAccountStatusPtr returns a pointer to the given service account status value.
+func ServiceAccountStatusPtr(v ServiceAccountStatus) *ServiceAccountStatus {
+	return &v
+}
