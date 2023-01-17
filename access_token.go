@@ -14,6 +14,7 @@ var _ AccessTokens = (*accessTokens)(nil)
 // AccessTokens describes all the access token related methods that the
 // Scalr IACP API supports.
 type AccessTokens interface {
+	Read(ctx context.Context, accessTokenID string) (*AccessToken, error)
 	Update(ctx context.Context, accessTokenID string, options AccessTokenUpdateOptions) (*AccessToken, error)
 	Delete(ctx context.Context, accessTokenID string) error
 }
@@ -37,10 +38,46 @@ type AccessToken struct {
 	Token       string    `jsonapi:"attr,token"`
 }
 
+// AccessTokenListOptions represents the options for listing access tokens.
+type AccessTokenListOptions struct {
+	ListOptions
+}
+
+// AccessTokenCreateOptions represents the options for creating a new AccessToken.
+type AccessTokenCreateOptions struct {
+	// For internal use only!
+	ID string `jsonapi:"primary,access-tokens"`
+
+	Description *string `jsonapi:"attr,description,omitempty"`
+}
+
 // AccessTokenUpdateOptions represents the options for updating an AccessToken.
 type AccessTokenUpdateOptions struct {
-	ID          string  `jsonapi:"primary,access-tokens"`
-	Description *string `jsonapi:"attr,description"`
+	// For internal use only!
+	ID string `jsonapi:"primary,access-tokens"`
+
+	Description *string `jsonapi:"attr,description,omitempty"`
+}
+
+// Read access token by its ID
+func (s *accessTokens) Read(ctx context.Context, accessTokenID string) (*AccessToken, error) {
+	if !validStringID(&accessTokenID) {
+		return nil, errors.New("invalid value for access token ID")
+	}
+
+	u := fmt.Sprintf("access-tokens/%s", url.QueryEscape(accessTokenID))
+	req, err := s.client.newRequest("GET", u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	at := &AccessToken{}
+	err = s.client.do(ctx, req, at)
+	if err != nil {
+		return nil, err
+	}
+
+	return at, nil
 }
 
 // Update is used to update an AccessToken.
@@ -51,10 +88,6 @@ func (s *accessTokens) Update(ctx context.Context, accessTokenID string, options
 
 	if !validStringID(&accessTokenID) {
 		return nil, fmt.Errorf("invalid value for access token ID: '%s'", accessTokenID)
-	}
-
-	if !validString(options.Description) {
-		return nil, errors.New("value for description must be a valid string")
 	}
 
 	req, err := s.client.newRequest("PATCH", fmt.Sprintf("access-tokens/%s", url.QueryEscape(accessTokenID)), &options)

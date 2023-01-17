@@ -63,9 +63,9 @@ func createAgentPool(t *testing.T, client *Client) (*AgentPool, func()) {
 	}
 }
 
-func createAgentPoolToken(t *testing.T, client *Client, poolID string) (*AgentPoolToken, func()) {
+func createAgentPoolToken(t *testing.T, client *Client, poolID string) (*AccessToken, func()) {
 	ctx := context.Background()
-	apt, err := client.AgentPoolTokens.Create(ctx, poolID, AgentPoolTokenCreateOptions{Description: String("provider test token")})
+	apt, err := client.AgentPoolTokens.Create(ctx, poolID, AccessTokenCreateOptions{Description: String("provider test token")})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -438,6 +438,24 @@ func createServiceAccount(
 			t.Errorf("Error destroying service account! WARNING: Dangling resources\n"+
 				"may exist! The full error is shown below.\n\n"+
 				"Service account: %s\nError: %s", sa.ID, err)
+		}
+	}
+}
+
+func createServiceAccountToken(t *testing.T, client *Client, serviceAccountID string) (*AccessToken, func()) {
+	ctx := context.Background()
+	sat, err := client.ServiceAccountTokens.Create(
+		ctx, serviceAccountID, AccessTokenCreateOptions{Description: String("tst-description-" + randomString(t))},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return sat, func() {
+		if err := client.AccessTokens.Delete(ctx, sat.ID); err != nil {
+			t.Errorf("Error destroying service account token! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"Service account token: %s\nError: %s", sat.ID, err)
 		}
 	}
 }
