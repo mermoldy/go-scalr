@@ -7,8 +7,8 @@ jobs:
     name: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
         with:
           go-version: "1.18"
       - name: golangci-lint
@@ -19,51 +19,77 @@ jobs:
     runs-on: ubuntu-latest
     name: tests
     env:
-      REVIZOR_URL: ${{ secrets.REVIZOR_URL }}
-      REVIZOR_TOKEN: ${{ secrets.REVIZOR_TOKEN }}
       SCALR_TOKEN: ${{ secrets.SCALR_TOKEN }}
       UPSTREAM_ID: ${{ github.run_number }}
+      GCP: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      GH_PAT: ${{ secrets.GH_PAT }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
         with:
           go-version: "1.18"
+      - name: Clone fatmouse repo
+        uses: actions/checkout@v3
+        with:
+          repository: Scalr/fatmouse
+          path: fatmouse
+          token: ${{ secrets.GH_PAT }}
       - name: Set API_BRANCH
         if: ${{ contains(github.event.head_commit.message, '[API_BRANCH]') }}
         run: echo "API_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
       - name: Set DB_BRANCH
         if: ${{ contains(github.event.head_commit.message, '[DB_BRANCH]') }}
         run: echo "DB_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
-      - name: Create container
-        id: create
-        uses: Scalr/gh-action-revizor@master
+      - id: auth
+        uses: google-github-actions/auth@v0
         with:
-          command: create
-      - name: Run tests
-        env:
-          SCALR_ADDRESS: https://${{ steps.create.outputs.hostname }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TEST_AWS_ACCESS_KEY: ${{ secrets.TEST_AWS_ACCESS_KEY }}
-          TEST_AWS_SECRET_KEY: ${{ secrets.TEST_AWS_SECRET_KEY }}
-          TEST_AWS_ROLE_ARN: ${{ secrets.TEST_AWS_ROLE_ARN }}
-          TEST_AWS_EXTERNAL_ID: ${{ secrets.TEST_AWS_EXTERNAL_ID }}
-          TEST_ARM_CLIENT_ID: ${{ secrets.TEST_ARM_CLIENT_ID }}
-          TEST_ARM_CLIENT_SECRET: ${{ secrets.TEST_ARM_CLIENT_SECRET }}
-          TEST_ARM_TENANT_ID: ${{ secrets.TEST_ARM_TENANT_ID }}
-          TEST_ARM_SUBSCRIPTION_ID: ${{ secrets.TEST_ARM_SUBSCRIPTION_ID }}
-        run: make test
-      - name: Install goveralls
-        env:
-          GO111MODULE: off
-        run: go get github.com/mattn/goveralls
-      - name: Send coverage
-        env:
-          COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: goveralls -coverprofile=covprofile -service=github
-      - name: Delete container
-        id: delete
-        if: ${{ always() && steps.create.outputs.container_id }}
-        uses: Scalr/gh-action-revizor@master
-        with:
-          command: delete
-          container_id: ${{ steps.create.outputs.container_id }}
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+      - name: Copy secrets
+        shell: bash
+        run: |
+          mkdir ~/.scalr-labs
+          gsutil cp gs://drone_bucket/prod/private.d/.secrets.yaml fatmouse/tacobell/.secrets.yaml
+          gsutil cp gs://drone_bucket/prod/private.d/github.json ~/.scalr-labs/github.json
+      - name: Configure docker
+        shell: bash
+        run: gcloud auth configure-docker eu.gcr.io
+      - name: Pull python builder
+        shell: bash
+        run: |
+          docker pull eu.gcr.io/development-156220/fatmouse/python-builder:master
+          docker tag eu.gcr.io/development-156220/fatmouse/python-builder:master fatmouse/python-builder:master
+#      - name: Create container
+#        id: create
+#        uses: Scalr/gh-action-revizor@master
+#        with:
+#          command: create
+#      - name: Run tests
+#        env:
+#          SCALR_ADDRESS: https://${{ steps.create.outputs.hostname }}
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          TEST_AWS_ACCESS_KEY: ${{ secrets.TEST_AWS_ACCESS_KEY }}
+#          TEST_AWS_SECRET_KEY: ${{ secrets.TEST_AWS_SECRET_KEY }}
+#          TEST_AWS_ROLE_ARN: ${{ secrets.TEST_AWS_ROLE_ARN }}
+#          TEST_AWS_EXTERNAL_ID: ${{ secrets.TEST_AWS_EXTERNAL_ID }}
+#          TEST_ARM_CLIENT_ID: ${{ secrets.TEST_ARM_CLIENT_ID }}
+#          TEST_ARM_CLIENT_SECRET: ${{ secrets.TEST_ARM_CLIENT_SECRET }}
+#          TEST_ARM_TENANT_ID: ${{ secrets.TEST_ARM_TENANT_ID }}
+#          TEST_ARM_SUBSCRIPTION_ID: ${{ secrets.TEST_ARM_SUBSCRIPTION_ID }}
+#        run: make test
+#      - name: Install goveralls
+#        env:
+#          GO111MODULE: off
+#        run: go get github.com/mattn/goveralls
+#      - name: Send coverage
+#        env:
+#          COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        run: goveralls -coverprofile=covprofile -service=github
+#      - name: Delete container
+#        id: delete
+#        if: ${{ always() && steps.create.outputs.container_id }}
+#        uses: Scalr/gh-action-revizor@master
+#        with:
+#          command: delete
+#          container_id: ${{ steps.create.outputs.container_id }}
