@@ -113,6 +113,7 @@ type EnvironmentListOptions struct {
 	Name    *string `url:"query,omitempty"`
 	Id      *string `url:"query,omitempty"`
 	Account *string `url:"filter[account],omitempty"`
+	Tag     *string `url:"filter[tag],omitempty"`
 }
 
 // List all the environmens.
