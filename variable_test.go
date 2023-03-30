@@ -3,6 +3,7 @@ package scalr
 import (
 	"context"
 	"fmt"
+	"log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -286,6 +287,19 @@ func TestVariablesList(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("scopes", func(t *testing.T) {
+		variables, err := client.Variables.List(ctx, VariableListOptions{})
+		if err != nil {
+			log.Fatalf("Cant remove default variables before test: %v", err)
+			return
+		}
+		for _, variable := range variables.Items {
+			err = client.Variables.Delete(ctx, variable.ID)
+			if err != nil {
+				log.Fatalf("Cant remove default variables before test: %v", err)
+				return
+			}
+		}
+
 		globalVariable, deleteGlobalVariable := createVariable(t, client, nil, nil, nil)
 		defer deleteGlobalVariable()
 
