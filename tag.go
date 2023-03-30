@@ -51,6 +51,7 @@ type TagRelation struct {
 type TagListOptions struct {
 	ListOptions
 
+	ID      *string `url:"filter[tag],omitempty"`
 	Account *string `url:"filter[account],omitempty"`
 	Name    *string `url:"filter[name],omitempty"`
 	Query   *string `url:"query,omitempty"`

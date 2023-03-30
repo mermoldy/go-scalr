@@ -382,6 +382,26 @@ func TestVariablesList(t *testing.T) {
 		assert.Equal(t, responseVariables.Items[0].ID, terraformVariable.ID)
 	})
 
+	t.Run("by id", func(t *testing.T) {
+		fooVariable, deleteFooVariable := createVariable(t, client, nil, nil, nil)
+		defer deleteFooVariable()
+
+		_, deleteBarVariable := createVariable(t, client, nil, nil, nil)
+		defer deleteBarVariable()
+
+		responseVariables, err := client.Variables.List(
+			ctx, VariableListOptions{Filter: &VariableFilter{
+				ID: String(fooVariable.ID),
+			}},
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		assert.Equal(t, 1, responseVariables.TotalCount)
+		assert.Equal(t, fooVariable.ID, responseVariables.Items[0].ID)
+	})
+
 	t.Run("name", func(t *testing.T) {
 		workspace, deleteWorkspace := createWorkspace(t, client, nil)
 		defer deleteWorkspace()

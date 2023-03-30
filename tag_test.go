@@ -39,6 +39,16 @@ func TestTagsList(t *testing.T) {
 		assert.Equal(t, 1, tagl.TotalCount)
 		assert.Equal(t, tagTest1.ID, tagl.Items[0].ID)
 	})
+
+	t.Run("with ID in options", func(t *testing.T) {
+		tagl, err := client.Tags.List(ctx, TagListOptions{
+			Account: String(defaultAccountID),
+			ID:      String(tagTest1.ID)},
+		)
+		require.NoError(t, err)
+		assert.Equal(t, 1, tagl.TotalCount)
+		assert.Equal(t, tagTest1.ID, tagl.Items[0].ID)
+	})
 }
 
 func TestTagsCreate(t *testing.T) {
