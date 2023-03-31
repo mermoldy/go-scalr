@@ -69,6 +69,7 @@ type ProviderConfigurationsListOptions struct {
 
 // ProviderConfigurationFilter represents the options for filtering provider configurations.
 type ProviderConfigurationFilter struct {
+	ProviderID   string `url:"provider-configuration,omitempty"`
 	ProviderName string `url:"provider-name,omitempty"`
 	Name         string `url:"name,omitempty"`
 	AccountID    string `url:"account,omitempty"`
