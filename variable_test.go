@@ -405,7 +405,7 @@ func TestVariablesList(t *testing.T) {
 
 		responseVariables, err := client.Variables.List(
 			ctx, VariableListOptions{Filter: &VariableFilter{
-				ID: String(fooVariable.ID),
+				Var: String(fooVariable.ID),
 			}},
 		)
 		if err != nil {

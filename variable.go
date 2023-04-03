@@ -84,7 +84,7 @@ type VariableListOptions struct {
 
 type VariableFilter struct {
 	// Filter by ID
-	ID *string `url:"var,omitempty"`
+	Var *string `url:"var,omitempty"`
 
 	// Filter by key
 	Key *string `url:"key,omitempty"`

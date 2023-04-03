@@ -37,7 +37,7 @@ func TestWorkspacesList(t *testing.T) {
 	t.Run("with ID in list options", func(t *testing.T) {
 		wsl, err := client.Workspaces.List(ctx, WorkspaceListOptions{
 			Environment: &envTest.ID,
-			ID:          &wsTest1.ID,
+			Workspace:   &wsTest1.ID,
 		})
 		require.NoError(t, err)
 		assert.Equal(t, 1, wsl.TotalCount)
