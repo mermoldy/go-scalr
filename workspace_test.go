@@ -64,7 +64,7 @@ func TestWorkspacesCreate(t *testing.T) {
 	envTest, envTestCleanup := createEnvironment(t, client)
 	defer envTestCleanup()
 
-	pool, poolCleanup := createAgentPool(t, client)
+	pool, poolCleanup := createAgentPool(t, client, false)
 	defer poolCleanup()
 
 	t.Run("with valid options", func(t *testing.T) {
@@ -262,7 +262,7 @@ func TestWorkspacesUpdate(t *testing.T) {
 	envTest, envTestCleanup := createEnvironment(t, client)
 	defer envTestCleanup()
 
-	pool, poolCleanup := createAgentPool(t, client)
+	pool, poolCleanup := createAgentPool(t, client, false)
 	defer poolCleanup()
 
 	wsTest, _ := createWorkspace(t, client, envTest)
