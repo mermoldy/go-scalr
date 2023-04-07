@@ -143,6 +143,7 @@ type WorkspacePermissions struct {
 type WorkspaceListOptions struct {
 	ListOptions
 
+	Workspace   *string `url:"filter[workspace],omitempty"`
 	Environment *string `url:"filter[environment],omitempty"`
 	AgentPool   *string `url:"filter[agent-pool],omitempty"`
 	Name        *string `url:"filter[name],omitempty"`

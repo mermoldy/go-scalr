@@ -34,6 +34,16 @@ func TestWorkspacesList(t *testing.T) {
 		assert.Equal(t, 2, wsl.TotalCount)
 	})
 
+	t.Run("with ID in list options", func(t *testing.T) {
+		wsl, err := client.Workspaces.List(ctx, WorkspaceListOptions{
+			Environment: &envTest.ID,
+			Workspace:   &wsTest1.ID,
+		})
+		require.NoError(t, err)
+		assert.Equal(t, 1, wsl.TotalCount)
+		assert.Equal(t, wsTest1.ID, wsl.Items[0].ID)
+	})
+
 	t.Run("with list options", func(t *testing.T) {
 		// Request a page number which is out of range. The result should
 		// be successful, but return no results if the paging options are

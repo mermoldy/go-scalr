@@ -45,6 +45,16 @@ func TestServiceAccountsList(t *testing.T) {
 		assert.Equal(t, saTest1.ID, sal.Items[0].ID)
 	})
 
+	t.Run("with ID filter", func(t *testing.T) {
+		sal, err := client.ServiceAccounts.List(ctx, ServiceAccountListOptions{
+			Account:        String(defaultAccountID),
+			ServiceAccount: String(saTest1.ID)},
+		)
+		require.NoError(t, err)
+		assert.Equal(t, 1, sal.TotalCount)
+		assert.Equal(t, saTest1.ID, sal.Items[0].ID)
+	})
+
 	t.Run("with query", func(t *testing.T) {
 		sal, err := client.ServiceAccounts.List(ctx,
 			ServiceAccountListOptions{Query: String(saTest2.Description)},

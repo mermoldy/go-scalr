@@ -162,7 +162,7 @@ func (s *webhooks) Read(ctx context.Context, webhookID string) (*Webhook, error)
 	return w, nil
 }
 
-// WebhookUpdateOptions represents the options for updating an webhook.
+// WebhookUpdateOptions represents the options for updating a webhook.
 type WebhookUpdateOptions struct {
 	// For internal use only!
 	ID      string  `jsonapi:"primary,webhooks"`
