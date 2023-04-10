@@ -49,7 +49,7 @@ func createAgentPool(t *testing.T, client *Client, vcsEnabled bool) (*AgentPool,
 	ap, err := client.AgentPools.Create(ctx, AgentPoolCreateOptions{
 		Name:       String("provider-tst-pool-" + randomString(t)),
 		Account:    &Account{ID: defaultAccountID},
-		VcsEnabled: vcsEnabled,
+		VcsEnabled: Bool(vcsEnabled),
 	})
 	if err != nil {
 		t.Fatal(err)

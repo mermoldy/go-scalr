@@ -76,7 +76,7 @@ func TestAgentPoolsCreate(t *testing.T) {
 		options := AgentPoolCreateOptions{
 			Account:    &Account{ID: defaultAccountID},
 			Name:       String("test-provider-pool-" + randomString(t)),
-			VcsEnabled: true,
+			VcsEnabled: Bool(true),
 		}
 
 		agentPool, err := client.AgentPools.Create(ctx, options)
@@ -108,6 +108,7 @@ func TestAgentPoolsCreate(t *testing.T) {
 			Account:     &Account{ID: defaultAccountID},
 			Environment: &Environment{ID: env.ID},
 			Name:        String("test-provider-pool-" + randomString(t)),
+			VcsEnabled:  Bool(false),
 		}
 
 		agentPool, err := client.AgentPools.Create(ctx, options)
@@ -141,6 +142,7 @@ func TestAgentPoolsCreate(t *testing.T) {
 			Environment: &Environment{ID: env.ID},
 			Workspaces:  []*Workspace{{ID: ws.ID}},
 			Name:        String("test-provider-pool-" + randomString(t)),
+			VcsEnabled:  Bool(false),
 		}
 
 		agentPool, err := client.AgentPools.Create(ctx, options)

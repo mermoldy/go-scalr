@@ -36,7 +36,7 @@ type AgentPoolList struct {
 type AgentPool struct {
 	ID         string `jsonapi:"primary,agent-pools"`
 	Name       string `jsonapi:"attr,name"`
-	VcsEnabled bool   `jsonapi:"attr,vcs-enabled"`
+	VcsEnabled *bool  `jsonapi:"attr,vcs-enabled"`
 	// Relations
 
 	// The agent pool's scope
@@ -53,7 +53,7 @@ type AgentPool struct {
 type AgentPoolCreateOptions struct {
 	ID         string  `jsonapi:"primary,agent-pools"`
 	Name       *string `jsonapi:"attr,name"`
-	VcsEnabled bool    `jsonapi:"attr,vcs-enabled"`
+	VcsEnabled *bool   `jsonapi:"attr,vcs-enabled"`
 
 	// The agent pool's scope
 	Account     *Account     `jsonapi:"relation,account"`

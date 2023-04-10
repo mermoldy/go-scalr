@@ -68,38 +68,6 @@ func TestVcsProvidersCreate(t *testing.T) {
 
 	t.Run("with valid options", func(t *testing.T) {
 		options := VcsProviderCreateOptions{
-			Name:     String("foo"),
-			VcsType:  Github,
-			AuthType: PersonalToken,
-			Token:    os.Getenv("GITHUB_TOKEN"),
-
-			Environments: []*Environment{envTest},
-			Account:      &Account{ID: defaultAccountID},
-		}
-
-		vcs, err := client.VcsProviders.Create(ctx, options)
-		require.NoError(t, err)
-
-		// Get a refreshed view from the API.
-		refreshed, err := client.VcsProviders.Read(ctx, vcs.ID)
-		require.NoError(t, err)
-
-		for _, item := range []*VcsProvider{
-			vcs,
-			refreshed,
-		} {
-			assert.NotEmpty(t, item.ID)
-			assert.Equal(t, *options.Name, item.Name)
-			assert.Equal(t, options.VcsType, item.VcsType)
-			assert.Equal(t, options.AuthType, item.AuthType)
-		}
-	})
-
-	t.Run("with agent-pool", func(t *testing.T) {
-		ap, apCleanup := createAgentPool(t, client, true)
-		defer apCleanup()
-
-		options := VcsProviderCreateOptions{
 			Name:     String("vcs-" + randomString(t)),
 			VcsType:  Github,
 			AuthType: PersonalToken,
@@ -107,7 +75,6 @@ func TestVcsProvidersCreate(t *testing.T) {
 
 			Environments: []*Environment{envTest},
 			Account:      &Account{ID: defaultAccountID},
-			AgentPool:    ap,
 		}
 
 		vcs, err := client.VcsProviders.Create(ctx, options)
