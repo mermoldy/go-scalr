@@ -3,6 +3,7 @@ package scalr
 import (
 	"context"
 	"fmt"
+	"log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -286,6 +287,19 @@ func TestVariablesList(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("scopes", func(t *testing.T) {
+		variables, err := client.Variables.List(ctx, VariableListOptions{})
+		if err != nil {
+			log.Fatalf("Cant remove default variables before test: %v", err)
+			return
+		}
+		for _, variable := range variables.Items {
+			err = client.Variables.Delete(ctx, variable.ID)
+			if err != nil {
+				log.Fatalf("Cant remove default variables before test: %v", err)
+				return
+			}
+		}
+
 		globalVariable, deleteGlobalVariable := createVariable(t, client, nil, nil, nil)
 		defer deleteGlobalVariable()
 
@@ -380,6 +394,26 @@ func TestVariablesList(t *testing.T) {
 		}
 		assert.Len(t, responseVariables.Items, 1)
 		assert.Equal(t, responseVariables.Items[0].ID, terraformVariable.ID)
+	})
+
+	t.Run("by id", func(t *testing.T) {
+		fooVariable, deleteFooVariable := createVariable(t, client, nil, nil, nil)
+		defer deleteFooVariable()
+
+		_, deleteBarVariable := createVariable(t, client, nil, nil, nil)
+		defer deleteBarVariable()
+
+		responseVariables, err := client.Variables.List(
+			ctx, VariableListOptions{Filter: &VariableFilter{
+				Var: String(fooVariable.ID),
+			}},
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		assert.Equal(t, 1, responseVariables.TotalCount)
+		assert.Equal(t, fooVariable.ID, responseVariables.Items[0].ID)
 	})
 
 	t.Run("name", func(t *testing.T) {
