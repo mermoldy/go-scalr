@@ -145,6 +145,7 @@ type Client struct {
 	VcsProviders                    VcsProviders
 	VcsRevisions                    VcsRevisions
 	Webhooks                        Webhooks
+	WebhookIntegrations             WebhookIntegrations
 	WorkspaceTags                   WorkspaceTags
 	Workspaces                      Workspaces
 }
@@ -242,6 +243,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.VcsProviders = &vcsProviders{client: client}
 	client.VcsRevisions = &vcsRevisions{client: client}
 	client.Webhooks = &webhooks{client: client}
+	client.WebhookIntegrations = &webhookIntegrations{client: client}
 	client.WorkspaceTags = &workspaceTag{client: client}
 	client.Workspaces = &workspaces{client: client}
 	return client, nil
