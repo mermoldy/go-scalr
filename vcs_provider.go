@@ -95,9 +95,9 @@ type VcsProvidersListOptions struct {
 	VcsType *VcsType `url:"filter[vcs-type],omitempty"`
 
 	// Scope filters.
-	Environment *string    `url:"filter[environment],omitempty"`
-	Account     *string    `url:"filter[account],omitempty"`
-	AgentPool   *AgentPool `url:"filter[agent-pool],omitempty"`
+	Environment *string `url:"filter[environment],omitempty"`
+	Account     *string `url:"filter[account],omitempty"`
+	AgentPool   *string `url:"filter[agent-pool],omitempty"`
 }
 
 // List the vcs providers.
@@ -183,7 +183,7 @@ type VcsProviderUpdateOptions struct {
 	Username *string `jsonapi:"attr,username,omitempty"`
 
 	// Relations
-	AgentPool *AgentPool `jsonapi:"relation,agent-pool,omitempty"`
+	AgentPool *AgentPool `jsonapi:"relation,agent-pool"`
 }
 
 // Update settings of an existing vcs provider.

@@ -93,7 +93,31 @@ func TestAgentPoolsCreate(t *testing.T) {
 			assert.NotEmpty(t, item.ID)
 			assert.Equal(t, *options.Name, item.Name)
 			assert.Equal(t, options.Account, item.Account)
-			assert.Equal(t, options.VcsEnabled, item.VcsEnabled)
+			assert.Equal(t, *options.VcsEnabled, item.VcsEnabled)
+		}
+		err = client.AgentPools.Delete(ctx, agentPool.ID)
+		require.NoError(t, err)
+	})
+
+	t.Run("when create without vcs_enabled", func(t *testing.T) {
+		options := AgentPoolCreateOptions{
+			Account: &Account{ID: defaultAccountID},
+			Name:    String("test-provider-pool-" + randomString(t)),
+		}
+
+		agentPool, err := client.AgentPools.Create(ctx, options)
+		require.NoError(t, err)
+
+		// Get a refreshed view from the API.
+		refreshed, err := client.AgentPools.Read(ctx, agentPool.ID)
+		require.NoError(t, err)
+
+		for _, item := range []*AgentPool{
+			agentPool,
+			refreshed,
+		} {
+			assert.NotEmpty(t, item.ID)
+			assert.Equal(t, item.VcsEnabled, false)
 		}
 		err = client.AgentPools.Delete(ctx, agentPool.ID)
 		require.NoError(t, err)
