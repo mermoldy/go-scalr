@@ -69,9 +69,10 @@ type ProviderConfigurationsListOptions struct {
 
 // ProviderConfigurationFilter represents the options for filtering provider configurations.
 type ProviderConfigurationFilter struct {
-	ProviderName string `url:"provider-name,omitempty"`
-	Name         string `url:"name,omitempty"`
-	AccountID    string `url:"account,omitempty"`
+	ProviderConfiguration string `url:"provider-configuration,omitempty"`
+	ProviderName          string `url:"provider-name,omitempty"`
+	Name                  string `url:"name,omitempty"`
+	AccountID             string `url:"account,omitempty"`
 }
 
 // List all the provider configurations within a scalr account.

@@ -38,7 +38,7 @@ type variables struct {
 // CategoryType represents a category type.
 type CategoryType string
 
-//List all available categories.
+// List all available categories.
 const (
 	CategoryEnv       CategoryType = "env"
 	CategoryTerraform CategoryType = "terraform"
@@ -83,10 +83,13 @@ type VariableListOptions struct {
 }
 
 type VariableFilter struct {
+	// Filter by ID
+	Var *string `url:"var,omitempty"`
+
 	// Filter by key
 	Key *string `url:"key,omitempty"`
 
-	// Filter by key
+	// Filter by category
 	Category *string `url:"category,omitempty"`
 
 	// Scope filters.
