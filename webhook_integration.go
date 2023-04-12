@@ -95,8 +95,8 @@ type WebhookIntegrationUpdateOptions struct {
 	MaxAttempts *int             `jsonapi:"attr,max-attempts,omitempty"`
 	Headers     []*WebhookHeader `jsonapi:"attr,headers,omitempty"`
 
-	Environments []*Environment     `jsonapi:"relation,environments,omitempty"`
-	Events       []*EventDefinition `jsonapi:"relation,events,omitempty"`
+	Environments []*Environment     `jsonapi:"relation,environments"`
+	Events       []*EventDefinition `jsonapi:"relation,events"`
 }
 
 func (s *webhookIntegrations) List(
