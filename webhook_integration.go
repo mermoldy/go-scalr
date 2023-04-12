@@ -80,7 +80,7 @@ type WebhookIntegrationCreateOptions struct {
 
 	Environments []*Environment     `jsonapi:"relation,environments,omitempty"`
 	Account      *Account           `jsonapi:"relation,account"`
-	Events       []*EventDefinition `jsonapi:"relation,events"`
+	Events       []*EventDefinition `jsonapi:"relation,events,omitempty"`
 }
 
 type WebhookIntegrationUpdateOptions struct {
@@ -95,7 +95,8 @@ type WebhookIntegrationUpdateOptions struct {
 	MaxAttempts *int             `jsonapi:"attr,max-attempts,omitempty"`
 	Headers     []*WebhookHeader `jsonapi:"attr,headers,omitempty"`
 
-	Environments []*Environment `jsonapi:"relation,environments,omitempty"`
+	Environments []*Environment     `jsonapi:"relation,environments,omitempty"`
+	Events       []*EventDefinition `jsonapi:"relation,events,omitempty"`
 }
 
 func (s *webhookIntegrations) List(
