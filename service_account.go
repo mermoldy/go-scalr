@@ -62,10 +62,11 @@ type ServiceAccount struct {
 type ServiceAccountListOptions struct {
 	ListOptions
 
-	Account *string `url:"filter[account],omitempty"`
-	Email   *string `url:"filter[email],omitempty"`
-	Query   *string `url:"query,omitempty"`
-	Include *string `url:"include,omitempty"`
+	Account        *string `url:"filter[account],omitempty"`
+	Email          *string `url:"filter[email],omitempty"`
+	ServiceAccount *string `url:"filter[service-account],omitempty"`
+	Query          *string `url:"query,omitempty"`
+	Include        *string `url:"include,omitempty"`
 }
 
 // ServiceAccountCreateOptions represents the options for creating a new service account.
