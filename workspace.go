@@ -152,8 +152,8 @@ type WorkspaceListOptions struct {
 
 // WorkspaceRunScheduleOptions represents option for setting run schedules for workspace
 type WorkspaceRunScheduleOptions struct {
-	ApplySchedule   string `json:"apply-schedule"`
-	DestroySchedule string `json:"destroy-schedule"`
+	ApplySchedule   *string `json:"apply-schedule"`
+	DestroySchedule *string `json:"destroy-schedule"`
 }
 
 // List all the workspaces within an environment.
