@@ -481,9 +481,11 @@ func TestWorkspacesSetSchedule(t *testing.T) {
 	wTest, _ := createWorkspace(t, client, envTest)
 
 	t.Run("with valid options", func(t *testing.T) {
+		applySchedule := "30 3 5 3-5 2"
+		destroySchedule := "31 5 5 3-5 2"
 		options := WorkspaceRunScheduleOptions{
-			ApplySchedule:   "30 3 5 3-5 2",
-			DestroySchedule: "30 5 5 3-5 2",
+			ApplySchedule:   &applySchedule,
+			DestroySchedule: &destroySchedule,
 		}
 
 		w, err := client.Workspaces.SetSchedule(ctx, wTest.ID, options)
@@ -497,14 +499,15 @@ func TestWorkspacesSetSchedule(t *testing.T) {
 			w,
 			refreshed,
 		} {
-			assert.Equal(t, options.ApplySchedule, item.ApplySchedule)
-			assert.Equal(t, options.DestroySchedule, item.DestroySchedule)
+			assert.Equal(t, applySchedule, item.ApplySchedule)
+			assert.Equal(t, destroySchedule, item.DestroySchedule)
 		}
 	})
 
 	t.Run("when an error is returned from the api", func(t *testing.T) {
+		applySchedule := "bla-bla-bla"
 		w, err := client.Workspaces.SetSchedule(ctx, wTest.ID, WorkspaceRunScheduleOptions{
-			ApplySchedule: "bla-bla-bla",
+			ApplySchedule: &applySchedule,
 		})
 		assert.Nil(t, w)
 		assert.Error(t, err)
