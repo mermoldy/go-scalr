@@ -68,7 +68,7 @@ func TestVcsProvidersCreate(t *testing.T) {
 
 	t.Run("with valid options", func(t *testing.T) {
 		options := VcsProviderCreateOptions{
-			Name:     String("foo"),
+			Name:     String("vcs-" + randomString(t)),
 			VcsType:  Github,
 			AuthType: PersonalToken,
 			Token:    os.Getenv("GITHUB_TOKEN"),
@@ -93,6 +93,25 @@ func TestVcsProvidersCreate(t *testing.T) {
 			assert.Equal(t, options.VcsType, item.VcsType)
 			assert.Equal(t, options.AuthType, item.AuthType)
 		}
+	})
+
+	t.Run("with agent-pool attr vcs-enabled: false", func(t *testing.T) {
+		ap, apCleanup := createAgentPool(t, client, false)
+		defer apCleanup()
+
+		options := VcsProviderCreateOptions{
+			Name:     String("vcs-" + randomString(t)),
+			VcsType:  Github,
+			AuthType: PersonalToken,
+			Token:    os.Getenv("GITHUB_TOKEN"),
+
+			Environments: []*Environment{envTest},
+			Account:      &Account{ID: defaultAccountID},
+			AgentPool:    ap,
+		}
+
+		_, err := client.VcsProviders.Create(ctx, options)
+		require.Error(t, err)
 	})
 
 	t.Run("when options has an invalid environment", func(t *testing.T) {

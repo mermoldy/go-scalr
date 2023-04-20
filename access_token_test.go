@@ -13,7 +13,7 @@ func TestAccessTokenRead(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	ap, apCleanup := createAgentPool(t, client)
+	ap, apCleanup := createAgentPool(t, client, false)
 	defer apCleanup()
 
 	atTest, atTestCleanup := createAgentPoolToken(t, client, ap.ID)
@@ -40,7 +40,7 @@ func TestAccessTokenUpdate(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	ap, apCleanup := createAgentPool(t, client)
+	ap, apCleanup := createAgentPool(t, client, false)
 	defer apCleanup()
 
 	apt, aptCleanup := createAgentPoolToken(t, client, ap.ID)
@@ -75,7 +75,7 @@ func TestAccessTokenDelete(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	ap, apCleanup := createAgentPool(t, client)
+	ap, apCleanup := createAgentPool(t, client, false)
 	defer apCleanup()
 
 	apt, _ := createAgentPoolToken(t, client, ap.ID)

@@ -13,10 +13,12 @@ func TestAgentPoolsList(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	agentPoolTest1, agentPoolTest1Cleanup := createAgentPool(t, client)
+	agentPoolTest1, agentPoolTest1Cleanup := createAgentPool(t, client, false)
 	defer agentPoolTest1Cleanup()
-	agentPoolTest2, agentPoolTest2Cleanup := createAgentPool(t, client)
+	agentPoolTest2, agentPoolTest2Cleanup := createAgentPool(t, client, true)
 	defer agentPoolTest2Cleanup()
+	agentPoolTest3, agentPoolTest3Cleanup := createAgentPool(t, client, true)
+	defer agentPoolTest3Cleanup()
 
 	t.Run("without options", func(t *testing.T) {
 		apList, err := client.AgentPools.List(ctx, AgentPoolListOptions{})
@@ -27,6 +29,7 @@ func TestAgentPoolsList(t *testing.T) {
 		}
 		assert.Contains(t, apListIDs, agentPoolTest1.ID)
 		assert.Contains(t, apListIDs, agentPoolTest2.ID)
+		assert.Contains(t, apListIDs, agentPoolTest3.ID)
 	})
 	t.Run("with account filter", func(t *testing.T) {
 		apList, err := client.AgentPools.List(ctx, AgentPoolListOptions{Account: String(defaultAccountID)})
@@ -37,6 +40,7 @@ func TestAgentPoolsList(t *testing.T) {
 		}
 		assert.Contains(t, apListIDs, agentPoolTest1.ID)
 		assert.Contains(t, apListIDs, agentPoolTest2.ID)
+		assert.Contains(t, apListIDs, agentPoolTest3.ID)
 	})
 	t.Run("with account and name filter", func(t *testing.T) {
 		apList, err := client.AgentPools.List(ctx, AgentPoolListOptions{Account: String(defaultAccountID), Name: agentPoolTest1.Name})
@@ -50,6 +54,18 @@ func TestAgentPoolsList(t *testing.T) {
 		assert.Len(t, apList.Items, 1)
 		assert.Equal(t, apList.Items[0].ID, agentPoolTest2.ID)
 	})
+	t.Run("with vcs-enabled filter", func(t *testing.T) {
+		var vcsEnabledFiler = true
+		apList, err := client.AgentPools.List(ctx, AgentPoolListOptions{VcsEnabled: &vcsEnabledFiler})
+		require.NoError(t, err)
+		apListIDs := make([]string, 0)
+		for _, agentPool := range apList.Items {
+			apListIDs = append(apListIDs, agentPool.ID)
+		}
+		assert.Len(t, apListIDs, 2)
+		assert.Contains(t, apListIDs, agentPoolTest2.ID)
+		assert.Contains(t, apListIDs, agentPoolTest3.ID)
+	})
 }
 
 func TestAgentPoolsCreate(t *testing.T) {
@@ -57,6 +73,33 @@ func TestAgentPoolsCreate(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("when account and name are provided", func(t *testing.T) {
+		options := AgentPoolCreateOptions{
+			Account:    &Account{ID: defaultAccountID},
+			Name:       String("test-provider-pool-" + randomString(t)),
+			VcsEnabled: Bool(true),
+		}
+
+		agentPool, err := client.AgentPools.Create(ctx, options)
+		require.NoError(t, err)
+
+		// Get a refreshed view from the API.
+		refreshed, err := client.AgentPools.Read(ctx, agentPool.ID)
+		require.NoError(t, err)
+
+		for _, item := range []*AgentPool{
+			agentPool,
+			refreshed,
+		} {
+			assert.NotEmpty(t, item.ID)
+			assert.Equal(t, *options.Name, item.Name)
+			assert.Equal(t, options.Account, item.Account)
+			assert.Equal(t, *options.VcsEnabled, item.VcsEnabled)
+		}
+		err = client.AgentPools.Delete(ctx, agentPool.ID)
+		require.NoError(t, err)
+	})
+
+	t.Run("when create without vcs_enabled", func(t *testing.T) {
 		options := AgentPoolCreateOptions{
 			Account: &Account{ID: defaultAccountID},
 			Name:    String("test-provider-pool-" + randomString(t)),
@@ -74,8 +117,7 @@ func TestAgentPoolsCreate(t *testing.T) {
 			refreshed,
 		} {
 			assert.NotEmpty(t, item.ID)
-			assert.Equal(t, *options.Name, item.Name)
-			assert.Equal(t, options.Account, item.Account)
+			assert.Equal(t, item.VcsEnabled, false)
 		}
 		err = client.AgentPools.Delete(ctx, agentPool.ID)
 		require.NoError(t, err)
@@ -90,6 +132,7 @@ func TestAgentPoolsCreate(t *testing.T) {
 			Account:     &Account{ID: defaultAccountID},
 			Environment: &Environment{ID: env.ID},
 			Name:        String("test-provider-pool-" + randomString(t)),
+			VcsEnabled:  Bool(false),
 		}
 
 		agentPool, err := client.AgentPools.Create(ctx, options)
@@ -123,6 +166,7 @@ func TestAgentPoolsCreate(t *testing.T) {
 			Environment: &Environment{ID: env.ID},
 			Workspaces:  []*Workspace{{ID: ws.ID}},
 			Name:        String("test-provider-pool-" + randomString(t)),
+			VcsEnabled:  Bool(false),
 		}
 
 		agentPool, err := client.AgentPools.Create(ctx, options)
@@ -241,7 +285,7 @@ func TestAgentPoolsRead(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	agentPoolTest, agentPoolTestCleanup := createAgentPool(t, client)
+	agentPoolTest, agentPoolTestCleanup := createAgentPool(t, client, false)
 	defer agentPoolTestCleanup()
 
 	t.Run("when the agentPool exists", func(t *testing.T) {
@@ -278,7 +322,7 @@ func TestAgentPoolsUpdate(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	agentPoolTest, agentPoolTestCleanup := createAgentPool(t, client)
+	agentPoolTest, agentPoolTestCleanup := createAgentPool(t, client, false)
 	defer agentPoolTestCleanup()
 
 	t.Run("when updating a name", func(t *testing.T) {
@@ -337,7 +381,7 @@ func TestAgentPoolsDelete(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	pool, _ := createAgentPool(t, client)
+	pool, _ := createAgentPool(t, client, false)
 
 	t.Run("with valid agent pool id", func(t *testing.T) {
 		err := client.AgentPools.Delete(ctx, pool.ID)
