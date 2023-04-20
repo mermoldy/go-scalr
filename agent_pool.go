@@ -34,9 +34,9 @@ type AgentPoolList struct {
 
 // AgentPool represents a Scalr agent pool.
 type AgentPool struct {
-	ID   string `jsonapi:"primary,agent-pools"`
-	Name string `jsonapi:"attr,name"`
-
+	ID         string `jsonapi:"primary,agent-pools"`
+	Name       string `jsonapi:"attr,name"`
+	VcsEnabled bool   `jsonapi:"attr,vcs-enabled"`
 	// Relations
 
 	// The agent pool's scope
@@ -51,8 +51,9 @@ type AgentPool struct {
 
 // AgentPoolCreateOptions represents the options for creating a new AgentPool.
 type AgentPoolCreateOptions struct {
-	ID   string  `jsonapi:"primary,agent-pools"`
-	Name *string `jsonapi:"attr,name"`
+	ID         string  `jsonapi:"primary,agent-pools"`
+	Name       *string `jsonapi:"attr,name"`
+	VcsEnabled *bool   `jsonapi:"attr,vcs-enabled,omitempty"`
 
 	// The agent pool's scope
 	Account     *Account     `jsonapi:"relation,account"`
@@ -96,6 +97,7 @@ type AgentPoolListOptions struct {
 	Environment *string `url:"filter[environment],omitempty"`
 	Name        string  `url:"filter[name],omitempty"`
 	AgentPool   string  `url:"filter[agent-pool],omitempty"`
+	VcsEnabled  *bool   `url:"filter[vcs-enabled],omitempty"`
 	Include     string  `url:"include,omitempty"`
 }
 
