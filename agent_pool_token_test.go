@@ -13,7 +13,7 @@ func TestAgentPoolTokenList(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	ap, apCleanup := createAgentPool(t, client, false)
+	ap, apCleanup := createAgentPool(t, client)
 	defer apCleanup()
 
 	apt, aptCleanup := createAgentPoolToken(t, client, ap.ID)
@@ -41,7 +41,7 @@ func TestAgentPoolTokenCreate(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	ap, apCleanup := createAgentPool(t, client, false)
+	ap, apCleanup := createAgentPool(t, client)
 	defer apCleanup()
 
 	t.Run("when description is provided", func(t *testing.T) {
