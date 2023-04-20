@@ -95,7 +95,7 @@ func TestVcsProvidersCreate(t *testing.T) {
 		}
 	})
 
-	t.Run("with agent-pool vcs-enabled: false", func(t *testing.T) {
+	t.Run("with agent-pool attr vcs-enabled: false", func(t *testing.T) {
 		ap, apCleanup := createAgentPool(t, client, false)
 		defer apCleanup()
 
