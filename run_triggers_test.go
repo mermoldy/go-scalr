@@ -88,16 +88,14 @@ func TestRunTriggersRead(t *testing.T) {
 		Downstream: &Downstream{ID: wsTest1.ID},
 		Upstream:   &Upstream{ID: wsTest2.ID},
 	}
-	createdTrigger, err := client.RunTriggers.Create(ctx, options)
+	created_trigger, err := client.RunTriggers.Create(ctx, options)
 	require.NoError(t, err)
-	assert.NotEmpty(t, createdTrigger.ID)
+	assert.NotEmpty(t, created_trigger.ID)
 
 	t.Run("get run trigger by id", func(t *testing.T) {
-		trigger, err := client.RunTriggers.Read(ctx, createdTrigger.ID)
+		trigger, err := client.RunTriggers.Read(ctx, created_trigger.ID)
 		require.NoError(t, err)
-		assert.Equal(t, createdTrigger.ID, trigger.ID)
-		assert.Equal(t, createdTrigger.Upstream.ID, trigger.Upstream.ID)
-		assert.Equal(t, createdTrigger.Downstream.ID, trigger.Downstream.ID)
+		assert.Equal(t, created_trigger, trigger)
 	})
 
 	t.Run("try to get run trigger with not valid ID", func(t *testing.T) {

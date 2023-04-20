@@ -75,7 +75,6 @@ type VcsProvider struct {
 	// Relations
 	Environments []*Environment `jsonapi:"relation,environments"`
 	Account      *Account       `jsonapi:"relation,account"`
-	AgentPool    *AgentPool     `jsonapi:"relation,agent-pool"`
 }
 
 // VcsProvidersListOptions represents the options for listing vcs providers.
@@ -97,7 +96,6 @@ type VcsProvidersListOptions struct {
 	// Scope filters.
 	Environment *string `url:"filter[environment],omitempty"`
 	Account     *string `url:"filter[account],omitempty"`
-	AgentPool   *string `url:"filter[agent-pool],omitempty"`
 }
 
 // List the vcs providers.
@@ -130,7 +128,6 @@ type VcsProviderCreateOptions struct {
 	// Relations
 	Environments []*Environment `jsonapi:"relation,environments,omitempty"`
 	Account      *Account       `jsonapi:"relation,account,omitempty"`
-	AgentPool    *AgentPool     `jsonapi:"relation,agent-pool,omitempty"`
 }
 
 // Create is used to create a new vcs provider.
@@ -181,9 +178,6 @@ type VcsProviderUpdateOptions struct {
 	Token    *string `jsonapi:"attr,token,omitempty"`
 	Url      *string `jsonapi:"attr,url,omitempty"`
 	Username *string `jsonapi:"attr,username,omitempty"`
-
-	// Relations
-	AgentPool *AgentPool `jsonapi:"relation,agent-pool"`
 }
 
 // Update settings of an existing vcs provider.

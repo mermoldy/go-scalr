@@ -44,12 +44,11 @@ func createEnvironment(t *testing.T, client *Client) (*Environment, func()) {
 	}
 }
 
-func createAgentPool(t *testing.T, client *Client, vcsEnabled bool) (*AgentPool, func()) {
+func createAgentPool(t *testing.T, client *Client) (*AgentPool, func()) {
 	ctx := context.Background()
 	ap, err := client.AgentPools.Create(ctx, AgentPoolCreateOptions{
-		Name:       String("provider-tst-pool-" + randomString(t)),
-		Account:    &Account{ID: defaultAccountID},
-		VcsEnabled: Bool(vcsEnabled),
+		Name:    String("provider-tst-pool-" + randomString(t)),
+		Account: &Account{ID: defaultAccountID},
 	})
 	if err != nil {
 		t.Fatal(err)
