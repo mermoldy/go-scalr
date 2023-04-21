@@ -485,3 +485,30 @@ func assignTagsToEnvironment(t *testing.T, client *Client, environment *Environm
 		t.Fatal(err)
 	}
 }
+
+func createWebhookIntegration(
+	t *testing.T, client *Client, isShared bool, envs []*Environment,
+) (*WebhookIntegration, func()) {
+	ctx := context.Background()
+	opts := WebhookIntegrationCreateOptions{
+		Name:         String("tst-" + randomString(t)),
+		Enabled:      Bool(true),
+		IsShared:     Bool(isShared),
+		Url:          String("https://example.com"),
+		Account:      &Account{ID: defaultAccountID},
+		Events:       []*EventDefinition{{ID: "run:completed"}},
+		Environments: envs,
+	}
+	w, err := client.WebhookIntegrations.Create(ctx, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return w, func() {
+		if err := client.WebhookIntegrations.Delete(ctx, w.ID); err != nil {
+			t.Errorf("Error destroying webhook integration! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"Webhook: %s\nError: %s", w.ID, err)
+		}
+	}
+}
