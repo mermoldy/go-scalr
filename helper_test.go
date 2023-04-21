@@ -44,12 +44,11 @@ func createEnvironment(t *testing.T, client *Client) (*Environment, func()) {
 	}
 }
 
-func createAgentPool(t *testing.T, client *Client, vcsEnabled bool) (*AgentPool, func()) {
+func createAgentPool(t *testing.T, client *Client) (*AgentPool, func()) {
 	ctx := context.Background()
 	ap, err := client.AgentPools.Create(ctx, AgentPoolCreateOptions{
-		Name:       String("provider-tst-pool-" + randomString(t)),
-		Account:    &Account{ID: defaultAccountID},
-		VcsEnabled: Bool(vcsEnabled),
+		Name:    String("provider-tst-pool-" + randomString(t)),
+		Account: &Account{ID: defaultAccountID},
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -484,5 +483,32 @@ func assignTagsToEnvironment(t *testing.T, client *Client, environment *Environm
 
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func createWebhookIntegration(
+	t *testing.T, client *Client, isShared bool, envs []*Environment,
+) (*WebhookIntegration, func()) {
+	ctx := context.Background()
+	opts := WebhookIntegrationCreateOptions{
+		Name:         String("tst-" + randomString(t)),
+		Enabled:      Bool(true),
+		IsShared:     Bool(isShared),
+		Url:          String("https://example.com"),
+		Account:      &Account{ID: defaultAccountID},
+		Events:       []*EventDefinition{{ID: "run:completed"}},
+		Environments: envs,
+	}
+	w, err := client.WebhookIntegrations.Create(ctx, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return w, func() {
+		if err := client.WebhookIntegrations.Delete(ctx, w.ID); err != nil {
+			t.Errorf("Error destroying webhook integration! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"Webhook: %s\nError: %s", w.ID, err)
+		}
 	}
 }
