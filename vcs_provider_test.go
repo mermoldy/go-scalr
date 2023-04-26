@@ -92,7 +92,30 @@ func TestVcsProvidersCreate(t *testing.T) {
 			assert.Equal(t, *options.Name, item.Name)
 			assert.Equal(t, options.VcsType, item.VcsType)
 			assert.Equal(t, options.AuthType, item.AuthType)
+			assert.Equal(t, false, item.IsShared)
 		}
+	})
+
+	t.Run("shared provider", func(t *testing.T) {
+		options := VcsProviderCreateOptions{
+			Name:     String("vcs-" + randomString(t)),
+			VcsType:  Github,
+			AuthType: PersonalToken,
+			Token:    os.Getenv("GITHUB_TOKEN"),
+			IsShared: Bool(true),
+
+			Account: &Account{ID: defaultAccountID},
+		}
+
+		vcs, err := client.VcsProviders.Create(ctx, options)
+		require.NoError(t, err)
+
+		assert.NotEmpty(t, vcs.ID)
+		assert.Equal(t, *options.Name, vcs.Name)
+		assert.Equal(t, options.VcsType, vcs.VcsType)
+		assert.Equal(t, options.AuthType, vcs.AuthType)
+		assert.Equal(t, *options.IsShared, vcs.IsShared)
+
 	})
 
 	t.Run("with agent-pool attr vcs-enabled: false", func(t *testing.T) {
@@ -125,7 +148,7 @@ func TestVcsProvidersCreate(t *testing.T) {
 			t,
 			ResourceNotFoundError{
 				Message: fmt.Sprintf(
-					"Invalid Relationship\n\nEnvironment with ID '%s' not found or user unauthorized",
+					"Relationship 'environments' with ID '%s' not found or user unauthorized",
 					badIdentifier,
 				),
 			}.Error(),
@@ -186,7 +209,8 @@ func TestVcsProvidersUpdate(t *testing.T) {
 
 	t.Run("when updating a subset of values", func(t *testing.T) {
 		options := VcsProviderUpdateOptions{
-			Name: String(randomString(t)),
+			Name:     String(randomString(t)),
+			IsShared: Bool(true),
 		}
 
 		vcsAfter, err := client.VcsProviders.Update(ctx, vcsTest.ID, options)
@@ -194,6 +218,7 @@ func TestVcsProvidersUpdate(t *testing.T) {
 
 		assert.Equal(t, vcsTest.AuthType, vcsAfter.AuthType)
 		assert.Equal(t, vcsTest.VcsType, vcsAfter.VcsType)
+		assert.True(t, vcsTest.IsShared != vcsAfter.IsShared)
 	})
 
 	t.Run("with valid options", func(t *testing.T) {
