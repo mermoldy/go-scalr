@@ -34,6 +34,16 @@ func TestWorkspacesList(t *testing.T) {
 		assert.Equal(t, 2, wsl.TotalCount)
 	})
 
+	t.Run("with ID in list options", func(t *testing.T) {
+		wsl, err := client.Workspaces.List(ctx, WorkspaceListOptions{
+			Environment: &envTest.ID,
+			Workspace:   &wsTest1.ID,
+		})
+		require.NoError(t, err)
+		assert.Equal(t, 1, wsl.TotalCount)
+		assert.Equal(t, wsTest1.ID, wsl.Items[0].ID)
+	})
+
 	t.Run("with list options", func(t *testing.T) {
 		// Request a page number which is out of range. The result should
 		// be successful, but return no results if the paging options are
@@ -64,7 +74,7 @@ func TestWorkspacesCreate(t *testing.T) {
 	envTest, envTestCleanup := createEnvironment(t, client)
 	defer envTestCleanup()
 
-	pool, poolCleanup := createAgentPool(t, client)
+	pool, poolCleanup := createAgentPool(t, client, false)
 	defer poolCleanup()
 
 	t.Run("with valid options", func(t *testing.T) {
@@ -262,7 +272,7 @@ func TestWorkspacesUpdate(t *testing.T) {
 	envTest, envTestCleanup := createEnvironment(t, client)
 	defer envTestCleanup()
 
-	pool, poolCleanup := createAgentPool(t, client)
+	pool, poolCleanup := createAgentPool(t, client, false)
 	defer poolCleanup()
 
 	wsTest, _ := createWorkspace(t, client, envTest)
@@ -471,9 +481,11 @@ func TestWorkspacesSetSchedule(t *testing.T) {
 	wTest, _ := createWorkspace(t, client, envTest)
 
 	t.Run("with valid options", func(t *testing.T) {
+		applySchedule := "30 3 5 3-5 2"
+		destroySchedule := "31 5 5 3-5 2"
 		options := WorkspaceRunScheduleOptions{
-			ApplySchedule:   "30 3 5 3-5 2",
-			DestroySchedule: "30 5 5 3-5 2",
+			ApplySchedule:   &applySchedule,
+			DestroySchedule: &destroySchedule,
 		}
 
 		w, err := client.Workspaces.SetSchedule(ctx, wTest.ID, options)
@@ -487,14 +499,15 @@ func TestWorkspacesSetSchedule(t *testing.T) {
 			w,
 			refreshed,
 		} {
-			assert.Equal(t, options.ApplySchedule, item.ApplySchedule)
-			assert.Equal(t, options.DestroySchedule, item.DestroySchedule)
+			assert.Equal(t, applySchedule, item.ApplySchedule)
+			assert.Equal(t, destroySchedule, item.DestroySchedule)
 		}
 	})
 
 	t.Run("when an error is returned from the api", func(t *testing.T) {
+		applySchedule := "bla-bla-bla"
 		w, err := client.Workspaces.SetSchedule(ctx, wTest.ID, WorkspaceRunScheduleOptions{
-			ApplySchedule: "bla-bla-bla",
+			ApplySchedule: &applySchedule,
 		})
 		assert.Nil(t, w)
 		assert.Error(t, err)

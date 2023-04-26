@@ -143,6 +143,7 @@ type WorkspacePermissions struct {
 type WorkspaceListOptions struct {
 	ListOptions
 
+	Workspace   *string `url:"filter[workspace],omitempty"`
 	Environment *string `url:"filter[environment],omitempty"`
 	AgentPool   *string `url:"filter[agent-pool],omitempty"`
 	Name        *string `url:"filter[name],omitempty"`
@@ -152,8 +153,8 @@ type WorkspaceListOptions struct {
 
 // WorkspaceRunScheduleOptions represents option for setting run schedules for workspace
 type WorkspaceRunScheduleOptions struct {
-	ApplySchedule   string `json:"apply-schedule"`
-	DestroySchedule string `json:"destroy-schedule"`
+	ApplySchedule   *string `json:"apply-schedule"`
+	DestroySchedule *string `json:"destroy-schedule"`
 }
 
 // List all the workspaces within an environment.
