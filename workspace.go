@@ -71,6 +71,7 @@ type Workspace struct {
 	Actions              *WorkspaceActions      `jsonapi:"attr,actions"`
 	AutoApply            bool                   `jsonapi:"attr,auto-apply"`
 	ForceLatestRun       bool                   `jsonapi:"attr,force-latest-run"`
+	DeletionProtection   bool                   `jsonapi:"attr,deletion-protection"`
 	CanQueueDestroyPlan  bool                   `jsonapi:"attr,can-queue-destroy-plan"`
 	CreatedAt            time.Time              `jsonapi:"attr,created-at,iso8601"`
 	FileTriggersEnabled  bool                   `jsonapi:"attr,file-triggers-enabled"`
@@ -182,6 +183,9 @@ type WorkspaceCreateOptions struct {
 
 	// Whether to automatically raise the priority of the latest new run.
 	ForceLatestRun *bool `jsonapi:"attr,force-latest-run,omitempty"`
+
+	// Whether to prevent deletion when the workspace has resources.
+	DeletionProtection *bool `jsonapi:"attr,deletion-protection,omitempty"`
 
 	// The name of the workspace, which can only include letters, numbers, -,
 	// and _. This will be used as an identifier and must be unique in the
@@ -350,6 +354,9 @@ type WorkspaceUpdateOptions struct {
 
 	// Whether to automatically raise the priority of the latest new run.
 	ForceLatestRun *bool `jsonapi:"attr,force-latest-run,omitempty"`
+
+	// Whether to prevent deletion when the workspace has resources.
+	DeletionProtection *bool `jsonapi:"attr,deletion-protection,omitempty"`
 
 	// A new name for the workspace, which can only include letters, numbers, -,
 	// and _. This will be used as an identifier and must be unique in the
