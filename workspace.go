@@ -142,13 +142,18 @@ type WorkspacePermissions struct {
 // WorkspaceListOptions represents the options for listing workspaces.
 type WorkspaceListOptions struct {
 	ListOptions
+	Include string           `url:"include,omitempty"`
+	Filter  *WorkspaceFilter `url:"filter,omitempty"`
+}
 
-	Workspace   *string `url:"filter[workspace],omitempty"`
-	Environment *string `url:"filter[environment],omitempty"`
-	AgentPool   *string `url:"filter[agent-pool],omitempty"`
-	Name        *string `url:"filter[name],omitempty"`
-	Tag         *string `url:"filter[tag],omitempty"`
-	Include     string  `url:"include,omitempty"`
+// WorkspaceFilter represents the options for filtering workspaces.
+type WorkspaceFilter struct {
+	Id          *string `url:"workspace,omitempty"`
+	Account     *string `url:"account,omitempty"`
+	Environment *string `url:"environment,omitempty"`
+	Name        *string `url:"name,omitempty"`
+	Tag         *string `url:"tag,omitempty"`
+	AgentPool   *string `url:"agent-pool,omitempty"`
 }
 
 // WorkspaceRunScheduleOptions represents option for setting run schedules for workspace
@@ -296,7 +301,10 @@ func (s *workspaces) Read(ctx context.Context, environmentID, workspaceName stri
 		return nil, errors.New("invalid value for workspace")
 	}
 
-	options := WorkspaceListOptions{Environment: &environmentID, Name: &workspaceName, Include: "created-by"}
+	options := WorkspaceListOptions{
+		Include: "created-by",
+		Filter:  &WorkspaceFilter{Environment: &environmentID, Name: &workspaceName},
+	}
 
 	req, err := s.client.newRequest("GET", "workspaces", &options)
 	if err != nil {
