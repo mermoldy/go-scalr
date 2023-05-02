@@ -48,7 +48,7 @@ func TestEnvironmentsList(t *testing.T) {
 	})
 
 	filterByNameOptions := EnvironmentListOptions{
-		Name: &envTest1.Name,
+		Filter: &EnvironmentFilter{Name: &envTest1.Name},
 	}
 	t.Run("with filter by name option", func(t *testing.T) {
 		envl, err := client.Environments.List(ctx, filterByNameOptions)
@@ -59,7 +59,7 @@ func TestEnvironmentsList(t *testing.T) {
 	})
 
 	filterByIdOptions := EnvironmentListOptions{
-		Id: &envTest1.ID,
+		Filter: &EnvironmentFilter{Id: &envTest1.ID},
 	}
 	t.Run("with filter by ID option", func(t *testing.T) {
 		envl, err := client.Environments.List(ctx, filterByIdOptions)
@@ -70,7 +70,7 @@ func TestEnvironmentsList(t *testing.T) {
 	})
 
 	filterByAccountIdOptions := EnvironmentListOptions{
-		Account: String(defaultAccountID),
+		Filter: &EnvironmentFilter{Account: String(defaultAccountID)},
 	}
 	t.Run("with filter by account option", func(t *testing.T) {
 		envl, err := client.Environments.List(ctx, filterByAccountIdOptions)

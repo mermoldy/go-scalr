@@ -22,7 +22,13 @@ func TestWorkspacesList(t *testing.T) {
 	defer wsTest2Cleanup()
 
 	t.Run("without list options", func(t *testing.T) {
-		wsl, err := client.Workspaces.List(ctx, WorkspaceListOptions{Environment: &envTest.ID})
+		wsl, err := client.Workspaces.List(ctx,
+			WorkspaceListOptions{
+				Filter: &WorkspaceFilter{
+					Environment: &envTest.ID,
+				},
+			},
+		)
 		require.NoError(t, err)
 		wslIDs := make([]string, len(wsl.Items))
 		for _, ws := range wsl.Items {
@@ -36,8 +42,10 @@ func TestWorkspacesList(t *testing.T) {
 
 	t.Run("with ID in list options", func(t *testing.T) {
 		wsl, err := client.Workspaces.List(ctx, WorkspaceListOptions{
-			Environment: &envTest.ID,
-			Workspace:   &wsTest1.ID,
+			Filter: &WorkspaceFilter{
+				Environment: &envTest.ID,
+				Id:          &wsTest1.ID,
+			},
 		})
 		require.NoError(t, err)
 		assert.Equal(t, 1, wsl.TotalCount)
@@ -53,7 +61,9 @@ func TestWorkspacesList(t *testing.T) {
 				PageNumber: 999,
 				PageSize:   100,
 			},
-			Environment: &envTest.ID,
+			Filter: &WorkspaceFilter{
+				Environment: &envTest.ID,
+			},
 		})
 		require.NoError(t, err)
 		assert.Empty(t, wl.Items)
@@ -61,7 +71,13 @@ func TestWorkspacesList(t *testing.T) {
 		assert.Equal(t, 2, wl.TotalCount)
 	})
 	t.Run("without a valid environment", func(t *testing.T) {
-		wl, err := client.Workspaces.List(ctx, WorkspaceListOptions{Environment: String(badIdentifier)})
+		wl, err := client.Workspaces.List(ctx,
+			WorkspaceListOptions{
+				Filter: &WorkspaceFilter{
+					Environment: String(badIdentifier),
+				},
+			},
+		)
 		assert.Len(t, wl.Items, 0)
 		assert.NoError(t, err)
 	})
