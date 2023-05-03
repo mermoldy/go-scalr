@@ -109,10 +109,16 @@ func (o EnvironmentCreateOptions) valid() error {
 type EnvironmentListOptions struct {
 	ListOptions
 
-	Include *string `url:"include,omitempty"`
-	Name    *string `url:"query,omitempty"`
-	Id      *string `url:"query,omitempty"`
-	Account *string `url:"filter[account],omitempty"`
+	Include *string            `url:"include,omitempty"`
+	Filter  *EnvironmentFilter `url:"filter,omitempty"`
+}
+
+// EnvironmentFilter represents the options for filtering environments.
+type EnvironmentFilter struct {
+	Id      *string `url:"environment,omitempty"`
+	Account *string `url:"account,omitempty"`
+	Name    *string `url:"name,omitempty"`
+	Tag     *string `url:"tag,omitempty"`
 }
 
 // List all the environmens.
