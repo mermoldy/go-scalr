@@ -13,6 +13,8 @@ on:
         required: true
       pr_branch:
         description: Pull request branch
+      base_branch:
+        description: Base branch of pull request
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}
   cancel-in-progress: true
@@ -105,10 +107,17 @@ jobs:
           FATMOUSE_BRANCH="--fatmouse-branch ${{ inputs.pr_branch }}"
           SCALR_BRANCH="--scalr-branch ${{ inputs.pr_branch }}"
 
-          if [ "${{ inputs.pr_branch }}" = "staging" ]; then
-            IMAGE="--scalr-server-image-tag staging"
+          TEV2_BRANCH=${{ inputs.pr_branch }}
+          NORMALIZED_BRANCH=$(echo $TEV2_BRANCH | tr / - | tr '[:upper:]' '[:lower:]')
+          if docker manifest inspect eu.gcr.io/development-156220/fatmouse/scalr-server-te:${NORMALIZED_BRANCH} ; then
+              IMAGE="--scalr-server-image-tag ${NORMALIZED_BRANCH}"
           else
-            IMAGE=""
+              if [[ "${{ inputs.base_branch }}" == release/* ]]; then
+                  NORMALIZED_IMAGE=$(echo "${{ inputs.base_branch }}" | tr / - | tr '[:upper:]' '[:lower:]')
+                  IMAGE="--scalr-server-image-tag ${NORMALIZED_IMAGE}"
+              else
+                  IMAGE=""
+              fi
           fi
 
           docker run --rm \
