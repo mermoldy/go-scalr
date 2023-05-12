@@ -71,6 +71,7 @@ type VcsProvider struct {
 	OAuth    *OAuth   `jsonapi:"attr,oauth"`
 	Token    *string  `jsonapi:"attr,token"`
 	Username *string  `jsonapi:"attr,username"`
+	IsShared bool     `jsonapi:"attr,is-shared"`
 
 	// Relations
 	Environments []*Environment `jsonapi:"relation,environments"`
@@ -126,6 +127,7 @@ type VcsProviderCreateOptions struct {
 	Token    string   `jsonapi:"attr,token"`
 	Url      *string  `jsonapi:"attr,url"`
 	Username *string  `jsonapi:"attr,username"`
+	IsShared *bool    `jsonapi:"attr,is-shared,omitempty"`
 
 	// Relations
 	Environments []*Environment `jsonapi:"relation,environments,omitempty"`
@@ -181,9 +183,11 @@ type VcsProviderUpdateOptions struct {
 	Token    *string `jsonapi:"attr,token,omitempty"`
 	Url      *string `jsonapi:"attr,url,omitempty"`
 	Username *string `jsonapi:"attr,username,omitempty"`
+	IsShared *bool   `jsonapi:"attr,is-shared,omitempty"`
 
 	// Relations
-	AgentPool *AgentPool `jsonapi:"relation,agent-pool"`
+	Environments []*Environment `jsonapi:"relation,environments"`
+	AgentPool    *AgentPool     `jsonapi:"relation,agent-pool"`
 }
 
 // Update settings of an existing vcs provider.
