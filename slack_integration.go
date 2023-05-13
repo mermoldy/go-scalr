@@ -29,13 +29,10 @@ type slackIntegrations struct {
 	client *Client
 }
 
-// SlackEvent represents a event slack integration subscribes to.
-type SlackEvent string
-
 const (
-	RunApprovalRequiredEvent SlackEvent = "run_approval_required"
-	RunSuccessEvent          SlackEvent = "run_success"
-	RunErroredEvent          SlackEvent = "run_errored"
+	RunApprovalRequiredEvent string = "run_approval_required"
+	RunSuccessEvent          string = "run_success"
+	RunErroredEvent          string = "run_errored"
 )
 
 type SlackStatus string
@@ -47,11 +44,11 @@ const (
 
 // SlackIntegration represents a Scalr IACP slack integration.
 type SlackIntegration struct {
-	ID        string       `jsonapi:"primary,slack-integrations"`
-	Name      string       `jsonapi:"attr,name"`
-	Status    SlackStatus  `jsonapi:"attr,status"`
-	ChannelId string       `jsonapi:"attr,channel-id"`
-	Events    []SlackEvent `jsonapi:"attr,events"`
+	ID        string      `jsonapi:"primary,slack-integrations"`
+	Name      string      `jsonapi:"attr,name"`
+	Status    SlackStatus `jsonapi:"attr,status"`
+	ChannelId string      `jsonapi:"attr,channel-id"`
+	Events    []string    `jsonapi:"attr,events"`
 
 	// Relations
 	Environment *Environment  `jsonapi:"relation,environment"`
@@ -71,10 +68,10 @@ type SlackIntegrationListOptions struct {
 }
 
 type SlackIntegrationCreateOptions struct {
-	ID        string       `jsonapi:"primary,slack-integrations"`
-	Name      *string      `jsonapi:"attr,name"`
-	ChannelId *string      `jsonapi:"attr,channel-id"`
-	Events    []SlackEvent `jsonapi:"attr,events"`
+	ID        string   `jsonapi:"primary,slack-integrations"`
+	Name      *string  `jsonapi:"attr,name"`
+	ChannelId *string  `jsonapi:"attr,channel-id"`
+	Events    []string `jsonapi:"attr,events"`
 
 	Account     *Account         `jsonapi:"relation,account"`
 	Connection  *SlackConnection `jsonapi:"relation,connection"`
@@ -83,11 +80,11 @@ type SlackIntegrationCreateOptions struct {
 }
 
 type SlackIntegrationUpdateOptions struct {
-	ID        string       `jsonapi:"primary,slack-integrations"`
-	Name      *string      `jsonapi:"attr,name,omitempty"`
-	ChannelId *string      `jsonapi:"attr,channel-id,omitempty"`
-	Status    SlackStatus  `jsonapi:"attr,status,omitempty"`
-	Events    []SlackEvent `jsonapi:"attr,events,omitempty"`
+	ID        string      `jsonapi:"primary,slack-integrations"`
+	Name      *string     `jsonapi:"attr,name,omitempty"`
+	ChannelId *string     `jsonapi:"attr,channel-id,omitempty"`
+	Status    SlackStatus `jsonapi:"attr,status,omitempty"`
+	Events    []string    `jsonapi:"attr,events,omitempty"`
 
 	Environment *Environment  `jsonapi:"relation,environment,omitempty"`
 	Workspaces  []*Workspaces `jsonapi:"relation,workspaces,omitempty"`
@@ -219,7 +216,7 @@ func (s *slackIntegrations) GetConnection(ctx context.Context, accID string) (*S
 		return nil, errors.New("invalid value for account ID")
 	}
 
-	u := fmt.Sprintf("/integrations/slack/%s/connection", url.QueryEscape(accID))
+	u := fmt.Sprintf("integrations/slack/%s/connection", url.QueryEscape(accID))
 	req, err := s.client.newRequest("GET", u, nil)
 	if err != nil {
 		return nil, err
@@ -241,7 +238,7 @@ func (s *slackIntegrations) GetChannels(
 		return nil, errors.New("invalid value for account ID")
 	}
 
-	u := fmt.Sprintf("/integrations/slack/%s/connection/channels", url.QueryEscape(accID))
+	u := fmt.Sprintf("integrations/slack/%s/connection/channels", url.QueryEscape(accID))
 	req, err := s.client.newRequest("GET", u, &options)
 	if err != nil {
 		return nil, err
