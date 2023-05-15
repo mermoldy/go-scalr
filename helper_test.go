@@ -515,19 +515,13 @@ func createWebhookIntegration(
 }
 
 func createSlackIntegration(
-	t *testing.T, client *Client, slackConnection *SlackConnection, environment *Environment,
+	t *testing.T, client *Client, slackConnection *SlackConnection, channelId *string, environment *Environment,
 ) (*SlackIntegration, func()) {
 	ctx := context.Background()
-	slackChannels, _ := client.SlackIntegrations.GetChannels(ctx, defaultAccountID, SlackChannelListOptions{})
-	var channelId string
-	for _, channel := range slackChannels.Items {
-		channelId = channel.ID
-		break
-	}
 	options := SlackIntegrationCreateOptions{
 		Name:        String("test-" + randomString(t)),
 		Events:      []string{string(RunApprovalRequiredEvent), string(RunSuccessEvent), string(RunErroredEvent)},
-		ChannelId:   &channelId,
+		ChannelId:   channelId,
 		Account:     &Account{ID: defaultAccountID},
 		Connection:  slackConnection,
 		Environment: environment,

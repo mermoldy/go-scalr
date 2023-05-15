@@ -21,7 +21,6 @@ type SlackIntegrations interface {
 	Update(ctx context.Context, slackIntegration string, options SlackIntegrationUpdateOptions) (*SlackIntegration, error)
 	Delete(ctx context.Context, slackIntegration string) error
 	GetConnection(ctx context.Context, accID string) (*SlackConnection, error)
-	GetChannels(ctx context.Context, accID string, options SlackChannelListOptions) (*SlackChannelList, error)
 }
 
 // slackIntegrations implements SlackIntegrations.
@@ -51,9 +50,9 @@ type SlackIntegration struct {
 	Events    []string    `jsonapi:"attr,events"`
 
 	// Relations
-	Environment *Environment  `jsonapi:"relation,environment"`
-	Account     *Account      `jsonapi:"relation,account"`
-	Workspaces  []*Workspaces `jsonapi:"relation,workspaces"`
+	Environment *Environment `jsonapi:"relation,environment"`
+	Account     *Account     `jsonapi:"relation,account"`
+	Workspaces  []*Workspace `jsonapi:"relation,workspaces"`
 }
 
 type SlackIntegrationList struct {
@@ -76,7 +75,7 @@ type SlackIntegrationCreateOptions struct {
 	Account     *Account         `jsonapi:"relation,account"`
 	Connection  *SlackConnection `jsonapi:"relation,connection"`
 	Environment *Environment     `jsonapi:"relation,environment"`
-	Workspaces  []*Workspaces    `jsonapi:"relation,workspaces,omitempty"`
+	Workspaces  []*Workspace     `jsonapi:"relation,workspaces,omitempty"`
 }
 
 type SlackIntegrationUpdateOptions struct {
@@ -86,8 +85,8 @@ type SlackIntegrationUpdateOptions struct {
 	Status    SlackStatus `jsonapi:"attr,status,omitempty"`
 	Events    []string    `jsonapi:"attr,events,omitempty"`
 
-	Environment *Environment  `jsonapi:"relation,environment,omitempty"`
-	Workspaces  []*Workspaces `jsonapi:"relation,workspaces,omitempty"`
+	Environment *Environment `jsonapi:"relation,environment,omitempty"`
+	Workspaces  []*Workspace `jsonapi:"relation,workspaces,omitempty"`
 }
 
 type SlackConnection struct {
@@ -96,23 +95,6 @@ type SlackConnection struct {
 
 	// Relations
 	Account *Account `jsonapi:"relation,account"`
-}
-
-type SlackChannel struct {
-	ID        string `json:"slack-connections"`
-	Name      string `json:"name"`
-	IsPrivate string `json:"is-private"`
-}
-
-type SlackChannelList struct {
-	*Pagination
-	Items []*SlackChannel
-}
-
-type SlackChannelListOptions struct {
-	ListOptions
-
-	Query *string `url:"query,omitempty"`
 }
 
 func (s *slackIntegrations) List(
@@ -223,28 +205,6 @@ func (s *slackIntegrations) GetConnection(ctx context.Context, accID string) (*S
 	}
 
 	c := &SlackConnection{}
-	err = s.client.do(ctx, req, c)
-	if err != nil {
-		return nil, err
-	}
-
-	return c, nil
-}
-
-func (s *slackIntegrations) GetChannels(
-	ctx context.Context, accID string, options SlackChannelListOptions,
-) (*SlackChannelList, error) {
-	if !validStringID(&accID) {
-		return nil, errors.New("invalid value for account ID")
-	}
-
-	u := fmt.Sprintf("integrations/slack/%s/connection/channels", url.QueryEscape(accID))
-	req, err := s.client.newRequest("GET", u, &options)
-	if err != nil {
-		return nil, err
-	}
-
-	c := &SlackChannelList{}
 	err = s.client.do(ctx, req, c)
 	if err != nil {
 		return nil, err

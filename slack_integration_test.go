@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"os"
 	"testing"
 )
 
@@ -12,17 +13,15 @@ func TestSlackIntegrationsCreate(t *testing.T) {
 	ctx := context.Background()
 	env1, deleteEnv1 := createEnvironment(t, client)
 	defer deleteEnv1()
-
+	var channelId = os.Getenv("SLACK_CHANNEL_ID")
+	if len(channelId) == 0 {
+		t.Skip("Set `SLACK_CHANNEL_ID` environment variable to run this test. Container should have connection to slack.")
+	}
 	slackConnection, err := client.SlackIntegrations.GetConnection(ctx, defaultAccountID)
 	if err != nil || slackConnection.ID == "" {
 		t.Skip("Scalr instance doesn't have working slack connection.")
 	}
-	slackChannels, _ := client.SlackIntegrations.GetChannels(ctx, defaultAccountID, SlackChannelListOptions{})
-	var channelId string
-	for _, channel := range slackChannels.Items {
-		channelId = channel.ID
-		break
-	}
+
 	t.Run("with valid options", func(t *testing.T) {
 
 		options := SlackIntegrationCreateOptions{
@@ -68,7 +67,12 @@ func TestSlackIntegrationsUpdate(t *testing.T) {
 	if err != nil || slackConnection.ID == "" {
 		t.Skip("Scalr instance doesn't have working slack connection.")
 	}
-	si, deleteSlack := createSlackIntegration(t, client, slackConnection, env1)
+	var channelId = os.Getenv("SLACK_CHANNEL_ID")
+	if len(channelId) == 0 {
+		t.Skip("Set `SLACK_CHANNEL_ID` environment variable to run this test. Container should have connection to slack.")
+	}
+
+	si, deleteSlack := createSlackIntegration(t, client, slackConnection, &channelId, env1)
 	defer deleteSlack()
 	t.Run("with valid options", func(t *testing.T) {
 
@@ -107,9 +111,14 @@ func TestSlackIntegrationsList(t *testing.T) {
 	if err != nil || slackConnection.ID == "" {
 		t.Skip("Scalr instance doesn't have working slack connection.")
 	}
-	si, deleteSlack := createSlackIntegration(t, client, slackConnection, env1)
+	var channelId = os.Getenv("SLACK_CHANNEL_ID")
+	if len(channelId) == 0 {
+		t.Skip("Set `SLACK_CHANNEL_ID` environment variable to run this test. Container should have connection to slack.")
+	}
+
+	si, deleteSlack := createSlackIntegration(t, client, slackConnection, &channelId, env1)
 	defer deleteSlack()
-	si2, deleteSlack2 := createSlackIntegration(t, client, slackConnection, env2)
+	si2, deleteSlack2 := createSlackIntegration(t, client, slackConnection, &channelId, env2)
 	defer deleteSlack2()
 	t.Run("with valid options", func(t *testing.T) {
 
