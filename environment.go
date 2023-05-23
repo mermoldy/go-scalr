@@ -35,11 +35,6 @@ const (
 	EnvironmentStatusInactive EnvironmentStatus = "Inactive"
 )
 
-// CloudCredential relationship
-type CloudCredential struct {
-	ID string `jsonapi:"primary,cloud-credentials"`
-}
-
 // EnvironmentList represents a list of environments.
 type EnvironmentList struct {
 	*Pagination
@@ -56,7 +51,6 @@ type Environment struct {
 
 	// Relations
 	Account                       *Account                 `jsonapi:"relation,account"`
-	CloudCredentials              []*CloudCredential       `jsonapi:"relation,cloud-credentials"`
 	PolicyGroups                  []*PolicyGroup           `jsonapi:"relation,policy-groups"`
 	DefaultProviderConfigurations []*ProviderConfiguration `jsonapi:"relation,default-provider-configurations"`
 	ProviderConfigurations        []*ProviderConfiguration `jsonapi:"relation,provider-configurations"`
@@ -85,7 +79,6 @@ type EnvironmentCreateOptions struct {
 
 	// Relations
 	Account                       *Account                 `jsonapi:"relation,account"`
-	CloudCredentials              []*CloudCredential       `jsonapi:"relation,cloud-credentials,omitempty"`
 	PolicyGroups                  []*PolicyGroup           `jsonapi:"relation,policy-groups,omitempty"`
 	DefaultProviderConfigurations []*ProviderConfiguration `jsonapi:"relation,default-provider-configurations,omitempty"`
 
@@ -192,7 +185,6 @@ type EnvironmentUpdateOptions struct {
 	CostEstimationEnabled *bool   `jsonapi:"attr,cost-estimation-enabled,omitempty"`
 
 	// Relations
-	CloudCredentials              []*CloudCredential       `jsonapi:"relation,cloud-credentials"`
 	PolicyGroups                  []*PolicyGroup           `jsonapi:"relation,policy-groups"`
 	DefaultProviderConfigurations []*ProviderConfiguration `jsonapi:"relation,default-provider-configurations"`
 }
