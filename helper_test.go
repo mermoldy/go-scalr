@@ -519,12 +519,12 @@ func createSlackIntegration(
 ) (*SlackIntegration, func()) {
 	ctx := context.Background()
 	options := SlackIntegrationCreateOptions{
-		Name:        String("test-" + randomString(t)),
-		Events:      []string{string(RunApprovalRequiredEvent), string(RunSuccessEvent), string(RunErroredEvent)},
-		ChannelId:   channelId,
-		Account:     &Account{ID: defaultAccountID},
-		Connection:  slackConnection,
-		Environment: environment,
+		Name:         String("test-" + randomString(t)),
+		Events:       []string{string(RunApprovalRequiredEvent), string(RunSuccessEvent), string(RunErroredEvent)},
+		ChannelId:    channelId,
+		Account:      &Account{ID: defaultAccountID},
+		Connection:   slackConnection,
+		Environments: []*Environment{environment},
 	}
 	si, err := client.SlackIntegrations.Create(ctx, options)
 	if err != nil {

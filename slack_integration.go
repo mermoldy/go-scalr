@@ -50,9 +50,9 @@ type SlackIntegration struct {
 	Events    []string    `jsonapi:"attr,events"`
 
 	// Relations
-	Environment *Environment `jsonapi:"relation,environment"`
-	Account     *Account     `jsonapi:"relation,account"`
-	Workspaces  []*Workspace `jsonapi:"relation,workspaces"`
+	Account      *Account       `jsonapi:"relation,account"`
+	Environments []*Environment `jsonapi:"relation,environments"`
+	Workspaces   []*Workspace   `jsonapi:"relation,workspaces"`
 }
 
 type SlackIntegrationList struct {
@@ -72,10 +72,10 @@ type SlackIntegrationCreateOptions struct {
 	ChannelId *string  `jsonapi:"attr,channel-id"`
 	Events    []string `jsonapi:"attr,events"`
 
-	Account     *Account         `jsonapi:"relation,account"`
-	Connection  *SlackConnection `jsonapi:"relation,connection"`
-	Environment *Environment     `jsonapi:"relation,environment"`
-	Workspaces  []*Workspace     `jsonapi:"relation,workspaces,omitempty"`
+	Account      *Account         `jsonapi:"relation,account"`
+	Connection   *SlackConnection `jsonapi:"relation,connection"`
+	Environments []*Environment   `jsonapi:"relation,environments"`
+	Workspaces   []*Workspace     `jsonapi:"relation,workspaces,omitempty"`
 }
 
 type SlackIntegrationUpdateOptions struct {
@@ -85,8 +85,8 @@ type SlackIntegrationUpdateOptions struct {
 	Status    SlackStatus `jsonapi:"attr,status,omitempty"`
 	Events    []string    `jsonapi:"attr,events,omitempty"`
 
-	Environment *Environment `jsonapi:"relation,environment,omitempty"`
-	Workspaces  []*Workspace `jsonapi:"relation,workspaces,omitempty"`
+	Environments []*Environment `jsonapi:"relation,environments,omitempty"`
+	Workspaces   []*Workspace   `jsonapi:"relation,workspaces,omitempty"`
 }
 
 type SlackConnection struct {

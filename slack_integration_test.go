@@ -25,12 +25,12 @@ func TestSlackIntegrationsCreate(t *testing.T) {
 	t.Run("with valid options", func(t *testing.T) {
 
 		options := SlackIntegrationCreateOptions{
-			Name:        String("test-" + randomString(t)),
-			Events:      []string{string(RunApprovalRequiredEvent), string(RunSuccessEvent), string(RunErroredEvent)},
-			ChannelId:   &channelId,
-			Account:     &Account{ID: defaultAccountID},
-			Connection:  slackConnection,
-			Environment: env1,
+			Name:         String("test-" + randomString(t)),
+			Events:       []string{string(RunApprovalRequiredEvent), string(RunSuccessEvent), string(RunErroredEvent)},
+			ChannelId:    &channelId,
+			Account:      &Account{ID: defaultAccountID},
+			Connection:   slackConnection,
+			Environments: []*Environment{env1},
 		}
 
 		si, err := client.SlackIntegrations.Create(ctx, options)
@@ -77,9 +77,9 @@ func TestSlackIntegrationsUpdate(t *testing.T) {
 	t.Run("with valid options", func(t *testing.T) {
 
 		options := SlackIntegrationUpdateOptions{
-			Name:        String("test-" + randomString(t)),
-			Events:      []string{RunApprovalRequiredEvent, RunErroredEvent},
-			Environment: env2,
+			Name:         String("test-" + randomString(t)),
+			Events:       []string{RunApprovalRequiredEvent, RunErroredEvent},
+			Environments: []*Environment{env2},
 		}
 
 		si, err := client.SlackIntegrations.Update(ctx, si.ID, options)
