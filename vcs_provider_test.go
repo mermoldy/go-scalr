@@ -51,8 +51,6 @@ func TestVCSProvidersList(t *testing.T) {
 	})
 
 	t.Run("with invalid environment filter", func(t *testing.T) {
-		// TODO: remove skip after SCALRCORE-26063
-		t.Skip("Default shared VCS providers are returned")
 		response, err := client.VcsProviders.List(ctx, VcsProvidersListOptions{Environment: String(badIdentifier)})
 		assert.Len(t, response.Items, 0)
 		assert.NoError(t, err)
