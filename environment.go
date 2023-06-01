@@ -18,7 +18,7 @@ type Environments interface {
 	Read(ctx context.Context, environmentID string) (*Environment, error)
 	Create(ctx context.Context, options EnvironmentCreateOptions) (*Environment, error)
 	Update(ctx context.Context, environmentID string, options EnvironmentUpdateOptions) (*Environment, error)
-	UpdateWithoutPG(ctx context.Context, environmentID string, options EnvironmentUpdateOptionsWithoutPG) (*Environment, error)
+	UpdateDefaultProviderConfigurationOnly(ctx context.Context, environmentID string, options EnvironmentUpdateOptionsDefaultProviderConfigurationOnly) (*Environment, error)
 	Delete(ctx context.Context, environmentID string) error
 }
 
@@ -190,11 +190,8 @@ type EnvironmentUpdateOptions struct {
 	DefaultProviderConfigurations []*ProviderConfiguration `jsonapi:"relation,default-provider-configurations"`
 }
 
-type EnvironmentUpdateOptionsWithoutPG struct {
-	ID                    string  `jsonapi:"primary,environments"`
-	Name                  *string `jsonapi:"attr,name,omitempty"`
-	CostEstimationEnabled *bool   `jsonapi:"attr,cost-estimation-enabled,omitempty"`
-
+type EnvironmentUpdateOptionsDefaultProviderConfigurationOnly struct {
+	ID string `jsonapi:"primary,environments"`
 	// Relations
 	DefaultProviderConfigurations []*ProviderConfiguration `jsonapi:"relation,default-provider-configurations"`
 }
@@ -219,7 +216,7 @@ func (s *environments) Update(ctx context.Context, environmentID string, options
 	return env, nil
 }
 
-func (s *environments) UpdateWithoutPG(ctx context.Context, environmentID string, options EnvironmentUpdateOptionsWithoutPG) (*Environment, error) {
+func (s *environments) UpdateDefaultProviderConfigurationOnly(ctx context.Context, environmentID string, options EnvironmentUpdateOptionsDefaultProviderConfigurationOnly) (*Environment, error) {
 	options.ID = ""
 
 	u := fmt.Sprintf("environments/%s", url.QueryEscape(environmentID))
