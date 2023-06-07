@@ -10,8 +10,7 @@ import (
 )
 
 const (
-	defaultTeamID     = "team-t67mjto75maj8p0"
-	defaultTeamLdapID = "team-t67mjto1k4vjptg"
+	defaultTeamID = "team-t67mjtnokncjpd8"
 )
 
 func TestTeamsList(t *testing.T) {
