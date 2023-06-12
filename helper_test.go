@@ -515,13 +515,17 @@ func createWebhookIntegration(
 }
 
 func createSlackIntegration(
-	t *testing.T, client *Client, slackConnection *SlackConnection, channelId *string, environment *Environment,
+	t *testing.T, client *Client, slackConnection *SlackConnection, environment *Environment,
 ) (*SlackIntegration, func()) {
 	ctx := context.Background()
 	options := SlackIntegrationCreateOptions{
-		Name:         String("test-" + randomString(t)),
-		Events:       []string{string(RunApprovalRequiredEvent), string(RunSuccessEvent), string(RunErroredEvent)},
-		ChannelId:    channelId,
+		Name: String("test-" + randomString(t)),
+		Events: []string{
+			SlackIntegrationEventRunApprovalRequired,
+			SlackIntegrationEventRunSuccess,
+			SlackIntegrationEventRunErrored,
+		},
+		ChannelId:    String("C123"),
 		Account:      &Account{ID: defaultAccountID},
 		Connection:   slackConnection,
 		Environments: []*Environment{environment},

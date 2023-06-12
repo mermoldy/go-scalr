@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"os"
 	"testing"
 )
 
@@ -13,10 +12,7 @@ func TestSlackIntegrationsCreate(t *testing.T) {
 	ctx := context.Background()
 	env1, deleteEnv1 := createEnvironment(t, client)
 	defer deleteEnv1()
-	var channelId = os.Getenv("SLACK_CHANNEL_ID")
-	if len(channelId) == 0 {
-		t.Skip("Set `SLACK_CHANNEL_ID` environment variable to run this test. Container should have connection to slack.")
-	}
+
 	slackConnection, err := client.SlackIntegrations.GetConnection(ctx, defaultAccountID)
 	if err != nil || slackConnection.ID == "" {
 		t.Skip("Scalr instance doesn't have working slack connection.")
@@ -25,9 +21,13 @@ func TestSlackIntegrationsCreate(t *testing.T) {
 	t.Run("with valid options", func(t *testing.T) {
 
 		options := SlackIntegrationCreateOptions{
-			Name:         String("test-" + randomString(t)),
-			Events:       []string{string(RunApprovalRequiredEvent), string(RunSuccessEvent), string(RunErroredEvent)},
-			ChannelId:    &channelId,
+			Name: String("test-" + randomString(t)),
+			Events: []string{
+				SlackIntegrationEventRunApprovalRequired,
+				SlackIntegrationEventRunSuccess,
+				SlackIntegrationEventRunErrored,
+			},
+			ChannelId:    String("C123"),
 			Account:      &Account{ID: defaultAccountID},
 			Connection:   slackConnection,
 			Environments: []*Environment{env1},
@@ -67,18 +67,15 @@ func TestSlackIntegrationsUpdate(t *testing.T) {
 	if err != nil || slackConnection.ID == "" {
 		t.Skip("Scalr instance doesn't have working slack connection.")
 	}
-	var channelId = os.Getenv("SLACK_CHANNEL_ID")
-	if len(channelId) == 0 {
-		t.Skip("Set `SLACK_CHANNEL_ID` environment variable to run this test. Container should have connection to slack.")
-	}
 
-	si, deleteSlack := createSlackIntegration(t, client, slackConnection, &channelId, env1)
+	si, deleteSlack := createSlackIntegration(t, client, slackConnection, env1)
 	defer deleteSlack()
+
 	t.Run("with valid options", func(t *testing.T) {
 
 		options := SlackIntegrationUpdateOptions{
 			Name:         String("test-" + randomString(t)),
-			Events:       []string{RunApprovalRequiredEvent, RunErroredEvent},
+			Events:       []string{SlackIntegrationEventRunApprovalRequired, SlackIntegrationEventRunErrored},
 			Environments: []*Environment{env2},
 		}
 
@@ -111,19 +108,16 @@ func TestSlackIntegrationsList(t *testing.T) {
 	if err != nil || slackConnection.ID == "" {
 		t.Skip("Scalr instance doesn't have working slack connection.")
 	}
-	var channelId = os.Getenv("SLACK_CHANNEL_ID")
-	if len(channelId) == 0 {
-		t.Skip("Set `SLACK_CHANNEL_ID` environment variable to run this test. Container should have connection to slack.")
-	}
 
-	si, deleteSlack := createSlackIntegration(t, client, slackConnection, &channelId, env1)
+	si, deleteSlack := createSlackIntegration(t, client, slackConnection, env1)
 	defer deleteSlack()
-	si2, deleteSlack2 := createSlackIntegration(t, client, slackConnection, &channelId, env2)
+	si2, deleteSlack2 := createSlackIntegration(t, client, slackConnection, env2)
 	defer deleteSlack2()
+
 	t.Run("with valid options", func(t *testing.T) {
 
 		options := SlackIntegrationListOptions{
-			Account: String(defaultAccountID),
+			Filter: &SlackIntegrationFilter{Account: String(defaultAccountID)},
 		}
 
 		sil, err := client.SlackIntegrations.List(ctx, options)

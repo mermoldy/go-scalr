@@ -29,25 +29,18 @@ type slackIntegrations struct {
 }
 
 const (
-	RunApprovalRequiredEvent string = "run_approval_required"
-	RunSuccessEvent          string = "run_success"
-	RunErroredEvent          string = "run_errored"
-)
-
-type SlackStatus string
-
-const (
-	IntegrationActive   SlackStatus = "active"
-	IntegrationDisabled SlackStatus = "disabled"
+	SlackIntegrationEventRunApprovalRequired string = "run_approval_required"
+	SlackIntegrationEventRunSuccess          string = "run_success"
+	SlackIntegrationEventRunErrored          string = "run_errored"
 )
 
 // SlackIntegration represents a Scalr IACP slack integration.
 type SlackIntegration struct {
-	ID        string      `jsonapi:"primary,slack-integrations"`
-	Name      string      `jsonapi:"attr,name"`
-	Status    SlackStatus `jsonapi:"attr,status"`
-	ChannelId string      `jsonapi:"attr,channel-id"`
-	Events    []string    `jsonapi:"attr,events"`
+	ID        string            `jsonapi:"primary,slack-integrations"`
+	Name      string            `jsonapi:"attr,name"`
+	Status    IntegrationStatus `jsonapi:"attr,status"`
+	ChannelId string            `jsonapi:"attr,channel-id"`
+	Events    []string          `jsonapi:"attr,events"`
 
 	// Relations
 	Account      *Account       `jsonapi:"relation,account"`
@@ -63,7 +56,12 @@ type SlackIntegrationList struct {
 type SlackIntegrationListOptions struct {
 	ListOptions
 
-	Account *string `url:"filter[account]"`
+	Filter *SlackIntegrationFilter `url:"filter,omitempty"`
+}
+
+// SlackIntegrationFilter represents the options for filtering Slack integrations.
+type SlackIntegrationFilter struct {
+	Account *string `url:"account,omitempty"`
 }
 
 type SlackIntegrationCreateOptions struct {
@@ -79,14 +77,14 @@ type SlackIntegrationCreateOptions struct {
 }
 
 type SlackIntegrationUpdateOptions struct {
-	ID        string      `jsonapi:"primary,slack-integrations"`
-	Name      *string     `jsonapi:"attr,name,omitempty"`
-	ChannelId *string     `jsonapi:"attr,channel-id,omitempty"`
-	Status    SlackStatus `jsonapi:"attr,status,omitempty"`
-	Events    []string    `jsonapi:"attr,events,omitempty"`
+	ID        string             `jsonapi:"primary,slack-integrations"`
+	Name      *string            `jsonapi:"attr,name,omitempty"`
+	ChannelId *string            `jsonapi:"attr,channel-id,omitempty"`
+	Status    *IntegrationStatus `jsonapi:"attr,status,omitempty"`
+	Events    []string           `jsonapi:"attr,events,omitempty"`
 
 	Environments []*Environment `jsonapi:"relation,environments,omitempty"`
-	Workspaces   []*Workspace   `jsonapi:"relation,workspaces,omitempty"`
+	Workspaces   []*Workspace   `jsonapi:"relation,workspaces"`
 }
 
 type SlackConnection struct {
