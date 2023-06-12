@@ -14,7 +14,9 @@ func TestSlackIntegrationsCreate(t *testing.T) {
 	defer deleteEnv1()
 
 	slackConnection, err := client.SlackIntegrations.GetConnection(ctx, defaultAccountID)
-	if err != nil || slackConnection.ID == "" {
+	require.NoError(t, err)
+
+	if slackConnection.ID == "" {
 		t.Skip("Scalr instance doesn't have working slack connection.")
 	}
 
@@ -64,7 +66,9 @@ func TestSlackIntegrationsUpdate(t *testing.T) {
 	defer deleteEnv2()
 
 	slackConnection, err := client.SlackIntegrations.GetConnection(ctx, defaultAccountID)
-	if err != nil || slackConnection.ID == "" {
+	require.NoError(t, err)
+
+	if slackConnection.ID == "" {
 		t.Skip("Scalr instance doesn't have working slack connection.")
 	}
 
@@ -105,7 +109,9 @@ func TestSlackIntegrationsList(t *testing.T) {
 	defer deleteEnv2()
 
 	slackConnection, err := client.SlackIntegrations.GetConnection(ctx, defaultAccountID)
-	if err != nil || slackConnection.ID == "" {
+	require.NoError(t, err)
+
+	if slackConnection.ID == "" {
 		t.Skip("Scalr instance doesn't have working slack connection.")
 	}
 

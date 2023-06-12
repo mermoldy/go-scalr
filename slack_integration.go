@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"strings"
 )
 
 // Compile-time proof of interface implementation.
@@ -205,6 +206,10 @@ func (s *slackIntegrations) GetConnection(ctx context.Context, accID string) (*S
 	c := &SlackConnection{}
 	err = s.client.do(ctx, req, c)
 	if err != nil {
+		if strings.Contains(err.Error(), "data is not a jsonapi representation") {
+			// workaround for jsonapi serializer that can't handle nil 'data' structure we use for missing connection
+			return c, nil
+		}
 		return nil, err
 	}
 
