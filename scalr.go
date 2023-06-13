@@ -139,6 +139,7 @@ type Client struct {
 	Runs                            Runs
 	ServiceAccountTokens            ServiceAccountTokens
 	ServiceAccounts                 ServiceAccounts
+	SlackIntegrations               SlackIntegrations
 	Tags                            Tags
 	Teams                           Teams
 	Users                           Users
@@ -237,6 +238,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.Runs = &runs{client: client}
 	client.ServiceAccountTokens = &serviceAccountTokens{client: client}
 	client.ServiceAccounts = &serviceAccounts{client: client}
+	client.SlackIntegrations = &slackIntegrations{client: client}
 	client.Tags = &tags{client: client}
 	client.Teams = &teams{client: client}
 	client.Users = &users{client: client}
