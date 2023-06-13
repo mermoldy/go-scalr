@@ -100,3 +100,7 @@ You can run the acceptance tests like this:
 ```
 make test
 ```
+To run specific test:
+```
+TESTARGS="-run TestAccessPoliciesList/without_list_options" make test
+```
