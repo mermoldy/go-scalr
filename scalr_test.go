@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"testing"
 )
@@ -190,26 +191,38 @@ func TestClient_retryHTTPCheck(t *testing.T) {
 		checkErr          error
 	}{
 		"429-no-server-errors": {
-			resp:     &http.Response{StatusCode: 429},
+			resp: &http.Response{
+				StatusCode: 429,
+				Request:    &http.Request{URL: &url.URL{Host: "scalr.test", Path: "/test/thing"}},
+			},
 			err:      nil,
 			checkOK:  true,
 			checkErr: nil,
 		},
 		"429-with-server-errors": {
-			resp:              &http.Response{StatusCode: 429},
+			resp: &http.Response{
+				StatusCode: 429,
+				Request:    &http.Request{URL: &url.URL{Host: "scalr.test", Path: "/test/thing"}},
+			},
 			err:               nil,
 			retryServerErrors: true,
 			checkOK:           true,
 			checkErr:          nil,
 		},
 		"500-no-server-errors": {
-			resp:     &http.Response{StatusCode: 500},
+			resp: &http.Response{
+				StatusCode: 500,
+				Request:    &http.Request{URL: &url.URL{Host: "scalr.test", Path: "/test/thing"}},
+			},
 			err:      nil,
 			checkOK:  false,
 			checkErr: nil,
 		},
 		"500-with-server-errors": {
-			resp:              &http.Response{StatusCode: 500},
+			resp: &http.Response{
+				StatusCode: 500,
+				Request:    &http.Request{URL: &url.URL{Host: "scalr.test", Path: "/test/thing"}},
+			},
 			err:               nil,
 			retryServerErrors: true,
 			checkOK:           true,
