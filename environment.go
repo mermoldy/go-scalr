@@ -18,6 +18,7 @@ type Environments interface {
 	Read(ctx context.Context, environmentID string) (*Environment, error)
 	Create(ctx context.Context, options EnvironmentCreateOptions) (*Environment, error)
 	Update(ctx context.Context, environmentID string, options EnvironmentUpdateOptions) (*Environment, error)
+	UpdateDefaultProviderConfigurationOnly(ctx context.Context, environmentID string, options EnvironmentUpdateOptionsDefaultProviderConfigurationOnly) (*Environment, error)
 	Delete(ctx context.Context, environmentID string) error
 }
 
@@ -35,11 +36,6 @@ const (
 	EnvironmentStatusInactive EnvironmentStatus = "Inactive"
 )
 
-// CloudCredential relationship
-type CloudCredential struct {
-	ID string `jsonapi:"primary,cloud-credentials"`
-}
-
 // EnvironmentList represents a list of environments.
 type EnvironmentList struct {
 	*Pagination
@@ -56,7 +52,6 @@ type Environment struct {
 
 	// Relations
 	Account                       *Account                 `jsonapi:"relation,account"`
-	CloudCredentials              []*CloudCredential       `jsonapi:"relation,cloud-credentials"`
 	PolicyGroups                  []*PolicyGroup           `jsonapi:"relation,policy-groups"`
 	DefaultProviderConfigurations []*ProviderConfiguration `jsonapi:"relation,default-provider-configurations"`
 	ProviderConfigurations        []*ProviderConfiguration `jsonapi:"relation,provider-configurations"`
@@ -85,7 +80,6 @@ type EnvironmentCreateOptions struct {
 
 	// Relations
 	Account                       *Account                 `jsonapi:"relation,account"`
-	CloudCredentials              []*CloudCredential       `jsonapi:"relation,cloud-credentials,omitempty"`
 	PolicyGroups                  []*PolicyGroup           `jsonapi:"relation,policy-groups,omitempty"`
 	DefaultProviderConfigurations []*ProviderConfiguration `jsonapi:"relation,default-provider-configurations,omitempty"`
 
@@ -192,14 +186,37 @@ type EnvironmentUpdateOptions struct {
 	CostEstimationEnabled *bool   `jsonapi:"attr,cost-estimation-enabled,omitempty"`
 
 	// Relations
-	CloudCredentials              []*CloudCredential       `jsonapi:"relation,cloud-credentials"`
 	PolicyGroups                  []*PolicyGroup           `jsonapi:"relation,policy-groups"`
+	DefaultProviderConfigurations []*ProviderConfiguration `jsonapi:"relation,default-provider-configurations"`
+}
+
+type EnvironmentUpdateOptionsDefaultProviderConfigurationOnly struct {
+	ID string `jsonapi:"primary,environments"`
+	// Relations
 	DefaultProviderConfigurations []*ProviderConfiguration `jsonapi:"relation,default-provider-configurations"`
 }
 
 // Update settings of an existing environment.
 func (s *environments) Update(ctx context.Context, environmentID string, options EnvironmentUpdateOptions) (*Environment, error) {
 	// Make sure we don't send a user provided ID.
+	options.ID = ""
+
+	u := fmt.Sprintf("environments/%s", url.QueryEscape(environmentID))
+	req, err := s.client.newRequest("PATCH", u, &options)
+	if err != nil {
+		return nil, err
+	}
+
+	env := &Environment{}
+	err = s.client.do(ctx, req, env)
+	if err != nil {
+		return nil, err
+	}
+
+	return env, nil
+}
+
+func (s *environments) UpdateDefaultProviderConfigurationOnly(ctx context.Context, environmentID string, options EnvironmentUpdateOptionsDefaultProviderConfigurationOnly) (*Environment, error) {
 	options.ID = ""
 
 	u := fmt.Sprintf("environments/%s", url.QueryEscape(environmentID))
