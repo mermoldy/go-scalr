@@ -146,7 +146,7 @@ func TestVcsProvidersCreate(t *testing.T) {
 			t,
 			ResourceNotFoundError{
 				Message: fmt.Sprintf(
-					"Relationship 'environments' with ID '%s' not found or user unauthorized",
+					"Invalid Relationship\n\nRelationship 'environments' with ID '%s' not found or user unauthorized",
 					badIdentifier,
 				),
 			}.Error(),

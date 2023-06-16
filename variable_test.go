@@ -151,7 +151,7 @@ func TestVariablesRead(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	vTest, vTestCleanup := createVariable(t, client, nil, nil, nil)
+	vTest, vTestCleanup := createVariable(t, client, nil, nil, &Account{ID: defaultAccountID})
 	defer vTestCleanup()
 
 	t.Run("when the variable exists", func(t *testing.T) {
@@ -190,7 +190,7 @@ func TestVariablesUpdate(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	vTest, vTestCleanup := createVariable(t, client, nil, nil, nil)
+	vTest, vTestCleanup := createVariable(t, client, nil, nil, &Account{ID: defaultAccountID})
 	defer vTestCleanup()
 
 	t.Run("with valid options", func(t *testing.T) {
@@ -236,7 +236,7 @@ func TestVariablesUpdate(t *testing.T) {
 	})
 
 	t.Run("without any changes", func(t *testing.T) {
-		created, vTestCleanup := createVariable(t, client, vTest.Workspace, nil, nil)
+		created, vTestCleanup := createVariable(t, client, nil, nil, vTest.Account)
 		defer vTestCleanup()
 
 		updated, err := client.Variables.Update(ctx, created.ID, VariableUpdateOptions{})
@@ -300,9 +300,6 @@ func TestVariablesList(t *testing.T) {
 			}
 		}
 
-		globalVariable, deleteGlobalVariable := createVariable(t, client, nil, nil, nil)
-		defer deleteGlobalVariable()
-
 		accountVariable, deleteAccountVariable := createVariable(t, client, nil, nil, &Account{ID: defaultAccountID})
 		defer deleteAccountVariable()
 
@@ -338,7 +335,7 @@ func TestVariablesList(t *testing.T) {
 			}})
 		require.NoError(t, err)
 
-		expectedIds := []string{globalVariable.ID, accountVariable.ID, environmentVariable.ID, workspaceVariable.ID}
+		expectedIds := []string{accountVariable.ID, environmentVariable.ID, workspaceVariable.ID}
 		responseIds := make([]string, 0)
 		for _, variable := range responseVariables.Items {
 			responseIds = append(responseIds, variable.ID)
@@ -397,10 +394,10 @@ func TestVariablesList(t *testing.T) {
 	})
 
 	t.Run("by id", func(t *testing.T) {
-		fooVariable, deleteFooVariable := createVariable(t, client, nil, nil, nil)
+		fooVariable, deleteFooVariable := createVariable(t, client, nil, nil, &Account{ID: defaultAccountID})
 		defer deleteFooVariable()
 
-		_, deleteBarVariable := createVariable(t, client, nil, nil, nil)
+		_, deleteBarVariable := createVariable(t, client, nil, nil, &Account{ID: defaultAccountID})
 		defer deleteBarVariable()
 
 		responseVariables, err := client.Variables.List(

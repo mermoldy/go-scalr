@@ -128,10 +128,15 @@ jobs:
           --cpu=1 \
           --ram=2G \
           ${{ env.RUN_TAG }}
+      - name: Get Scalr hostname
+        shell: bash
+        run: |
+          SCALR_HOST=${{ steps.create.outputs.host }}
+          echo "SCALR_ADDRESS=https://mainiacp.${SCALR_HOST/https:\/\//}" >> $GITHUB_ENV
       - name: Run tests
         id: run-tests
         env:
-          SCALR_ADDRESS: ${{ steps.create.outputs.host }}
+          SCALR_ADDRESS: ${{ env.SCALR_ADDRESS }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TEST_AWS_ACCESS_KEY: ${{ secrets.TEST_AWS_ACCESS_KEY }}
           TEST_AWS_SECRET_KEY: ${{ secrets.TEST_AWS_SECRET_KEY }}

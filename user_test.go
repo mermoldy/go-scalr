@@ -10,10 +10,8 @@ import (
 
 const (
 	defaultUserID                  = "user-suh84u6vuvidtbg"
-	defaultUserLdapID              = "user-suh84u72qsmbuvg"
-	defaultUserLdapEmail           = "produser1@scalr.local"
+	defaultUserEmail               = "test@scalr.com"
 	defaultIdentityProviderScalrID = "idp-sohkb0o1phrdmr8"
-	defaultIdentityProviderLdapID  = "idp-sojhv9e8mc2k808"
 )
 
 func TestUsersList(t *testing.T) {
@@ -55,37 +53,12 @@ func TestUsersList(t *testing.T) {
 
 	t.Run("with email filter", func(t *testing.T) {
 		ul, err := client.Users.List(ctx, UserListOptions{
-			Email: String(defaultUserLdapEmail),
+			Email: String(defaultUserEmail),
 		})
 		require.NoError(t, err)
 		assert.Equal(t, 1, ul.CurrentPage)
 		assert.Equal(t, 1, ul.TotalCount)
-		assert.Equal(t, defaultUserLdapID, ul.Items[0].ID)
-	})
-
-	t.Run("with identity provider filter", func(t *testing.T) {
-		ul, err := client.Users.List(ctx, UserListOptions{
-			IdentityProvider: String(defaultIdentityProviderLdapID),
-		})
-		require.NoError(t, err)
-
-		var uIDs []string
-		// Set of IDP IDs
-		idpIDs := make(map[string]bool)
-		for _, u := range ul.Items {
-			uIDs = append(uIDs, u.ID)
-			for _, idp := range u.IdentityProviders {
-				if !idpIDs[idp.ID] {
-					idpIDs[idp.ID] = true
-				}
-			}
-		}
-
-		assert.Equal(t, 1, ul.CurrentPage)
-		assert.True(t, ul.TotalCount >= 1)
-		assert.Contains(t, uIDs, defaultUserLdapID)
-		assert.Equal(t, 1, len(idpIDs))
-		assert.Contains(t, idpIDs, defaultIdentityProviderLdapID)
+		assert.Equal(t, defaultUserID, ul.Items[0].ID)
 	})
 
 	t.Run("without a valid user", func(t *testing.T) {
@@ -110,13 +83,12 @@ func TestUsersRead(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("when the user exists", func(t *testing.T) {
-		u, err := client.Users.Read(ctx, defaultUserLdapID)
+		u, err := client.Users.Read(ctx, defaultUserID)
 		require.NoError(t, err)
-		assert.Equal(t, defaultUserLdapID, u.ID)
+		assert.Equal(t, defaultUserID, u.ID)
 
 		t.Run("relationships are properly decoded", func(t *testing.T) {
-			assert.Equal(t, u.Teams[0].ID, defaultTeamLdapID)
-			assert.Equal(t, u.IdentityProviders[0].ID, defaultIdentityProviderLdapID)
+			assert.Equal(t, u.Teams[0].ID, defaultTeamID)
 		})
 	})
 
