@@ -513,3 +513,33 @@ func createWebhookIntegration(
 		}
 	}
 }
+
+func createSlackIntegration(
+	t *testing.T, client *Client, slackConnection *SlackConnection, environment *Environment,
+) (*SlackIntegration, func()) {
+	ctx := context.Background()
+	options := SlackIntegrationCreateOptions{
+		Name: String("test-" + randomString(t)),
+		Events: []string{
+			SlackIntegrationEventRunApprovalRequired,
+			SlackIntegrationEventRunSuccess,
+			SlackIntegrationEventRunErrored,
+		},
+		ChannelId:    String("C123"),
+		Account:      &Account{ID: defaultAccountID},
+		Connection:   slackConnection,
+		Environments: []*Environment{environment},
+	}
+	si, err := client.SlackIntegrations.Create(ctx, options)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return si, func() {
+		if err := client.SlackIntegrations.Delete(ctx, si.ID); err != nil {
+			t.Errorf("Error deleting slack integration! WARNING: Dangling resources\n"+
+				"may exist! The full error is shown below.\n\n"+
+				"Webhook: %s\nError: %s", si.ID, err)
+		}
+	}
+}

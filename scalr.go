@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -138,6 +139,7 @@ type Client struct {
 	Runs                            Runs
 	ServiceAccountTokens            ServiceAccountTokens
 	ServiceAccounts                 ServiceAccounts
+	SlackIntegrations               SlackIntegrations
 	Tags                            Tags
 	Teams                           Teams
 	Users                           Users
@@ -236,6 +238,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.Runs = &runs{client: client}
 	client.ServiceAccountTokens = &serviceAccountTokens{client: client}
 	client.ServiceAccounts = &serviceAccounts{client: client}
+	client.SlackIntegrations = &slackIntegrations{client: client}
 	client.Tags = &tags{client: client}
 	client.Teams = &teams{client: client}
 	client.Users = &users{client: client}
@@ -265,6 +268,12 @@ func (c *Client) retryHTTPCheck(ctx context.Context, resp *http.Response, err er
 		return c.retryServerErrors, err
 	}
 	if resp.StatusCode == 429 || (c.retryServerErrors && resp.StatusCode >= 500) {
+		if resp.StatusCode == 429 {
+			log.Printf(
+				"[DEBUG] API rate limit reached for %s%s, retrying...",
+				resp.Request.URL.Host, resp.Request.URL.Path,
+			)
+		}
 		return true, nil
 	}
 	return false, nil
