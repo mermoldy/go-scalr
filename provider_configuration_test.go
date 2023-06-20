@@ -235,6 +235,7 @@ func TestProviderConfigurationCreateGoogle(t *testing.T) {
 			Name:                 String("google_dev_project"),
 			ProviderName:         String("google"),
 			ExportShellVariables: Bool(false),
+			IsCustom:             Bool(false),
 			GoogleProject:        String(project),
 			GoogleCredentials:    String(credentials),
 		}

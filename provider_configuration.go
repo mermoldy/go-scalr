@@ -37,6 +37,7 @@ type ProviderConfiguration struct {
 	ProviderName          string `jsonapi:"attr,provider-name"`
 	ExportShellVariables  bool   `jsonapi:"attr,export-shell-variables"`
 	IsShared              bool   `jsonapi:"attr,is-shared"`
+	IsCustom              bool   `jsonapi:"attr,is-custom"`
 	AwsAccessKey          string `jsonapi:"attr,aws-access-key"`
 	AwsSecretKey          string `jsonapi:"attr,aws-secret-key"`
 	AwsAccountType        string `jsonapi:"attr,aws-account-type"`
@@ -98,6 +99,7 @@ type ProviderConfigurationCreateOptions struct {
 	ProviderName          *string `jsonapi:"attr,provider-name"`
 	ExportShellVariables  *bool   `jsonapi:"attr,export-shell-variables,omitempty"`
 	IsShared              *bool   `jsonapi:"attr,is-shared,omitempty"`
+	IsCustom              *bool   `jsonapi:"attr,is-custom,omitempty"`
 	AwsAccessKey          *string `jsonapi:"attr,aws-access-key,omitempty"`
 	AwsSecretKey          *string `jsonapi:"attr,aws-secret-key,omitempty"`
 	AwsAccountType        *string `jsonapi:"attr,aws-account-type"`
