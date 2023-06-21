@@ -59,6 +59,7 @@ jobs:
         with:
           repository: Scalr/fatmouse
           path: fatmouse
+          ref: ${{ inputs.pr_branch }}
           token: ${{ secrets.GH_PAT }}
       - name: Set DB_BRANCH
         if: ${{ contains(github.event.head_commit.message, '[DB_BRANCH]') }}
@@ -98,22 +99,6 @@ jobs:
         id: create
         shell: bash
         run: |
-          FATMOUSE_BRANCH="--fatmouse-branch ${{ inputs.pr_branch }}"
-          SCALR_BRANCH="--scalr-branch ${{ inputs.pr_branch }}"
-
-          TEV2_BRANCH=${{ inputs.pr_branch }}
-          NORMALIZED_BRANCH=$(echo $TEV2_BRANCH | tr / - | tr '[:upper:]' '[:lower:]')
-          if docker manifest inspect eu.gcr.io/development-156220/fatmouse/scalr-server-te:${NORMALIZED_BRANCH} ; then
-              IMAGE="--scalr-server-image-tag ${NORMALIZED_BRANCH}"
-          else
-              if [[ "${{ inputs.base_branch }}" == release/* ]]; then
-                  NORMALIZED_IMAGE=$(echo "${{ inputs.base_branch }}" | tr / - | tr '[:upper:]' '[:lower:]')
-                  IMAGE="--scalr-server-image-tag ${NORMALIZED_IMAGE}"
-              else
-                  IMAGE=""
-              fi
-          fi
-
           docker run --rm \
           -e GITHUB_WORKSPACE=true \
           -e GITHUB_OUTPUT=/fatmouse/output \
@@ -122,7 +107,7 @@ jobs:
           -v $GITHUB_OUTPUT:/fatmouse/output \
           -v ~/.scalr-labs:/etc/scalr-labs \
           fatmouse/python-builder:master python -u clickfile.py te up \
-          ${FATMOUSE_BRANCH} ${SCALR_BRANCH} ${IMAGE} \
+          --branch ${{ inputs.pr_branch }} \
           --run-url ${{ steps.get-job-id.outputs.html_url }} \
           --skip-ui-build \
           --cpu=1 \
