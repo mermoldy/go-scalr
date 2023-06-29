@@ -126,7 +126,6 @@ jobs:
           --run-url ${{ steps.get-job-id.outputs.html_url }} \
           --skip-ui-build \
           ${{ env.RUN_TAG }}
-
       - name: Get Scalr hostname
         shell: bash
         run: |
