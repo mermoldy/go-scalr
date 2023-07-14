@@ -254,6 +254,7 @@ func TestProviderConfigurationCreateGoogle(t *testing.T) {
 		assert.Equal(t, *options.ExportShellVariables, pcfg.ExportShellVariables)
 		assert.Equal(t, *options.GoogleProject, pcfg.GoogleProject)
 		assert.Equal(t, "", pcfg.GoogleCredentials)
+		assert.Equal(t, "service-account-key", pcfg.GoogleAuthType)
 	})
 }
 
