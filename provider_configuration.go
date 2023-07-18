@@ -45,6 +45,7 @@ type ProviderConfiguration struct {
 	AwsTrustedEntityType       string `jsonapi:"attr,aws-trusted-entity-type"`
 	AwsRoleArn                 string `jsonapi:"attr,aws-role-arn"`
 	AwsExternalId              string `jsonapi:"attr,aws-external-id"`
+	AwsAudience                string `jsonapi:"attr,aws-audience"`
 	AzurermClientId            string `jsonapi:"attr,azurerm-client-id"`
 	AzurermClientSecret        string `jsonapi:"attr,azurerm-client-secret"`
 	AzurermSubscriptionId      string `jsonapi:"attr,azurerm-subscription-id"`
@@ -108,6 +109,7 @@ type ProviderConfigurationCreateOptions struct {
 	AwsAccountType             *string `jsonapi:"attr,aws-account-type"`
 	AwsCredentialsType         *string `jsonapi:"attr,aws-credentials-type"`
 	AwsTrustedEntityType       *string `jsonapi:"attr,aws-trusted-entity-type"`
+	AwsAudience                *string `jsonapi:"attr,aws-audience"`
 	AwsRoleArn                 *string `jsonapi:"attr,aws-role-arn"`
 	AwsExternalId              *string `jsonapi:"attr,aws-external-id"`
 	AzurermClientId            *string `jsonapi:"attr,azurerm-client-id,omitempty"`
@@ -184,6 +186,7 @@ type ProviderConfigurationUpdateOptions struct {
 	AwsTrustedEntityType       *string        `jsonapi:"attr,aws-trusted-entity-type"`
 	AwsRoleArn                 *string        `jsonapi:"attr,aws-role-arn"`
 	AwsExternalId              *string        `jsonapi:"attr,aws-external-id"`
+	AwsAudience                *string        `jsonapi:"attr,aws-audience"`
 	AzurermClientId            *string        `jsonapi:"attr,azurerm-client-id"`
 	AzurermClientSecret        *string        `jsonapi:"attr,azurerm-client-secret"`
 	AzurermSubscriptionId      *string        `jsonapi:"attr,azurerm-subscription-id"`
