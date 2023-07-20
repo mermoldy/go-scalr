@@ -27,6 +27,13 @@ jobs:
       SCALR_TOKEN: ${{ secrets.SCALR_TOKEN }}
       UPSTREAM_ID: ${{ github.run_number }}
     steps:
+      - name: Sudo GitHub Token
+        id: generate_token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{vars.SUDO_GHA_APP_ID}}
+          installation_id: ${{vars.SUDO_GHA_APP_INSTALLATION_ID}}
+          private_key: ${{secrets.SUDO_GHA_APP_PRIVATE_KEY}}
       - uses: actions/checkout@v3
       - name: Log pr link
         run: |
@@ -40,7 +47,7 @@ jobs:
       - name: Set pending status
         uses: actions/github-script@v3
         with:
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{steps.generate_token.outputs.token}}
           script: |
             github.repos.createCommitStatus({
               owner: 'Scalr',
@@ -60,7 +67,7 @@ jobs:
           repository: Scalr/fatmouse
           path: fatmouse
           ref: ${{ inputs.pr_branch }}
-          token: ${{ secrets.GH_PAT }}
+          token: ${{steps.generate_token.outputs.token}}
       - name: Set DB_BRANCH
         if: ${{ contains(github.event.head_commit.message, '[DB_BRANCH]') }}
         run: echo "DB_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
@@ -134,7 +141,7 @@ jobs:
         if: ${{ always() && (steps.run-tests.outcome == 'failure' ||  steps.run-tests.outcome == 'success') }}
         uses: actions/github-script@v3
         with:
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{steps.generate_token.outputs.token}}
           script: |
             github.repos.createCommitStatus({
               owner: 'Scalr',
@@ -149,7 +156,7 @@ jobs:
         if: ${{ always() && steps.run-tests.outcome != 'failure' &&  steps.run-tests.outcome != 'success' }}
         uses: actions/github-script@v3
         with:
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{steps.generate_token.outputs.token}}
           script: |
             github.repos.createCommitStatus({
               owner: 'Scalr',
@@ -170,7 +177,7 @@ jobs:
             const repo = '${{ inputs.repo }}';
             const message = '**go-scalr tests failed**\nJob url ${{ steps.get-job-id.outputs.html_url }}';
             await github.rest.issues.createComment({owner, repo, issue_number, body: message});
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{steps.generate_token.outputs.token}}
       - name: Delete container
         id: delete
         if: ${{ always() }}
