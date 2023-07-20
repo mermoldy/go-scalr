@@ -50,6 +50,8 @@ type ProviderConfiguration struct {
 	AzurermClientSecret        string `jsonapi:"attr,azurerm-client-secret"`
 	AzurermSubscriptionId      string `jsonapi:"attr,azurerm-subscription-id"`
 	AzurermTenantId            string `jsonapi:"attr,azurerm-tenant-id"`
+	AzurermAuthType            string `jsonapi:"attr,azurerm-auth-type"`
+	AzurermAudience            string `jsonapi:"attr,azurerm-audience"`
 	GoogleAuthType             string `jsonapi:"attr,google-auth-type"`
 	GoogleServiceAccountEmail  string `jsonapi:"attr,google-service-account-email"`
 	GoogleWorkloadProviderName string `jsonapi:"attr,google-workload-provider-name"`
@@ -116,6 +118,8 @@ type ProviderConfigurationCreateOptions struct {
 	AzurermClientSecret        *string `jsonapi:"attr,azurerm-client-secret,omitempty"`
 	AzurermSubscriptionId      *string `jsonapi:"attr,azurerm-subscription-id,omitempty"`
 	AzurermTenantId            *string `jsonapi:"attr,azurerm-tenant-id,omitempty"`
+	AzurermAuthType            *string `jsonapi:"attr,azurerm-auth-type,omitempty"`
+	AzurermAudience            *string `jsonapi:"attr,azurerm-audience,omitempty"`
 	GoogleAuthType             *string `jsonapi:"attr,google-auth-type,omitempty"`
 	GoogleServiceAccountEmail  *string `jsonapi:"attr,google-service-account-email,omitempty"`
 	GoogleWorkloadProviderName *string `jsonapi:"attr,google-workload-provider-name,omitempty"`
@@ -187,6 +191,8 @@ type ProviderConfigurationUpdateOptions struct {
 	AwsRoleArn                 *string        `jsonapi:"attr,aws-role-arn"`
 	AwsExternalId              *string        `jsonapi:"attr,aws-external-id"`
 	AwsAudience                *string        `jsonapi:"attr,aws-audience"`
+	AzurermAuthType            *string        `jsonapi:"attr,azurerm-auth-type"`
+	AzurermAudience            *string        `jsonapi:"attr,azurerm-audience"`
 	AzurermClientId            *string        `jsonapi:"attr,azurerm-client-id"`
 	AzurermClientSecret        *string        `jsonapi:"attr,azurerm-client-secret"`
 	AzurermSubscriptionId      *string        `jsonapi:"attr,azurerm-subscription-id"`
