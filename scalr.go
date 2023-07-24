@@ -555,5 +555,15 @@ func checkResponseCode(r *http.Response) error {
 		}
 	}
 
+	if r.StatusCode == 403 {
+		return fmt.Errorf(
+			"The Scalr Terraform provider has been configured with an access token that lacks sufficient permissions." +
+				" If you are running remotely, follow the documentation (https://docs.scalr.io/docs/scalr) on how to " +
+				"enable the Scalr provider configuration in the remote workspace. " +
+				"If running locally, ensure you have enough permissions to perform actions." +
+				"\n Errors: " + strings.Join(errs, "\n"),
+		)
+	}
+
 	return fmt.Errorf(strings.Join(errs, "\n"))
 }
